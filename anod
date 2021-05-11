@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+
+"""Simple front-end to the task-specific anod scripts contained in lib."""
+
+### Hack to get the platform DB in e3.platform plug-ing ###
+import importlib
+from stevedore import ExtensionManager
+dummy_ep = importlib.metadata.EntryPoint('my_db', 'lib.platform_db:PlatDB', 'e3.platform_db')
+ExtensionManager.ENTRY_POINT_CACHE = {'e3.platform_db': [dummy_ep]}
+### END OF HACK ###
+
+from e3.main import Main
+
+from argparse import SUPPRESS, ArgumentParser, _HelpAction
+
+
+class CustomHelpAction(_HelpAction):
+    """
+    Custom help action for ArgumentParser.
+
+    This action will defer printing help if it sees that the command positional
+    argument has already been given and it is on the first pass. This allows
+    more specific help to be retrieved by placing the the help option after the
+    command argument.
+
+    Once the first round of argument parsing is completely, call increment_pass
+    """
+
+    def __init__(self, option_strings, dest=SUPPRESS, default=SUPPRESS, help=None):
+        super(CustomHelpAction, self).__init__(
+            option_strings=option_strings, dest=dest, default=default, help=help,
+        )
+        self.current_pass = 1
+
+    def __call__(
+        self, parser, namespace, values, option_string=None,
+    ):
+        if self.current_pass > 1 or getattr(namespace, "command", None) is None:
+            parser.print_help()
+            parser.exit()
+
+    def increment_pass(self) -> None:
+        """Increment the current pass number."""
+        self.current_pass += 1
+
+
+if __name__ == "__main__":
+
+    m = Main(argument_parser=ArgumentParser(add_help=False))
+
+    command_arg = m.argument_parser.add_argument(
+        "command",
+        choices=["build", "install", "printenv"],
+        help="the subcommand to be run.",
+    )
+
+    help_arg = m.argument_parser.add_argument(
+        "-h", "--help", action=CustomHelpAction, help="show this help message and exit",
+    )
+
+    m.parse_args(known_args_only=True)
+
+    # Now that we've parsed the command, we don't want it showing up in help
+    # for the subcommands
+    command_arg.help = SUPPRESS
+    help_arg.increment_pass()
+
+    if m.args.command == "build":
+        from lib.anod_build import do_build
+
+        exit(do_build(m))
+
+    if m.args.command == "install":
+        from lib.anod_build import do_install
+
+        exit(do_install(m))
+
+    elif m.args.command == "printenv":
+        from lib.anod_printenv import do_printenv
+
+        exit(do_printenv(m))
+
+    else:
+        # cannot happen
+        exit(4)

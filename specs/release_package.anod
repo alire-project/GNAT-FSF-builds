@@ -1,0 +1,85 @@
+from e3.os.fs import unixpath
+from e3.anod.helper import Configure, Make, log
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+from e3.archive import create_archive
+from e3.hash import sha256
+import os
+
+valid_packages = ["gprbuild", "gnat"]
+
+class ReleasePackage(spec('common')):
+
+    @property
+    def package(self):
+        if 'package' not in self.parsed_qualifier:
+            raise Exception("--qualifier=package=<%s> required" %
+                            ", ".join(valid_packages))
+
+        if self.parsed_qualifier['package'] not in valid_packages:
+            raise Exception("Invalid package: '%s' (expects: %s)" %
+                            (self.parsed_qualifier['package'],
+                             " or ".join(valid_packages)))
+
+        return self.parsed_qualifier['package']
+
+    @property
+    def version(self):
+        package = self.package
+
+        if package == 'gprbuild':
+            return self.deps['gprbuild'].version
+        elif package == 'gnat':
+            return self.deps['gcc'].version
+
+    @property
+    def build_space_name(self):
+        return "%s-%s-%s" % (self.name,
+                             self.package,
+                             self.env.platform)
+
+    @property
+    def build_deps(self):
+        pck = self.package
+        if pck == 'gprbuild':
+            return [Anod.Dependency('gprbuild', track=True)]
+
+        if pck == 'gnat':
+            # Note: the binutils are already merged in gcc installation
+
+            if self.env.target.triplet == "arm-eabi":
+                return [Anod.Dependency("gcc", track=True),
+                        Anod.Dependency("gdb", track=True),
+                        Anod.Dependency("newlib", track=True)]
+
+            elif self.env.target.triplet == "riscv64-elf":
+                return [Anod.Dependency("gcc", track=True),
+                        Anod.Dependency("gdb", track=True),
+                        Anod.Dependency("newlib", track=True)]
+
+            elif self.env.build.triplet == self.env.target.triplet:
+                # Native
+                return [Anod.Dependency("gcc", track=True),
+                        Anod.Dependency("gdb", track=True)]
+            else:
+                raise Exception('Unknown target for gcc package')
+
+    @Anod.primitive()
+    def build(self):
+        for dep in self.deps.keys():
+            self.deps[dep].merge(self["PKG_DIR"])
+
+        name = "%s-%s-%s" % (self.package,
+                             self.env.platform,
+                             self.version)
+        archive = '%s.tar.gz' % name
+
+        create_archive(filename=archive,
+                       from_dir=self["PKG_DIR"],
+                       dest=self["INSTALL_DIR"],
+                       from_dir_rename=name)
+
+        sha = sha256(os.path.join(self["INSTALL_DIR"], archive))
+        log.info("archive: %s sha256: %s" % (archive, sha))
+        with open(os.path.join(self["INSTALL_DIR"], archive + '.sha256'), "w") as f:
+            f.write(sha)

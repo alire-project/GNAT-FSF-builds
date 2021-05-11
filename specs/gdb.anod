@@ -1,0 +1,69 @@
+from e3.os.fs import unixpath
+from e3.fs import sync_tree
+from e3.anod.helper import Configure, Make, text_replace
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+import os
+from datetime import date
+
+
+class GDB(spec('common')):
+
+    @property
+    def version(self):
+        return "10.1"
+
+    @property
+    def tarball(self):
+        return 'gdb-%s.tar.gz' % self.version
+
+    @property
+    def source_pkg_build(self):
+        return [
+            self.HTTPSSourceBuilder(
+                name=self.tarball,
+                url='https://ftp.gnu.org/gnu/gdb/%s' % self.tarball)]
+
+    @property
+    def build_source_list(self):
+        return [Anod.Source(name=self.tarball,
+                            publish=True, dest='')]
+
+    @property
+    def build_deps(self):
+        # We always use the system's GCC to build GDB, that's why it is not
+        # specified as a dependency here.
+        return []
+
+    @Anod.primitive()
+    def build(self):
+        configure = Configure(self)
+        configure.add("--build=%s" % self.env.build.triplet)
+        configure.add("--host=%s" % self.env.host.triplet)
+        configure.add("--target=%s" % self.env.target.triplet)
+        configure.add('--prefix=%s' % unixpath(self['INSTALL_DIR']))
+        configure.add("--disable-nls", # Disable Native Language Support (NLS)
+                      "--disable-werror",
+                      "--disable-binutils",
+                      "--disable-gas",
+                      "--disable-ld",
+                      "--disable-gprof",
+                      "--with-zlib",
+                      "--without-libusb",
+                      "--without-bugurl",
+                      "--without-guile",
+                      "--disable-plugins",
+                      "--disable-gdbserver",
+                      "--with-static-standard-libraries",
+                      "--disable-source-highlight", # Incomaptible with static std libs
+                      "--with-curses",
+                      "--enable-tui",
+                      "--disable-sim")
+
+        configure()
+
+        make = Make(self)
+        make()
+        make('install')
+
+        self.clean()

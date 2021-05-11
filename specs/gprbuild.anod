@@ -1,0 +1,101 @@
+from e3.os.fs import unixpath
+from e3.fs import sync_tree
+from e3.anod.helper import Configure, Make, text_replace
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+import os
+from datetime import date
+
+
+class GPRbuild(spec('common')):
+
+    @property
+    def version(self):
+        return "21.0.0"
+
+    @property
+    def tarball(self):
+        return 'gprbuild-%s.tar.gz' % self.version
+
+    @property
+    def source_pkg_build(self):
+        return [
+            self.HTTPSSourceBuilder(
+                name=self.tarball,
+                url='https://github.com/AdaCore/gprbuild/archive/v%s/%s' % (self.version,
+                                                                            self.tarball))]
+
+    @property
+    def build_source_list(self):
+        return [Anod.Source(name=self.tarball,
+                            publish=True, dest='')]
+
+    @property
+    def bootstrap(self):
+        return 'bootstrap' in self.parsed_qualifier
+
+    @property
+    def build_space_name(self):
+        if self.bootstrap:
+            return "%s-bootstrap" % (self.name)
+        else:
+            return "%s" % (self.name)
+
+    @property
+    def build_deps(self):
+        # We always use the system's GCC/GNAT to build GPRbuild, that's why it
+        # is not specified as a dependency here.
+
+        return [Anod.Dependency("xmlada", track=True),
+                Anod.Dependency("gprconfig_kb", track=True)]
+
+    def update_version(self):
+        text_replace(
+            os.path.join(self['SRC_DIR'], "gpr", "src", "gpr-version.ads"),
+            [("Build_Type : constant Gnat_Build_Type := Gnatpro;",
+              "Build_Type : constant Gnat_Build_Type := FSF;")],
+        )
+        text_replace(
+            os.path.join(self['SRC_DIR'], "gpr", "src", "gpr-version.ads"),
+            [("Gpr_Version : constant String.*",
+              'Gpr_Version : constant String := "%s";' % self.version),
+             ("Date : constant String.*",
+              'Date : constant String := "%s";' % str(date.today())),
+             ("Current_Year : constant String.*",
+              'Current_Year : constant String := "%s";' % str(date.today().year))],
+        )
+
+
+    def do_bootstrap(self):
+        raise Exception("Bootstrap not supported yet...")
+
+        cmd = os.path.join(self['SRC_DIR'], "bootstrap.sh")
+        self.shell(cmd,
+                   '--prefix=%s' % unixpath(self['INSTALL_DIR']),
+                   '--with-xmlada=%s' % unixpath(self.deps["xmlada"]["SRC_DIR"]),
+                   '--with-kb=%s' % unixpath(self.deps["gprconfig_kb"]["SRC_DIR"]),
+                   )
+
+    @Anod.primitive()
+    def build(self):
+
+        self.update_version()
+
+        if self.bootstrap:
+            return self.do_bootstrap()
+
+        self.deps["xmlada"].setenv()
+
+        make = Make(self, makefile=os.path.join(self["SRC_DIR"], "Makefile"))
+
+        make.set_var("TARGET", self.env.target.triplet)
+        make.set_var("prefix", unixpath(self["INSTALL_DIR"]))
+
+        make("distall", jobs=1)
+
+        # Install the gprconfig knowledge-base
+        kb_src = os.path.join(self.deps["gprconfig_kb"]["SRC_DIR"], 'db')
+        kb_dst = os.path.join(self["INSTALL_DIR"], 'share', 'gprconfig')
+        sync_tree(kb_src, kb_dst)
+
+        self.clean()
