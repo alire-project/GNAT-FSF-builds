@@ -2,6 +2,7 @@ from e3.anod.package import UnmanagedSourceBuilder
 from e3.anod.spec import Anod
 import os
 from e3.fs import sync_tree, mkdir, rm
+from e3.env import Env
 from e3.os.fs import unixpath
 from e3.anod.helper import log
 
@@ -85,7 +86,6 @@ class Common(Anod):
         sync_tree(self["INSTALL_DIR"], prefix, delete=False)
 
     def clean(self):
-        None
-        # if not self.env.disable_build_cleanup:
-        #     rm(self['BUILD_DIR'], recursive = True)
-        #     rm(self['SRC_DIR'], recursive = True)
+        if not Env().main_options.disable_cleanup:
+            rm(self['BUILD_DIR'], recursive = True)
+            rm(self['SRC_DIR'], recursive = True)

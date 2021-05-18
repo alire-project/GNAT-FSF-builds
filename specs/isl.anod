@@ -44,3 +44,5 @@ class ISL(spec('common')):
         make = Make(self)
         make()
         make('install')
+
+        self.clean()

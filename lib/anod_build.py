@@ -9,7 +9,7 @@ from lib.anod.util import create_anod_context, create_anod_sandbox
 from lib.anod.paths import REPO_DIR, SPEC_DIR, SBX_DIR
 
 from e3.anod.status import ReturnValue
-from e3.env import BaseEnv
+from e3.env import BaseEnv, Env
 from e3.main import Main
 
 import os
@@ -83,8 +83,6 @@ def do_build(m: Main, set_prog: bool = True) -> int:
 
     env = BaseEnv.from_env()
     env.set_env(m.args.build, m.args.host, m.args.target)
-
-    env.disable_build_cleanup = m.args.disable_cleanup
 
     sbx.create_dirs()
 

@@ -40,3 +40,5 @@ class GMP(spec('common')):
         make = Make(self)
         make()
         make('install')
+
+        self.clean()

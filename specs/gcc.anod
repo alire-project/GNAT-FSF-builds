@@ -156,3 +156,4 @@ class GCC(spec('common')):
 
             make('install-strip')
 
+        self.clean()
