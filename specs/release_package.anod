@@ -2,6 +2,7 @@ from e3.os.fs import unixpath
 from e3.anod.helper import Configure, Make, log
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
+from e3.anod.error import ShellError
 from e3.archive import create_archive
 from e3.hash import sha256
 import os
@@ -31,6 +32,16 @@ class ReleasePackage(spec('common')):
             return self.deps['gprbuild'].version
         elif package == 'gnat':
             return self.deps['gcc'].version
+
+    @property
+    def release_name(self):
+        return "%s-%s-%s" % (self.package,
+                             self.env.platform,
+                             self.version)
+
+    @property
+    def archive_name(self):
+        return '%s.tar.gz' % self.release_name
 
     @property
     def build_space_name(self):
@@ -64,15 +75,33 @@ class ReleasePackage(spec('common')):
             else:
                 raise Exception('Unknown target for gcc package')
 
+    def check_github_release(self, release_name):
+        try:
+            # If the gh command does not fail, the release exists
+            self.shell('gh', 'release', 'view', release_name)
+            return True
+        except ShellError:
+            return False
+
+    def publish_on_github(self):
+        name = self.release_name
+        archive = os.path.join(self["INSTALL_DIR"], self.archive_name)
+        sha = archive + '.sha256'
+
+        if self.check_github_release(name):
+            log.info("There is already a GitHub release for %s. Skipping." % (name))
+            return
+
+        log.info("Publishing GitHub release for %s..." % (name))
+        self.shell('gh', 'release', 'create', name, archive, sha)
+
     @Anod.primitive()
     def build(self):
         for dep in self.deps.keys():
             self.deps[dep].merge(self["PKG_DIR"])
 
-        name = "%s-%s-%s" % (self.package,
-                             self.env.platform,
-                             self.version)
-        archive = '%s.tar.gz' % name
+        name = self.release_name
+        archive = self.archive_name
 
         create_archive(filename=archive,
                        from_dir=self["PKG_DIR"],
@@ -83,3 +112,6 @@ class ReleasePackage(spec('common')):
         log.info("archive: %s sha256: %s" % (archive, sha))
         with open(os.path.join(self["INSTALL_DIR"], archive + '.sha256'), "w") as f:
             f.write(sha)
+
+        if 'do_gh_release' in self.parsed_qualifier:
+            self.publish_on_github()

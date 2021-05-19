@@ -30,7 +30,9 @@ jobs:
       run: ./anod build gprbuild -v --loglevel DEBUG
 
     - name: Package gprbuild
-      run: ./anod build release_package --qualifier=package=gprbuild,name=gprbuild-linux64-21.0.0 -v --loglevel DEBUG
+      run: ./anod build release_package --qualifier=package=gprbuild,do_gh_release -v --loglevel DEBUG
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
     - uses: actions/upload-artifact@v2
       with:

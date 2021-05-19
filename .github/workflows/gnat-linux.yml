@@ -40,7 +40,9 @@ jobs:
       run: ./anod build gdb -v --loglevel DEBUG
 
     - name: Package GNAT
-      run: ./anod build release_package --qualifier=package=gnat,name=gnat-linux64-10.2.0 -v --loglevel DEBUG
+      run: ./anod build release_package --qualifier=package=gnat,do_gh_release -v --loglevel DEBUG
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
     - name: Build GNAT arm-elf
       run: ./anod build gcc -v --loglevel DEBUG --target=arm-elf
@@ -49,7 +51,9 @@ jobs:
       run: ./anod build gdb -v --loglevel DEBUG --target=arm-elf
 
     - name: Package GNAT arm-elf
-      run: ./anod build release_package --qualifier=package=gnat,name=gnat-arm-elf-linux64-10.2.0 -v --loglevel DEBUG --target=arm-elf
+      run: ./anod build release_package --qualifier=package=gnat,do_gh_release --target=arm-elf -v --loglevel DEBUG
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
     - name: Build GNAT riscv64-elf
       run: ./anod build gcc -v --loglevel DEBUG --target=riscv64-elf
@@ -58,7 +62,9 @@ jobs:
       run: ./anod build gdb -v --loglevel DEBUG --target=riscv64-elf
 
     - name: Package GNAT riscv64-elf
-      run: ./anod build release_package --qualifier=package=gnat,name=gnat-riscv64-elf-linux64-10.2.0 -v --loglevel DEBUG --target=riscv64-elf
+      run: ./anod build release_package --qualifier=package=gnat,do_gh_release --target=riscv64-elf -v --loglevel DEBUG
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
       
     - uses: actions/upload-artifact@v2
       with:
