@@ -38,7 +38,7 @@ class XMLAda(spec('common')):
     @Anod.primitive()
     def build(self):
         configure = Configure(self, exec_dir=self["BUILD_DIR"])
-        configure.add("--prefix=" + unixpath(self["INSTALL_DIR"]))
+        configure.add("--prefix=" + self["INSTALL_DIR"])
 
         make = Make(self)
         make.set_var("PROCESSORS", str(self.jobs))
