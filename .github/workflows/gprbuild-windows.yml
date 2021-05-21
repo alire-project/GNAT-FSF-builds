@@ -1,0 +1,41 @@
+name: GPRbuild Windows
+on:
+  #schedule:
+  #  - cron:  '0 0 * * *'
+  #push:
+  pull_request:
+
+jobs:
+  update:
+    name: GPRbuild Windows
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v1
+      
+    - name: Install msys2
+      uses: msys2/setup-msys2@v2
+      with:
+        install: >-
+          mingw-w64-x86_64-github-cli mingw-w64-x86_64-gcc-ada mingw-w64-x86_64-gprbuild mingw-w64-x86_64-python
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install e3-core
+
+    - name: Build gprbuild
+      run: ./anod build gprbuild -v --loglevel DEBUG
+
+    - name: Package gprbuild
+      run: ./anod build release_package --qualifier=package=gprbuild,do_gh_release -v --loglevel DEBUG
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: release-packages
+        path: sbx/*/release_package*/install/* 
