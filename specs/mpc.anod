@@ -1,0 +1,53 @@
+from e3.os.fs import unixpath
+from e3.anod.helper import Configure, Make
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+
+
+class MPC(spec('common')):
+
+    @property
+    def version(self):
+        return "1.2.1"
+
+    @property
+    def tarball(self):
+        return 'mpc-%s.tar.gz' % self.version
+
+    @property
+    def source_pkg_build(self):
+        return [
+            self.HTTPSSourceBuilder(
+                name=self.tarball,
+                url='https://ftp.gnu.org/gnu/mpc/' + self.tarball)]
+
+    @property
+    def build_source_list(self):
+        return [Anod.Source(name=self.tarball,
+                            publish=True, dest='')]
+
+    @property
+    def build_deps(self):
+        return [Anod.Dependency("gmp",  require='installation', track=True),
+                Anod.Dependency("mpfr", require='installation', track=True)]
+
+    @Anod.primitive()
+    def build(self):
+        configure = Configure(self)
+        configure.add("--build=%s" % self.env.build.triplet)
+        configure.add("--host=%s" % self.env.target.triplet)
+        configure.add('--prefix=%s' % unixpath(self['INSTALL_DIR']))
+        configure.add("--disable-shared")
+        configure.add("--with-gmp=%s" % unixpath(self.deps["gmp"]["INSTALL_DIR"]))
+        configure.add("--with-mpfr=%s" % unixpath(self.deps["mpfr"]["INSTALL_DIR"]))
+
+        if self.env.target.cpu.name == "x86_64":
+            configure.add("ABI=64")
+
+        configure()
+
+        make = Make(self)
+        make()
+        make('install')
+
+        self.clean()
