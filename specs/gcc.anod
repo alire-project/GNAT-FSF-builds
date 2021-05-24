@@ -115,6 +115,10 @@ class GCC(spec('common')):
         # We need to install binutils in the compiler package
         self.deps["binutils"].merge(self["INSTALL_DIR"])
 
+        # Also install newlib for cross
+        if "newlib" in self.deps:
+            self.deps["newlib"].merge(self["INSTALL_DIR"])
+
         configure = Configure(self)
         configure.add("--build=%s" % self.env.build.triplet)
         configure.add("--host=%s" % self.env.host.triplet)
