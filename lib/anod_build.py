@@ -51,8 +51,8 @@ def do_build(m: Main, set_prog: bool = True) -> int:
     )
 
     m.argument_parser.add_argument(
-        "--disable-cleanup",
-        help="Disable removal of build and source dirs after the build",
+        "--enable-cleanup",
+        help="Enable removal of build and source dirs after the build",
         action="store_true",
         default=False,
     )

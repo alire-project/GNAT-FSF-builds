@@ -1,0 +1,58 @@
+from e3.os.fs import unixpath
+from e3.anod.helper import Configure, Make
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+
+import os
+import glob
+
+
+class EmbeddedRuntimes(spec('common')):
+
+    @property
+    def version(self):
+        return "0.1"
+
+    @property
+    def commit_id(self):
+        return 'a994743'
+
+    @property
+    def tarball(self):
+        return "embedded-runtimes-%s.zip" % self.commit_id
+
+    @property
+    def source_pkg_build(self):
+        return [
+            self.HTTPSSourceBuilder(
+                name=self.tarball,
+                url='https://github.com/Fabien-Chouteau/bb-runtimes/archive/%s.zip'
+                % self.commit_id)]
+
+    @property
+    def build_source_list(self):
+        return [Anod.Source(name=self.tarball,
+                            publish=True, dest='')]
+
+    @property
+    def build_deps(self):
+        return [Anod.Dependency("gcc", track=True),
+                Anod.Dependency("gprbuild", target='host', track=True)]
+
+    @Anod.primitive()
+    def build(self):
+        self.deps["gcc"].setenv()
+        self.deps["gprbuild"].setenv()
+
+        if self.env.target.triplet == 'arm-eabi':
+            bsp_dir = os.path.join(self['SRC_DIR'], 'gen_rts_arm', 'BSPs')
+        elif self.env.target.triplet == 'riscv64-elf':
+            bsp_dir = os.path.join(self['SRC_DIR'], 'gen_rts_riscv64', 'BSPs')
+        else:
+            raise Exception("Unknown target: %s" % self.env.target.triplet)
+
+        for gpr in glob.glob(bsp_dir + "/*.gpr"):
+            self.shell('gprbuild', '-p', '-j0', '-P', gpr)
+            self.shell('gprinstall', '-p', '-P', gpr, '--prefix=' + self['INSTALL_DIR'])
+
+        self.clean()

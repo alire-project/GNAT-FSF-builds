@@ -61,12 +61,12 @@ class ReleasePackage(spec('common')):
             if self.env.target.triplet == "arm-eabi":
                 return [Anod.Dependency("gcc", track=True),
                         Anod.Dependency("gdb", track=True),
-                        Anod.Dependency("newlib", track=True)]
+                        Anod.Dependency("embedded-runtimes", track=True)]
 
             elif self.env.target.triplet == "riscv64-elf":
                 return [Anod.Dependency("gcc", track=True),
                         Anod.Dependency("gdb", track=True),
-                        Anod.Dependency("newlib", track=True)]
+                        Anod.Dependency("embedded-runtimes", track=True)]
 
             elif self.env.build.triplet == self.env.target.triplet:
                 # Native
