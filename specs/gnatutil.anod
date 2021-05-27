@@ -30,7 +30,8 @@ class GNATUTIL(spec('common')):
 
     @property
     def build_deps(self):
-        return [Anod.Dependency("gcc",  track=True)]
+        return [Anod.Dependency("gcc", track=True),
+                Anod.Dependency("gprbuild", track=True)]
 
     @Anod.primitive()
     def build(self):

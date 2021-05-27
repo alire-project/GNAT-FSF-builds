@@ -25,7 +25,7 @@ jobs:
         pip install e3-core
 
     - name: Install Ada dependencies
-      run: sudo apt-get install gprbuild gnat
+      run: sudo apt-get install gnat
 
     - name: Build GNAT native
       run: ./anod build gcc -v --loglevel DEBUG --enable-cleanup

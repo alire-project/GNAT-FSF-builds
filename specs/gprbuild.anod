@@ -1,4 +1,4 @@
-from e3.os.fs import unixpath
+from e3.os.fs import unixpath, cd
 from e3.fs import sync_tree
 from e3.anod.helper import Configure, Make, text_replace
 from e3.anod.spec import Anod
@@ -27,8 +27,7 @@ class GPRbuild(spec('common')):
 
     @property
     def build_source_list(self):
-        return [Anod.Source(name=self.tarball,
-                            publish=True, dest='')]
+        return [Anod.Source(name=self.tarball, publish=True, dest='')]
 
     @property
     def bootstrap(self):
@@ -43,9 +42,16 @@ class GPRbuild(spec('common')):
 
     @property
     def build_deps(self):
-        return [Anod.Dependency("gcc", track=True),
-                Anod.Dependency("xmlada", track=True),
-                Anod.Dependency("gprconfig_kb", track=True)]
+        deps = [Anod.Dependency("gcc", track=True),
+                Anod.Dependency("gprconfig_kb", require="source_pkg", track=True)]
+
+        if not self.bootstrap:
+            deps.append(Anod.Dependency("xmlada", track=True))
+            deps.append(Anod.Dependency("gprbuild", qualifier="bootstrap", track=True))
+        else:
+            deps.append(Anod.Dependency("xmlada", require="source_pkg", track=True))
+
+        return deps
 
     def update_version(self):
         text_replace(
@@ -65,24 +71,28 @@ class GPRbuild(spec('common')):
 
 
     def do_bootstrap(self):
-        raise Exception("Bootstrap not supported yet...")
-
-        cmd = os.path.join(self['SRC_DIR'], "bootstrap.sh")
-        self.shell(cmd,
-                   '--prefix=%s' % unixpath(self['INSTALL_DIR']),
+        cd(self['SRC_DIR'])
+        self.shell('./bootstrap.sh',
                    '--with-xmlada=%s' % unixpath(self.deps["xmlada"]["SRC_DIR"]),
                    '--with-kb=%s' % unixpath(self.deps["gprconfig_kb"]["SRC_DIR"]),
-                   )
+                   '--build')
+
+        self.shell('./bootstrap.sh',
+                   '--prefix=%s' % unixpath(self['INSTALL_DIR']),
+                   '--with-kb=%s' % unixpath(self.deps["gprconfig_kb"]["SRC_DIR"]),
+                   '--install')
 
     @Anod.primitive()
     def build(self):
 
         self.update_version()
 
+        for m in ['gcc', 'xmlada', 'gprbuild']:
+            if m in self.deps:
+                self.deps[m].setenv()
+
         if self.bootstrap:
             return self.do_bootstrap()
-
-        self.deps["xmlada"].setenv()
 
         make = Make(self, makefile=os.path.join(self["SRC_DIR"], "Makefile"))
 
