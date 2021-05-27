@@ -7,7 +7,7 @@ from e3.archive import create_archive
 from e3.hash import sha256
 import os
 
-valid_packages = ["gprbuild", "gnat"]
+valid_packages = ["gprbuild", "gnat", "gnatcov"]
 
 class ReleasePackage(spec('common')):
 
@@ -28,8 +28,8 @@ class ReleasePackage(spec('common')):
     def version(self):
         package = self.package
 
-        if package == 'gprbuild':
-            return self.deps['gprbuild'].version
+        if package in ['gprbuild', 'gnatcov']:
+            return self.deps[package].version
         elif package == 'gnat':
             return self.deps['gcc'].version
 
@@ -54,6 +54,9 @@ class ReleasePackage(spec('common')):
         pck = self.package
         if pck == 'gprbuild':
             return [Anod.Dependency('gprbuild', track=True)]
+
+        if pck == 'gnatcov':
+            return [Anod.Dependency('gnatcov', track=True)]
 
         if pck == 'gnat':
             # Note: the binutils are already merged in gcc installation

@@ -43,10 +43,8 @@ class GPRbuild(spec('common')):
 
     @property
     def build_deps(self):
-        # We always use the system's GCC/GNAT to build GPRbuild, that's why it
-        # is not specified as a dependency here.
-
-        return [Anod.Dependency("xmlada", track=True),
+        return [Anod.Dependency("gcc", track=True),
+                Anod.Dependency("xmlada", track=True),
                 Anod.Dependency("gprconfig_kb", track=True)]
 
     def update_version(self):

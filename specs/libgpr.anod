@@ -1,11 +1,11 @@
 from e3.os.fs import unixpath
-from e3.fs import sync_tree
 from e3.anod.helper import Configure, Make
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
 
+import os
 
-class XMLAda(spec('common')):
+class LibGPR(spec('common')):
 
     @property
     def version(self):
@@ -13,15 +13,14 @@ class XMLAda(spec('common')):
 
     @property
     def tarball(self):
-        return 'xmlada-%s.tar.gz' % self.version
+        return 'libgpr-%s.tar.gz' % self.version
 
     @property
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url='https://github.com/AdaCore/xmlada/archive/v%s/%s' % (self.version,
-                                                                          self.tarball))]
+                url='https://github.com/AdaCore/gprbuild/archive/v%s.tar.gz' % self.version)]
 
     @property
     def build_source_list(self):
@@ -30,24 +29,19 @@ class XMLAda(spec('common')):
 
     @property
     def build_deps(self):
-        return [Anod.Dependency("gcc", track=True)]
+        return [Anod.Dependency("gcc",  track=True),
+                Anod.Dependency("gprbuild", track=True),
+                Anod.Dependency("xmlada",  track=True)]
 
     @Anod.primitive()
     def build(self):
         for m in self.deps:
             self.deps[m].setenv()
+        makefile = os.path.join(self['SRC_DIR'], 'Makefile')
 
-        configure = Configure(self, exec_dir=self["BUILD_DIR"])
-        configure.add("--prefix=" + unixpath(self["INSTALL_DIR"]))
+        make = Make(self, exec_dir=self["SRC_DIR"])
+        make('libgpr.build')
 
-        make = Make(self)
-        make.set_var("PROCESSORS", str(self.jobs))
-
-        sync_tree(self["SRC_DIR"], self["BUILD_DIR"], delete=True)
-
-        configure()
-
-        make("all")
-        make("install", jobs=1)
+        make('libgpr.install', 'prefix=' + self['INSTALL_DIR'])
 
         self.clean()

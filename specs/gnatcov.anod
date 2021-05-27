@@ -1,0 +1,75 @@
+from e3.os.fs import unixpath
+from e3.fs import rm
+from e3.anod.helper import Configure, Make
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+
+import os
+
+class GNATcov(spec('common')):
+
+    @property
+    def version(self):
+        return "21.0"
+
+    @property
+    def tarball(self):
+        return 'gnatcov-%s.zip' % self.version
+
+    @property
+    def source_pkg_build(self):
+        return [
+            self.HTTPSSourceBuilder(
+                name=self.tarball,
+                url='https://github.com/AdaCore/gnatcoverage/archive/refs/heads/%s.zip'
+                % self.version)]
+
+    @property
+    def build_source_list(self):
+        return [Anod.Source(name=self.tarball,
+                            publish=True, dest='')]
+
+    @property
+    def build_deps(self):
+        return [Anod.Dependency("gcc",  track=True),
+                Anod.Dependency("gprbuild", track=True),
+                Anod.Dependency("libgpr", track=True),
+                Anod.Dependency("gnatcoll", track=True),
+                Anod.Dependency("gnatcoll-bindings", track=True),
+                Anod.Dependency("langkit", track=True),
+                Anod.Dependency("libadalang",track=True),
+                Anod.Dependency("binutils", track=True),
+                Anod.Dependency("gnatutil", track=True),
+                Anod.Dependency("xmlada", track=True)]
+
+    @Anod.primitive()
+    def build(self):
+        for m in self.deps:
+            self.deps[m].setenv()
+
+        build_mode = "prod"
+        exec_dir = os.path.join(self["SRC_DIR"], 'tools', 'gnatcov')
+        make_all = Make(self, exec_dir=exec_dir, jobs=1)
+        make_all.set_default_target("all")
+
+        make_all.set_var("BUILD_MODE", "prod")
+        make_all.set_var("BINUTILS_SRC_DIR", self.deps["binutils"]["SRC_DIR"])
+        make_all.set_var("BINUTILS_BUILD_DIR", self.deps["binutils"]["BUILD_DIR"])
+        make_all.set_var("DISTRIB_ARCH", self.env.build.cpu.name)
+        make_all.set_var("ADAPTERS_LIST", "")
+
+        make_distrib = Make(self, exec_dir=exec_dir)
+        make_distrib.set_var("BUILD_MODE", build_mode)
+        make_distrib.set_var("DISTRIB_ARCH", self.env.build.cpu.name)
+        make_distrib.set_var("ADAPTERS_LIST", "")
+
+        make_distrib.set_var("PREFIX", unixpath(self["INSTALL_DIR"]))
+        make_distrib.set_default_target("distrib-without-doc")
+
+        for m in (make_all, make_distrib):
+            m.set_var("BITS_ARCH", str(self.env.target.cpu.bits))
+
+
+        make_all()
+        make_distrib()
+        self.clean()

@@ -61,6 +61,11 @@ class Common(Anod):
                                      os.path.join(prefix, 'share', 'gpr'))
             env_modified = True
 
+        if os.path.isdir(os.path.join(prefix, 'lib', 'gnat')):
+            self.env.add_search_path('GPR_PROJECT_PATH',
+                                     os.path.join(prefix, 'lib', 'gnat'))
+            env_modified = True
+
         if not env_modified:
             if os.path.exists(prefix) and os.path.isdir(prefix) and os.listdir(prefix):
                 raise AnodError(
