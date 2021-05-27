@@ -27,7 +27,13 @@ class GPRbuild(spec('common')):
 
     @property
     def build_source_list(self):
-        return [Anod.Source(name=self.tarball, publish=True, dest='')]
+        if self.bootstrap:
+            return [Anod.Source(name=self.tarball, publish=True, dest=''),
+                    Anod.Source(name=self.deps['gprconfig_kb'].tarball, publish=True, dest='gprconfig_kb'),
+                    Anod.Source(name=self.deps['xmlada'].tarball, publish=True, dest='xmlada')]
+        else:
+            return [Anod.Source(name=self.tarball, publish=True, dest=''),
+                    Anod.Source(name=self.deps['gprconfig_kb'].tarball, publish=True, dest='gprconfig_kb')]
 
     @property
     def bootstrap(self):
@@ -71,28 +77,34 @@ class GPRbuild(spec('common')):
 
 
     def do_bootstrap(self):
+        for m in ['gcc']:
+            if m in self.deps:
+                self.deps[m].setenv()
+
         cd(self['SRC_DIR'])
         self.shell('./bootstrap.sh',
-                   '--with-xmlada=%s' % unixpath(self.deps["xmlada"]["SRC_DIR"]),
-                   '--with-kb=%s' % unixpath(self.deps["gprconfig_kb"]["SRC_DIR"]),
+                   '--with-xmlada=%s' % os.path.join(self["SRC_DIR"], 'xmlada'),
+                   '--with-kb=%s' % os.path.join(self["SRC_DIR"], 'gprconfig_kb'),
                    '--build')
 
         self.shell('./bootstrap.sh',
                    '--prefix=%s' % unixpath(self['INSTALL_DIR']),
-                   '--with-kb=%s' % unixpath(self.deps["gprconfig_kb"]["SRC_DIR"]),
+                   '--with-xmlada=%s' % os.path.join(self["SRC_DIR"], 'xmlada'),
+                   '--with-kb=%s' % os.path.join(self["SRC_DIR"], 'gprconfig_kb'),
                    '--install')
+        self.clean()
 
     @Anod.primitive()
     def build(self):
 
         self.update_version()
 
+        if self.bootstrap:
+            return self.do_bootstrap()
+
         for m in ['gcc', 'xmlada', 'gprbuild']:
             if m in self.deps:
                 self.deps[m].setenv()
-
-        if self.bootstrap:
-            return self.do_bootstrap()
 
         make = Make(self, makefile=os.path.join(self["SRC_DIR"], "Makefile"))
 
@@ -102,7 +114,7 @@ class GPRbuild(spec('common')):
         make("distall", jobs=1)
 
         # Install the gprconfig knowledge-base
-        kb_src = os.path.join(self.deps["gprconfig_kb"]["SRC_DIR"], 'db')
+        kb_src = os.path.join(self["SRC_DIR"], 'gprconfig_kb', 'db')
         kb_dst = os.path.join(self["INSTALL_DIR"], 'share', 'gprconfig')
         sync_tree(kb_src, kb_dst)
 
