@@ -1,0 +1,48 @@
+from e3.os.fs import unixpath
+from e3.anod.helper import Configure, Make
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+
+import os
+
+class GNATUTIL(spec('common')):
+
+    @property
+    def version(self):
+        return "20.0w-20190814-1532A"
+
+    @property
+    def tarball(self):
+        return 'gnat_util-%s-src.tar.gz' % self.version
+
+    @property
+    def source_pkg_build(self):
+        return [
+            self.HTTPSSourceBuilder(
+                name=self.tarball,
+                url='https://community.download.adacore.com/v1/26bd253101b46706f5f8e3d0ca8b3107cde99e99?filename=%s'
+                % self.tarball)]
+
+    @property
+    def build_source_list(self):
+        return [Anod.Source(name=self.tarball,
+                            publish=True, dest='')]
+
+    @property
+    def build_deps(self):
+        return [Anod.Dependency("gcc", track=True),
+                Anod.Dependency("gprbuild", track=True)]
+
+    @Anod.primitive()
+    def build(self):
+        for m in self.deps:
+            self.deps[m].setenv()
+
+        makefile = os.path.join(self['SRC_DIR'], 'Makefile')
+
+        make = Make(self, exec_dir=self["SRC_DIR"])
+        make('all')
+
+        make('install', 'prefix=' + self['INSTALL_DIR'])
+
+        self.clean()

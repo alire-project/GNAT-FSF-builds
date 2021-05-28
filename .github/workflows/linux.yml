@@ -25,22 +25,32 @@ jobs:
         pip install e3-core
 
     - name: Install Ada dependencies
-      run: sudo apt-get install gprbuild gnat
+      run: sudo apt-get install gnat
 
     - name: Build GNAT native
       run: ./anod build gcc -v --loglevel DEBUG --enable-cleanup
-
-    - uses: actions/upload-artifact@v2
-      if: failure()
-      with:
-        name: gcc-config-log
-        path: sbx/x86_64-linux/gcc/build/config.log
 
     - name: Build GDB
       run: ./anod build gdb -v --loglevel DEBUG --enable-cleanup
 
     - name: Package GNAT
       run: ./anod build release_package --qualifier=package=gnat,do_gh_release -v --loglevel DEBUG
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
+
+    - name: Build GPRbuild
+      run: ./anod build gprbuild -v --loglevel DEBUG --enable-cleanup
+ 
+    - name: Package GPRbuild
+      run: ./anod build release_package --qualifier=package=gprbuild,do_gh_release -v --loglevel DEBUG
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
+
+    - name: Build GNATcov
+      run: ./anod build gnatcov -v --loglevel DEBUG --enable-cleanup
+ 
+    - name: Package GNATcov
+      run: ./anod build release_package --qualifier=package=gnatcov,do_gh_release -v --loglevel DEBUG
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 

@@ -1,4 +1,4 @@
-from e3.os.fs import unixpath
+from e3.os.fs import unixpath, cd
 from e3.fs import sync_tree
 from e3.anod.helper import Configure, Make, text_replace
 from e3.anod.spec import Anod
@@ -27,8 +27,13 @@ class GPRbuild(spec('common')):
 
     @property
     def build_source_list(self):
-        return [Anod.Source(name=self.tarball,
-                            publish=True, dest='')]
+        if self.bootstrap:
+            return [Anod.Source(name=self.tarball, publish=True, dest=''),
+                    Anod.Source(name=self.deps['gprconfig_kb'].tarball, publish=True, dest='gprconfig_kb'),
+                    Anod.Source(name=self.deps['xmlada'].tarball, publish=True, dest='xmlada')]
+        else:
+            return [Anod.Source(name=self.tarball, publish=True, dest=''),
+                    Anod.Source(name=self.deps['gprconfig_kb'].tarball, publish=True, dest='gprconfig_kb')]
 
     @property
     def bootstrap(self):
@@ -43,11 +48,16 @@ class GPRbuild(spec('common')):
 
     @property
     def build_deps(self):
-        # We always use the system's GCC/GNAT to build GPRbuild, that's why it
-        # is not specified as a dependency here.
+        deps = [Anod.Dependency("gcc", track=True),
+                Anod.Dependency("gprconfig_kb", require="source_pkg", track=True)]
 
-        return [Anod.Dependency("xmlada", track=True),
-                Anod.Dependency("gprconfig_kb", track=True)]
+        if not self.bootstrap:
+            deps.append(Anod.Dependency("xmlada", track=True))
+            deps.append(Anod.Dependency("gprbuild", qualifier="bootstrap", track=True))
+        else:
+            deps.append(Anod.Dependency("xmlada", require="source_pkg", track=True))
+
+        return deps
 
     def update_version(self):
         text_replace(
@@ -67,14 +77,22 @@ class GPRbuild(spec('common')):
 
 
     def do_bootstrap(self):
-        raise Exception("Bootstrap not supported yet...")
+        for m in ['gcc']:
+            if m in self.deps:
+                self.deps[m].setenv()
 
-        cmd = os.path.join(self['SRC_DIR'], "bootstrap.sh")
-        self.shell(cmd,
+        cd(self['SRC_DIR'])
+        self.shell('./bootstrap.sh',
+                   '--with-xmlada=%s' % os.path.join(self["SRC_DIR"], 'xmlada'),
+                   '--with-kb=%s' % os.path.join(self["SRC_DIR"], 'gprconfig_kb'),
+                   '--build')
+
+        self.shell('./bootstrap.sh',
                    '--prefix=%s' % unixpath(self['INSTALL_DIR']),
-                   '--with-xmlada=%s' % unixpath(self.deps["xmlada"]["SRC_DIR"]),
-                   '--with-kb=%s' % unixpath(self.deps["gprconfig_kb"]["SRC_DIR"]),
-                   )
+                   '--with-xmlada=%s' % os.path.join(self["SRC_DIR"], 'xmlada'),
+                   '--with-kb=%s' % os.path.join(self["SRC_DIR"], 'gprconfig_kb'),
+                   '--install')
+        self.clean()
 
     @Anod.primitive()
     def build(self):
@@ -84,7 +102,9 @@ class GPRbuild(spec('common')):
         if self.bootstrap:
             return self.do_bootstrap()
 
-        self.deps["xmlada"].setenv()
+        for m in ['gcc', 'xmlada', 'gprbuild']:
+            if m in self.deps:
+                self.deps[m].setenv()
 
         make = Make(self, makefile=os.path.join(self["SRC_DIR"], "Makefile"))
 
@@ -94,7 +114,7 @@ class GPRbuild(spec('common')):
         make("distall", jobs=1)
 
         # Install the gprconfig knowledge-base
-        kb_src = os.path.join(self.deps["gprconfig_kb"]["SRC_DIR"], 'db')
+        kb_src = os.path.join(self["SRC_DIR"], 'gprconfig_kb', 'db')
         kb_dst = os.path.join(self["INSTALL_DIR"], 'share', 'gprconfig')
         sync_tree(kb_src, kb_dst)
 
