@@ -1,4 +1,4 @@
-name: GNAT Linux
+name: GNAT macOS
 on:
   #schedule:
   #  - cron:  '0 0 * * *'
@@ -8,7 +8,7 @@ on:
 
 jobs:
   update:
-    name: GNAT macOSC
+    name: GNAT macOS
     runs-on: macos-latest
     steps:
     - name: Checkout Project
