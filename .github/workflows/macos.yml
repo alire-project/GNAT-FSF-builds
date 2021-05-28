@@ -26,9 +26,9 @@ jobs:
 
     - name: Install Ada dependencies
       uses: ada-actions/toolchain@ce2020
-       with:
-         distrib: community
-         target: native
+      with:
+        distrib: community
+        target: native
 
     - name: Build GNAT native
       run: ./anod build gcc -v --loglevel DEBUG --enable-cleanup
