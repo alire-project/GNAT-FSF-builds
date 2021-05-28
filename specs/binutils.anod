@@ -29,19 +29,34 @@ class Binutils(spec('common')):
 
     @property
     def build_deps(self):
-        return [Anod.Dependency("gmp",  target='host', track=True),
+        deps = [Anod.Dependency("gmp",  target='host', track=True),
                 Anod.Dependency("mpfr", target='host', track=True),
                 Anod.Dependency("mpc",  target='host', track=True),
                 Anod.Dependency("isl",  target='host', track=True)]
+
+        if self.env.is_canadian:
+            deps.append(
+                Anod.Dependency(
+                    name="gcc",
+                    host="build",
+                    target="host",
+                    local_name="canadian-cross-compiler",
+                )
+            )
+
+        return deps
 
     def merge(self, prefix):
         sync_tree(self["INSTALL_DIR"], prefix, delete=False)
 
     @Anod.primitive()
     def build(self):
+        for m in self.deps:
+            self.deps[m].setenv()
+
         configure = Configure(self)
         configure.add("--build=%s" % self.env.build.triplet)
-        # configure.add("--host=%s" % self.env.host.triplet)
+        configure.add("--host=%s" % self.env.host.triplet)
         configure.add("--target=%s" % self.env.target.triplet)
         configure.add('--prefix=%s' % unixpath(self['INSTALL_DIR']))
         configure.add("--disable-nls",

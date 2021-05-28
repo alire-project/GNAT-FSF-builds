@@ -1,0 +1,48 @@
+from e3.anod.loader import spec
+from e3.anod.spec import Anod
+import os
+
+class GNU(spec('common')):
+
+    def pre_build(self):
+        """Method called just before starting the build."""
+        pass
+
+    def compiler_deps(self):
+        deps = []
+
+        # For native builds we use the system compiler
+
+        if self.env.is_canadian:
+            deps.append(
+                Anod.Dependency(
+                    name="gcc",
+                    host="build",
+                    target="host",
+                    local_name="canadian-cross-compiler",
+                )
+            )
+
+        return deps
+
+    def setenv(self):
+        self.env.add_search_path('C_INCLUDE_PATH',
+                                 os.path.join(self['INSTALL_DIR'], 'include'))
+        self.env.add_search_path('LIBRARY_PATH',
+                                 os.path.join(self['INSTALL_DIR'], 'lib'))
+
+    @Anod.primitive(pre="setup")
+    def build(self):
+        self.pre_build()
+        for m in self.deps:
+            self.deps[m].setenv()
+        try:
+            self["configure"]()
+        except ShellError:
+            self.add_log_file("config.log")
+            raise
+        self["make"]()
+        # Many projects fail when running `make install` with parallel jobs
+        self["make"]("install", jobs=1)
+
+        self.clean()

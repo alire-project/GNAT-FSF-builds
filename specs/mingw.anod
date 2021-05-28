@@ -1,0 +1,93 @@
+import os
+
+from e3.os.fs import unixpath
+from e3.fs import mkdir, rm, sync_tree
+from e3.anod.helper import Configure, Make
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+
+
+class MINGW(spec('common')):
+
+    @property
+    def version(self):
+        return "9.0.0"
+
+    @property
+    def tarball(self):
+        return 'mingw-w64-v%s.tar.bz2' % self.version
+
+    @property
+    def source_pkg_build(self):
+        return [
+            self.HTTPSSourceBuilder(
+                name=self.tarball,
+                url='https://nav.dl.sourceforge.net/project/mingw-w64/mingw-w64/mingw-w64-release/' + self.tarball)]
+
+    @property
+    def build_source_list(self):
+        return [Anod.Source(name=self.tarball,
+                            publish=True, dest='')]
+
+    @property
+    def build_deps(self):
+        return []
+
+    @Anod.primitive()
+    def build(self):
+        hdr_build = os.path.join(self["BUILD_DIR"], "mingw-w64-headers")
+        crt_build = os.path.join(self["BUILD_DIR"], "mingw-w64-crt")
+        hdr_src = os.path.join(self["SRC_DIR"], "mingw-w64-headers")
+        crt_src = os.path.join(self["SRC_DIR"], "mingw-w64-crt")
+
+        mkdir(hdr_build)
+        mkdir(crt_build)
+
+        # First build the headers and install them. This is important to
+        # do that step separately for the crt compilation in order to
+        # avoid issues with older headers.
+        configure = Configure(
+            self, exec_dir=unixpath(hdr_build), src_dir=unixpath(hdr_src)
+        )
+        configure.add("--prefix=%s" % unixpath(self["INSTALL_DIR"]))
+        configure.add("--with-default-win32-winnt=0x0600")
+        configure.add("CFLAGS=-Wno-expansion-to-defined")
+        configure()
+        make = Make(self, exec_dir=hdr_build)
+        make("install")
+
+        # Now take care of crt part.
+        configure = Configure(
+            self,
+            exec_dir=unixpath(crt_build),
+            src_dir=unixpath(crt_src),
+            auto_target=False,
+        )
+        configure.add("--prefix=%s" % unixpath(self["INSTALL_DIR"]))
+
+        # Deal with mingw configure peculiarity that --target is unsupported
+        configure.add("--build=" + self.env.build.triplet)
+        configure.add("--host=" + self.env.target.triplet)
+
+        # Enable wildcard by default.
+        configure.add("--enable-wildcard")
+        # The mingw headers do things like:
+        #  #define __INTRINSIC_PROLOG(name) \
+        #    (!defined(__INTRINSIC_DEFINED_ ## name)) [...]
+        #
+        # which are non portable and tricky / risky to rewrite.
+        #
+        # Prevent the warnings about the non-portability, which output a lot
+        # of log and might turn into errors in some build setups using
+        # -Werror (see: U128-016).
+        configure.add("CFLAGS=-Wno-expansion-to-defined")
+        configure()
+
+        make = Make(self, exec_dir=crt_build)
+        make()
+        make("install", jobs=1)
+
+        # Remove crtbegin.o and crtend.o. We are rebuilding them during
+        # GCC builds
+        rm(os.path.join(self["INSTALL_DIR"], "lib", "crtbegin.o"))
+        rm(os.path.join(self["INSTALL_DIR"], "lib", "crtend.o"))

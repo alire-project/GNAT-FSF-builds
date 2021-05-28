@@ -47,7 +47,7 @@ class Langkit(spec('common')):
         gpr_file = os.path.join(self['SRC_DIR'], 'libadalang.gpr')
         build_mode = 'prod'
 
-        for library_type in ['static', 'static-pic', 'relocatable']:
+        for library_type in ['static']:
             self.shell('gprbuild', '-p',
                        '-P', gpr_file,
                        '-j' + str(self.jobs),

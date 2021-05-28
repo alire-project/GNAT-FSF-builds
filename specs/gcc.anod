@@ -1,4 +1,5 @@
 from e3.os.fs import unixpath
+from e3.fs import cp, echo_to_file, ls, mkdir, mv, rm, sync_tree
 from e3.anod.helper import Configure, Make, log
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
@@ -33,7 +34,8 @@ class GCC(spec('common')):
 
     @property
     def is_cross(self):
-        return self.env.build.triplet != self.env.target.triplet
+        return (self.env.target.triplet == "arm-eabi" or
+                self.env.target.triplet == "riscv64-elf")
 
     @property
     def build_space_name(self):
@@ -46,24 +48,41 @@ class GCC(spec('common')):
     def enable_languages(self):
         if self.bootstrap:
             return ['c']
+        elif not self.env.target.os.is_bareboard:
+            return ['c', 'ada', 'c++']
         else:
             return ['c', 'ada']
 
     @property
     def build_deps(self):
-        deps = [Anod.Dependency("gmp",      target='host', track=True),
-                Anod.Dependency("mpfr",     target='host', track=True),
-                Anod.Dependency("mpc",      target='host', track=True),
-                Anod.Dependency("isl",      target='host', track=True),
-                Anod.Dependency("binutils", track=True)]
+        deps = [Anod.Dependency("gmp",      host='build', target='host'),
+                Anod.Dependency("mpfr",     host='build', target='host'),
+                Anod.Dependency("mpc",      host='build', target='host'),
+                Anod.Dependency("isl",      host='build', target='host'),
+                Anod.Dependency("binutils")]
 
         # We se the system's GCC/GNAT to build native GCC/GNAT, that's why it
         # is not specified as a dependency here.
 
-        if self.is_cross and not self.bootstrap:
-            deps.append (Anod.Dependency("newlib", track=True))
-            deps.append (Anod.Dependency("gcc", local_name='gcc_native',
-                                         target='host', track=True))
+        if self.env.target.os.is_bareboard and not self.bootstrap:
+            deps.append (Anod.Dependency("newlib"))
+
+        if self.env.is_cross and not self.bootstrap:
+            deps.append (Anod.Dependency("gcc", local_name='gcc_native', target='host'))
+
+        if self.env.target.os.name == "windows":
+            deps.append(Anod.Dependency("mingw", host="build", target="target", track=True))
+
+        # Environment dependencies
+        if self.env.is_canadian:
+            deps.append(
+                Anod.Dependency(
+                    name="gcc",
+                    host="build",
+                    target="target",
+                    local_name="base_compiler_cross_target",
+                )
+            )
 
         return deps
 
@@ -79,6 +98,15 @@ class GCC(spec('common')):
         if self.env.target.triplet == "x86_64-pc-linux-gnu":
             args.append("--disable-multilib")
             args.append("--enable-threads=posix")
+
+        # Windows Native
+        if self.env.target.triplet == "x86_64-w64-mingw32":
+            args.append("--disable-multilib")
+            args.append("--enable-threads=win32")
+            args.append("--with-native-system-header-dir=%s" %
+                        unixpath(os.path.join(self["INSTALL_DIR"], 'include')))
+
+            
 
         cross_commons = ["--enable-plugins",
                          "--disable-decimal-float",
@@ -103,12 +131,11 @@ class GCC(spec('common')):
             args += cross_commons
             args.append("--enable-multilib")
 
-
         return args
 
     @Anod.primitive()
     def build(self):
-        for m in ("binutils", "gcc_native"):
+        for m in ("binutils", "gcc_native", "mingw", "base_compiler_cross_target"):
             if m in self.deps:
                 self.deps[m].setenv()
 
@@ -119,6 +146,35 @@ class GCC(spec('common')):
         if "newlib" in self.deps:
             self.deps["newlib"].merge(self["INSTALL_DIR"])
 
+        # The libsubdir relative path
+        gcc_libsubdir = os.path.join(
+            "lib", "gcc", self.env.target.triplet, self.version
+        )
+
+        if self.env.target.os.name == "windows":
+            # Deploy the mingw dependency in the ./mingw64 directory
+            self.deps["mingw"].merge(os.path.join(self["SRC_DIR"], "mingw64"))
+
+        # On windows we need to install the mingw and w32api include and libs
+        if self.env.target.os.name == "windows":
+            target_path = os.path.join(self["BUILD_DIR"], gcc_libsubdir)
+            mkdir(os.path.join(target_path, "include"))
+            sync_tree(
+                os.path.join(self["SRC_DIR"], "mingw64", "include"),
+                os.path.join(target_path, "include"),
+                delete=False,
+            )
+            sync_tree(
+                os.path.join(self["SRC_DIR"], "mingw64", "lib"),
+                target_path,
+                delete=False,
+            )
+            mkdir(os.path.join(self["BUILD_DIR"], "gcc"))
+            sync_tree(
+                os.path.join(self["BUILD_DIR"], "lib"),
+                os.path.join(self["BUILD_DIR"], "gcc", "lib"),
+            )
+
         configure = Configure(self)
         configure.add("--build=%s" % self.env.build.triplet)
         configure.add("--host=%s" % self.env.host.triplet)
@@ -126,15 +182,16 @@ class GCC(spec('common')):
         configure.add('--prefix=%s' % unixpath(self['INSTALL_DIR']))
 
         configure.add("--with-build-time-tools=%s" %
-                      os.path.join(self.deps["binutils"]["INSTALL_DIR"], 'bin'))
+                      unixpath(os.path.join(self.deps["binutils"]["INSTALL_DIR"], 'bin')))
 
         configure.add("--enable-languages=" + ",".join(self.enable_languages))
 
         if "c++" in self.enable_languages:
             configure.add("--enable-libstdcxx")
+            configure.add("--enable-libstdcxx-threads")
             # Note that --disable-libstdcxx seems to break the builds
 
-        if "ada" in self.enable_languages and not self.is_cross:
+        if "ada" in self.enable_languages and not self.env.target.os.is_bareboard:
             configure.add("--enable-libada")
         else:
             configure.add("--disable-libada")
@@ -143,7 +200,8 @@ class GCC(spec('common')):
             configure.add(a)
 
         for m in ("mpfr", "gmp", "mpc", "isl"):
-            configure.add("--with-%s=%s" % (m, unixpath(self.deps[m]["INSTALL_DIR"])))
+            if m in self.deps:
+                configure.add("--with-%s=%s" % (m, unixpath(self.deps[m]["INSTALL_DIR"])))
 
         configure()
 
@@ -153,11 +211,29 @@ class GCC(spec('common')):
             make('install-gcc')
         else:
             make('all')
-
-            if self.is_cross:
+        
+            if self.env.is_cross:
                 make('cross-gnattools', exec_dir='gcc')
                 make('ada.all.cross', exec_dir='gcc')
-
+        
             make('install-strip')
+
+        # Add mingw
+        if self.env.target.os.name == "windows":
+            if not self.env.is_cross:
+                cp(
+                    os.path.join(self["INSTALL_DIR"], gcc_libsubdir, "adalib", "*.dll"),
+                    os.path.join(self["INSTALL_DIR"], "bin"),
+                )
+            sync_tree(
+                os.path.join(self["SRC_DIR"], "mingw64", "include"),
+                os.path.join(self["INSTALL_DIR"], self.env.target.triplet, "include"),
+                delete=False,
+            )
+            sync_tree(
+                os.path.join(self["SRC_DIR"], "mingw64", "lib"),
+                os.path.join(self["INSTALL_DIR"], gcc_libsubdir),
+                delete=False,
+            )
 
         self.clean()

@@ -20,6 +20,16 @@ class PlatDB(PlatformDBPlugin):
             }
         )
 
+        self.host_guess.pop("x86-windows")
+        self.host_guess.update(
+            {
+                "x86_64-windows64": {
+                    "os": "Windows",
+                    "cpu": "AMD64",
+                },
+            }
+        )
+
         self.platform_info.update(
             {
                 "riscv32-elf": {"cpu": "riscv32", "os": "none", "is_hie": True},

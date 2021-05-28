@@ -28,8 +28,15 @@ class Newlib(spec('common')):
 
     @property
     def build_deps(self):
-        return [Anod.Dependency("binutils", track=True),
-                Anod.Dependency("gcc", qualifier='bootstrap', track=True)]
+        deps = [Anod.Dependency("binutils")]
+
+        if self.env.is_canadian:
+            deps.append(Anod.Dependency("gcc", qualifier='bootstrap',
+                                        host="build", target="target"))
+        else:
+            deps.append(Anod.Dependency("gcc", qualifier='bootstrap'))
+
+        return deps
 
     @Anod.primitive()
     def build(self):

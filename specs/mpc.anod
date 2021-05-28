@@ -4,7 +4,7 @@ from e3.anod.spec import Anod
 from e3.anod.loader import spec
 
 
-class MPC(spec('common')):
+class MPC(spec('gnu')):
 
     @property
     def version(self):
@@ -28,11 +28,9 @@ class MPC(spec('common')):
 
     @property
     def build_deps(self):
-        return [Anod.Dependency("gmp",  require='installation', track=True),
-                Anod.Dependency("mpfr", require='installation', track=True)]
+        return [Anod.Dependency("gmp"), Anod.Dependency("mpfr")] + self.compiler_deps()
 
-    @Anod.primitive()
-    def build(self):
+    def setup(self):
         configure = Configure(self)
         configure.add("--build=%s" % self.env.build.triplet)
         configure.add("--host=%s" % self.env.target.triplet)
@@ -44,10 +42,6 @@ class MPC(spec('common')):
         if self.env.target.cpu.name == "x86_64":
             configure.add("ABI=64")
 
-        configure()
-
         make = Make(self)
-        make()
-        make('install')
 
-        self.clean()
+        return {"configure": configure, "make": make}

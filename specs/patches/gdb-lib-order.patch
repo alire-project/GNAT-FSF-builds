@@ -1,0 +1,21 @@
+--- gdb/Makefile.in.orig
++++ gdb/Makefile.in
+@@ -626,7 +626,7 @@ CLIBS = $(SIM) $(READLINE) $(OPCODES) $(LIBCTF) $(BFD) $(ZLIB) \
+ 	$(XM_CLIBS) $(GDBTKLIBS) \
+ 	@LIBS@ @GUILE_LIBS@ @PYTHON_LIBS@ \
+ 	$(LIBEXPAT) $(LIBLZMA) $(LIBBABELTRACE) $(LIBIPT) \
+-	$(WIN32LIBS) $(LIBGNU) $(LIBICONV) \
++	$(LIBGNU) $(WIN32LIBS) $(LIBICONV) \
+ 	$(LIBMPFR) $(SRCHIGH_LIBS) $(LIBXXHASH) $(PTHREAD_LIBS) \
+ 	$(DEBUGINFOD_LIBS)
+ CDEPS = $(NAT_CDEPS) $(SIM) $(BFD) $(READLINE_DEPS) $(CTF_DEPS) \
+--- gdb/configure.orig
++++ gdb/configure
+@@ -12998,7 +12998,7 @@ fi
+ 
+ $as_echo "#define USE_WIN32API 1" >>confdefs.h
+ 
+-      WIN32APILIBS="-lws2_32"
++      WIN32APILIBS="-lws2_32 -lbcrypt"
+       ;;
+   esac
