@@ -3,6 +3,8 @@ from e3.anod.helper import Configure, Make, log
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
 import os
+import re
+import subprocess
 
 class GCC(spec('common')):
 
@@ -50,14 +52,21 @@ class GCC(spec('common')):
             return ['c', 'ada']
 
     @property
+    def is_target_macos(self):
+        # in macOS, the target triplet ends with the OS version
+        return re.match('x86_64-apple-darwin', self.env.target.triplet) != None
+    
+    @property
     def build_deps(self):
         deps = [Anod.Dependency("gmp",      target='host', track=True),
                 Anod.Dependency("mpfr",     target='host', track=True),
                 Anod.Dependency("mpc",      target='host', track=True),
-                Anod.Dependency("isl",      target='host', track=True),
-                Anod.Dependency("binutils", track=True)]
+                Anod.Dependency("isl",      target='host', track=True)]
 
-        # We se the system's GCC/GNAT to build native GCC/GNAT, that's why it
+        if not self.is_target_macos:
+            deps.append (Anod.Dependency("binutils", track=True))
+
+        # We use the system's GCC/GNAT to build native GCC/GNAT, that's why it
         # is not specified as a dependency here.
 
         if self.is_cross and not self.bootstrap:
@@ -71,9 +80,27 @@ class GCC(spec('common')):
         args = ["--disable-nls", # Disable Native Language Support (NLS)
                 "--without-libiconv-prefix",
                 "--disable-libstdcxx-pch",
-                "--enable-lto",
-                "--with-gnu-as",
-                "--with-gnu-ld"]
+                "--enable-lto"]
+
+        if self.is_target_macos:
+            # This is what GNAT CE 2020 used to overcome the unusual
+            # arrangements in macOS Catalina and later.
+            SDKROOT = \
+                subprocess.check_output (['xcrun', '--show-sdk-path'],
+                                         text=True)[:-1]
+            args.append ("--with-build-sysroot=" + SDKROOT)
+            args.append ("--with-sysroot=")
+            # GNAT CE 2020 used a specs function xcode-path() which is
+            # unknown to GCC.
+            # Also, --sysroot= isn't accepted here (some weirdness about
+            # the way the argument is presented to configure, involves
+            # extra quotes ' ???)
+            # Is this needed anyway?
+            # args.append ("--with-specs='%%{!sysroot=*:--sysroot=%s}'"
+            #              % SDKROOT)
+        else:
+            args.append ("--with-gnu-as")
+            args.append ("--with-gnu-ld")
 
         # Linux64 Native
         if self.env.target.triplet == "x86_64-pc-linux-gnu":
@@ -113,7 +140,11 @@ class GCC(spec('common')):
                 self.deps[m].setenv()
 
         # We need to install binutils in the compiler package
-        self.deps["binutils"].merge(self["INSTALL_DIR"])
+        if "binutils" in self.deps:
+            self.deps["binutils"].merge(self["INSTALL_DIR"])
+            configure.add("--with-build-time-tools=%s" %
+                          os.path.join(self.deps["binutils"]["INSTALL_DIR"],
+                                       'bin'))
 
         # Also install newlib for cross
         if "newlib" in self.deps:
@@ -124,9 +155,6 @@ class GCC(spec('common')):
         configure.add("--host=%s" % self.env.host.triplet)
         configure.add("--target=%s" % self.env.target.triplet)
         configure.add('--prefix=%s' % unixpath(self['INSTALL_DIR']))
-
-        configure.add("--with-build-time-tools=%s" %
-                      os.path.join(self.deps["binutils"]["INSTALL_DIR"], 'bin'))
 
         configure.add("--enable-languages=" + ",".join(self.enable_languages))
 
