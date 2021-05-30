@@ -85,6 +85,7 @@ class GCC(spec('common')):
         if self.is_target_macos:
             # This is what GNAT CE 2020 used to overcome the unusual
             # arrangements in macOS Catalina and later.
+            args.append ("--with-build-config=no")
             SDKROOT = \
                 subprocess.check_output (['xcrun', '--show-sdk-path'],
                                          text=True)[:-1]
