@@ -37,7 +37,7 @@ jobs:
       - name: Upload math result for job 2
         uses: actions/upload-artifact@v2
         with:
-          name: homework
+          name: homework2
           path: math-homework.txt
 
   job_3:
@@ -48,7 +48,7 @@ jobs:
       - name: Download math result for job 2
         uses: actions/download-artifact@v2
         with:
-          name: homework
+          name: homework2
       - name: Print the final result
         shell: bash
         run: |
