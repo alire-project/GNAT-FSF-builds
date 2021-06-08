@@ -1,0 +1,12 @@
+from e3.anod.loader import spec
+from e3.os.fs import touch
+import os
+
+class ArtifactA(spec('gh-artifact')):
+    @property
+    def version(self):
+        return "1.0.0"
+
+    def artifact_build(self):
+        touch(os.path.join(self['INSTALL_DIR'], "artifact_a_1"))
+        touch(os.path.join(self['INSTALL_DIR'], "artifact_a_2"))

@@ -9,61 +9,78 @@ on:
 
 jobs:
   job_1:
-    name: Add 3 and 7
     runs-on: ubuntu-latest
     steps:
-      - shell: bash
-        run: |
-          expr 3 + 7 > math-homework.txt
-      - name: Upload math result for job 1
-        uses: actions/upload-artifact@v2
+      - uses: actions/checkout@v1
+   
+      - uses: actions/setup-python@v2
         with:
-          name: homework
-          path: math-homework.txt
+          python-version: 3.8
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install e3-core      - shell: bash
+
+      - run: ./anod build artifacta -v --loglevel DEBUG --enable-cleanup
+
+      - uses: actions/upload-artifact@v2
+        with:
+          path: artifacts/*
+
+      - run: ls -laR
 
   job_2:
-    name: Multiply by 9
-    needs: job_1
+    needs : job_1
     runs-on: ubuntu-latest
     steps:
-      - name: Download math result for job 1
-        uses: actions/download-artifact@v2
+      - uses: actions/checkout@v1
+   
+      - uses: actions/download-artifact@v2
         with:
-          name: homework
-      - shell: bash
+          path: artifacts/
+
+      - run: ls -laR
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install Python dependencies
         run: |
-          value=`cat math-homework.txt`
-          expr $value \* 9 > math-homework.txt
-      - name: Upload math result for job 2
-        uses: actions/upload-artifact@v2
+          python -m pip install --upgrade pip
+          pip install e3-core      - shell: bash
+
+      - run: ./anod build artifactb -v --loglevel DEBUG --enable-cleanup
+
+      - uses: actions/upload-artifact@v2
         with:
-          name: homework2
-          path: math-homework.txt
+          path: artifacts/*
+
+      - run: ls -laR
 
   job_3:
-    name: Display results
-    needs: job_2
+    needs : job_2
     runs-on: ubuntu-latest
     steps:
-      - name: Download math result for job 2
-        uses: actions/download-artifact@v2
+      - uses: actions/checkout@v1
+   
+      - uses: actions/download-artifact@v2
         with:
-          name: homework2
-      - name: Print the final result
-        shell: bash
-        run: |
-          value=`cat math-homework.txt`
-          echo The result is $value
+          path: artifacts/
 
-  job_4:
-    needs: job_3
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v2
-      - name: plop
-        shell: bash
-        run: |
-          ls -R
+      - run: ls -laR
 
-          
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install e3-core      - shell: bash
+
+      - run: ./anod build artifactc -v --loglevel DEBUG --enable-cleanup
+
+      - uses: actions/upload-artifact@v2
+        with:
+          path: artifacts/*
+
+      - run: ls -laR

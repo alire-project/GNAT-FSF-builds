@@ -1,0 +1,96 @@
+from e3.os.fs import unixpath
+from e3.fs import mkdir
+from e3.anod.helper import Configure, Make
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+from e3.anod.helper import log
+from e3.archive import create_archive, unpack_archive
+
+import os
+import glob
+
+
+class GHArtifact(spec('common')):
+    """ This anod spec provides a generic way of passing build results from one
+    GitHub (GH) Action (GHA) job to the other. This is required to overcome the
+    6 hours time limit on GHA jobs, which makes impossible the build of GNAT
+    native and multiple cross GNAT on Windows in one job.
+
+    The Specs that inherit from this Spec will have their build result stored
+    in an archive, and this archive stored in a dedicated folder of the
+    sandbox.
+
+    The location of the folder is taken relative to the Anod specs folder:
+      <spec_dir>/../artifacts
+
+    The GHA workflow file should then upload an artifact from the content of
+    this folder and then download the artifact for all the jobs that depends on
+    it, e.g.:
+       - job_1:
+         - build GCC native
+         - build GPRBUILD
+         - upload GCC and GPRBUILD as artifacts
+      - job_2:
+         - wait for job_1
+         - download GCC and GPRBUILD artifacts
+         - build GNATcov
+      - job_3:
+         - wait for job_1
+         - download GCC and GPRBUILD artifacts
+         - build GNAT arm-elf
+    """
+
+    def artifact_build(self):
+        raise Exception("artifact_build() not implemented")
+
+    @property
+    def artifacts_dir(self):
+        return os.path.join(self.spec_dir, '..', 'artifacts')
+
+    @property
+    def artifact_name(self):
+        return "%s-%s-%s" % (self.name,
+                             self.version,
+                             self.env.platform)
+
+    @property
+    def artifact_archive(self):
+        return self.artifact_name + ".tar.bz2"
+
+    def find_artifact(self):
+        """GitHub will sometimes put artifacts in subdirectories of the
+        artifact dir if there are multiple, so we do an os.walk() to search for
+        them.
+
+        Return None if the artifact is not found.
+        """
+        for root, dirs, files in os.walk(self.artifacts_dir):
+            for name in files:
+                if name == self.artifact_archive:
+                    ret = os.path.join(root, name)
+                    log.debug("Found '%s' for '%s' artifact" % (ret, self.artifact_name))
+                    return ret
+        return None
+
+    def publish_artifact(self):
+        log.debug("Building artifact for '%s'" % self.artifact_name)
+        mkdir(self.artifacts_dir)
+        create_archive(filename=self.artifact_archive,
+                       from_dir=self["INSTALL_DIR"],
+                       dest=self.artifacts_dir,
+                       from_dir_rename=self.artifact_name)
+
+    def install_from_artifact(self, arti):
+        log.debug("Installing from artifact: '%s'" % arti)
+        unpack_archive(filename=arti,
+                       dest=self["INSTALL_DIR"],
+                       remove_root_dir=True)
+
+    @Anod.primitive()
+    def build(self):
+        arti = self.find_artifact()
+        if arti is not None:
+            self.install_from_artifact(arti)
+        else:
+            self.artifact_build()
+            self.publish_artifact()
