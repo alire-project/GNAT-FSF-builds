@@ -117,7 +117,7 @@ jobs:
 
 
 
-gnat_arm_elf:
+  gnat_arm_elf:
     name: GNAT arm-elf-windows
     needs: gnat_gprbuild
     runs-on: windows-latest
@@ -173,7 +173,7 @@ gnat_arm_elf:
 
 
 
-gnat_riscv64_elf:
+  gnat_riscv64_elf:
     name: GNAT riscv64-elf-windows
     needs: gnat_gprbuild
     runs-on: windows-latest
