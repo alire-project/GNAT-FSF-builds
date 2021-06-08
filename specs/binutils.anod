@@ -5,7 +5,7 @@ from e3.anod.spec import Anod
 from e3.anod.loader import spec
 
 
-class Binutils(spec('common')):
+class Binutils(spec('gh-artifact')):
 
     @property
     def version(self):
@@ -49,8 +49,10 @@ class Binutils(spec('common')):
     def merge(self, prefix):
         sync_tree(self["INSTALL_DIR"], prefix, delete=False)
 
-    @Anod.primitive()
-    def build(self):
+    def artifact_build(self):
+        # This spec inherit from gh-artifact and therefore has a different
+        # build method.
+
         for m in self.deps:
             self.deps[m].setenv()
 

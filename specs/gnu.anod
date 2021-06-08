@@ -2,7 +2,7 @@ from e3.anod.loader import spec
 from e3.anod.spec import Anod
 import os
 
-class GNU(spec('common')):
+class GNU(spec('gh-artifact')):
 
     def pre_build(self):
         """Method called just before starting the build."""
@@ -31,8 +31,10 @@ class GNU(spec('common')):
         self.env.add_search_path('LIBRARY_PATH',
                                  os.path.join(self['INSTALL_DIR'], 'lib'))
 
-    @Anod.primitive(pre="setup")
-    def build(self):
+    def artifact_build(self):
+        # This spec inherit from gh-artifact and therefore has a different
+        # build method.
+
         self.pre_build()
         for m in self.deps:
             self.deps[m].setenv()

@@ -5,7 +5,7 @@ from e3.anod.spec import Anod
 from e3.anod.loader import spec
 import os
 
-class GCC(spec('common')):
+class GCC(spec('gh-artifact')):
 
     @property
     def version(self):
@@ -106,7 +106,7 @@ class GCC(spec('common')):
             args.append("--with-native-system-header-dir=%s" %
                         unixpath(os.path.join(self["INSTALL_DIR"], 'include')))
 
-            
+
 
         cross_commons = ["--enable-plugins",
                          "--disable-decimal-float",
@@ -133,8 +133,10 @@ class GCC(spec('common')):
 
         return args
 
-    @Anod.primitive()
-    def build(self):
+    def artifact_build(self):
+        # This spec inherit from gh-artifact and therefore has a different
+        # build method.
+
         for m in ("binutils", "gcc_native", "mingw", "base_compiler_cross_target"):
             if m in self.deps:
                 self.deps[m].setenv()
@@ -211,11 +213,11 @@ class GCC(spec('common')):
             make('install-gcc')
         else:
             make('all')
-        
+
             if self.env.is_cross:
                 make('cross-gnattools', exec_dir='gcc')
                 make('ada.all.cross', exec_dir='gcc')
-        
+
             make('install-strip')
 
         # Add mingw
