@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Project
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
 
     - name: Set up Python
       uses: actions/setup-python@v2
@@ -48,8 +48,9 @@ jobs:
 
     - uses: actions/upload-artifact@v2
       with:
+        name: anod-artifacts
         path: out_artifacts/*
-        retention-days: 5
+        retention-days: 1
 
     - uses: actions/upload-artifact@v2
       with:
@@ -65,10 +66,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Project
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
 
     - uses: actions/download-artifact@v2
       with:
+        name: anod-artifacts
         path: in_artifacts/
 
     - name: Set up Python
@@ -103,10 +105,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Project
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
 
     - uses: actions/download-artifact@v2
       with:
+        name: anod-artifacts
         path: in_artifacts/
 
     - name: Set up Python
@@ -148,6 +151,7 @@ jobs:
 
     - uses: actions/download-artifact@v2
       with:
+        name: anod-artifacts
         path: in_artifacts/
 
     - name: Set up Python
