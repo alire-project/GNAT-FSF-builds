@@ -25,7 +25,8 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          path: artifacts/*
+          path: out_artifacts/*
+          retention-days: 5
 
       - run: ls -laR
 
@@ -34,10 +35,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-   
+
       - uses: actions/download-artifact@v2
         with:
-          path: artifacts/
+          path: in_artifacts/
 
       - run: ls -laR
 
@@ -53,7 +54,8 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          path: artifacts/*
+          path: out_artifacts/*
+          retention-days: 5
 
       - run: ls -laR
 
@@ -65,7 +67,7 @@ jobs:
    
       - uses: actions/download-artifact@v2
         with:
-          path: artifacts/
+          path: in_artifacts/
 
       - run: ls -laR
 
@@ -81,6 +83,7 @@ jobs:
 
       - uses: actions/upload-artifact@v2
         with:
-          path: artifacts/*
+          path: out_artifacts/*
+          retention-days: 5
 
       - run: ls -laR

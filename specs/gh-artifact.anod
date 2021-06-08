@@ -17,11 +17,12 @@ class GHArtifact(spec('common')):
     native and multiple cross GNAT on Windows in one job.
 
     The Specs that inherit from this Spec will have their build result stored
-    in an archive, and this archive stored in a dedicated folder of the
-    sandbox.
+    in an archive, and this archive stored in a dedicated output folder of the
+    sandbox: <spec_dir>/../out_artifacts
 
-    The location of the folder is taken relative to the Anod specs folder:
-      <spec_dir>/../artifacts
+    The Specs that inherit from this Spec will also look for existing artifact
+    in a dedicated input folder and, if available, will use the artifact
+    instead of building.
 
     The GHA workflow file should then upload an artifact from the content of
     this folder and then download the artifact for all the jobs that depends on
@@ -33,23 +34,27 @@ class GHArtifact(spec('common')):
       - job_2:
          - wait for job_1
          - download GCC and GPRBUILD artifacts
-         - build GNATcov
+         - build GNATcov (uses artifact instead of building GNAT and GPRBUILD again)
       - job_3:
          - wait for job_1
          - download GCC and GPRBUILD artifacts
-         - build GNAT arm-elf
+         - build GNAT arm-elf (uses artifact)
     """
 
     def artifact_build(self):
         raise Exception("artifact_build() not implemented")
 
     @property
-    def artifacts_dir(self):
-        return os.path.join(self.spec_dir, '..', 'artifacts')
+    def artifacts_out_dir(self):
+        return os.path.join(self.spec_dir, '..', 'out_artifacts')
+
+    @property
+    def artifacts_in_dir(self):
+        return os.path.join(self.spec_dir, '..', 'in_artifacts')
 
     @property
     def artifact_name(self):
-        return "%s-%s-%s" % (self.name,
+        return "%s-%s-%s" % (self.build_space_name,
                              self.version,
                              self.env.platform)
 
@@ -64,7 +69,7 @@ class GHArtifact(spec('common')):
 
         Return None if the artifact is not found.
         """
-        for root, dirs, files in os.walk(self.artifacts_dir):
+        for root, dirs, files in os.walk(self.artifacts_in_dir):
             for name in files:
                 if name == self.artifact_archive:
                     ret = os.path.join(root, name)
@@ -74,10 +79,10 @@ class GHArtifact(spec('common')):
 
     def publish_artifact(self):
         log.debug("Building artifact for '%s'" % self.artifact_name)
-        mkdir(self.artifacts_dir)
+        mkdir(self.artifacts_out_dir)
         create_archive(filename=self.artifact_archive,
                        from_dir=self["INSTALL_DIR"],
-                       dest=self.artifacts_dir,
+                       dest=self.artifacts_out_dir,
                        from_dir_rename=self.artifact_name)
 
     def install_from_artifact(self, arti):
@@ -92,5 +97,6 @@ class GHArtifact(spec('common')):
         if arti is not None:
             self.install_from_artifact(arti)
         else:
+            log.debug("Artifact not found, building...")
             self.artifact_build()
             self.publish_artifact()
