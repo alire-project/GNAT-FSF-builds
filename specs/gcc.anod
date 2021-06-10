@@ -57,9 +57,11 @@ class GCC(spec('gh-artifact')):
     def build_deps(self):
         deps = [Anod.Dependency("gmp",      host='build', target='host'),
                 Anod.Dependency("mpfr",     host='build', target='host'),
-                Anod.Dependency("mpc",      host='build', target='host'),
-                Anod.Dependency("isl",      host='build', target='host'),
-                Anod.Dependency("binutils")]
+                Anod.Dependency("mpc",      host='build', target='host')]
+
+        if self.env.target.os.name != 'darwin':
+            deps.append(Anod.Dependency('isl', host='build'))
+            deps.append(Anod.Dependency('binutils', host='build'))
 
         # We se the system's GCC/GNAT to build native GCC/GNAT, that's why it
         # is not specified as a dependency here.
@@ -90,9 +92,7 @@ class GCC(spec('gh-artifact')):
         args = ["--disable-nls", # Disable Native Language Support (NLS)
                 "--without-libiconv-prefix",
                 "--disable-libstdcxx-pch",
-                "--enable-lto",
-                "--with-gnu-as",
-                "--with-gnu-ld"]
+                "--enable-lto"]
 
         # Linux64 Native
         if self.env.target.triplet == "x86_64-pc-linux-gnu":
@@ -106,7 +106,19 @@ class GCC(spec('gh-artifact')):
             args.append("--with-native-system-header-dir=%s" %
                         unixpath(os.path.join(self["INSTALL_DIR"], 'include')))
 
-
+        # macOS Native
+        if self.env.target.triplet.startswith("x86_64-apple-darwin"):
+            args.append("--disable-multilib")
+            args.append("--with-stage1-ldflags=-static-libstdc++")
+            args.append("--with-boot-ldflags=-static-libstdc++")
+            args.append("--disable-libcilkrts")
+            args.append("--with-build-sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk")
+            args.append("--with-sysroot=")
+            args.append("--with-specs=%{!sysroot=*:--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk}")
+            #args.append("--with-specs='%{!sysroot=*:--sysroot=%:xcode-path(/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk)}'")
+        else:
+            args.append("--with-gnu-ld")
+            args.append("--with-gnu-as")
 
         cross_commons = ["--enable-plugins",
                          "--disable-decimal-float",
@@ -142,7 +154,8 @@ class GCC(spec('gh-artifact')):
                 self.deps[m].setenv()
 
         # We need to install binutils in the compiler package
-        self.deps["binutils"].merge(self["INSTALL_DIR"])
+        if 'binutils' in self.deps:
+            self.deps["binutils"].merge(self["INSTALL_DIR"])
 
         # Also install newlib for cross
         if "newlib" in self.deps:
@@ -183,8 +196,9 @@ class GCC(spec('gh-artifact')):
         configure.add("--target=%s" % self.env.target.triplet)
         configure.add('--prefix=%s' % unixpath(self['INSTALL_DIR']))
 
-        configure.add("--with-build-time-tools=%s" %
-                      unixpath(os.path.join(self.deps["binutils"]["INSTALL_DIR"], 'bin')))
+        if 'binutils' in self.deps:
+            configure.add("--with-build-time-tools=%s" %
+                          unixpath(os.path.join(self.deps["binutils"]["INSTALL_DIR"], 'bin')))
 
         configure.add("--enable-languages=" + ",".join(self.enable_languages))
 

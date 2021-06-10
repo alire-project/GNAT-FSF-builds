@@ -1,4 +1,4 @@
-name: GNAT Linux
+name: macOS
 on:
   #schedule:
   #  - cron:  '0 0 * * *'
@@ -8,8 +8,8 @@ on:
 
 jobs:
   gnat_gprbuild:
-    name: GNAT Linux and GPRbuild
-    runs-on: ubuntu-latest
+    name: GNAT macOS and GPRbuild
+    runs-on: macos-latest
     steps:
     - name: Checkout Project
       uses: actions/checkout@v2
@@ -25,7 +25,10 @@ jobs:
         pip install e3-core
 
     - name: Install Ada dependencies
-      run: sudo apt-get install gnat
+      uses: ada-actions/toolchain@ce2020
+      with:
+        distrib: community
+        target: native
 
     - name: Build GNAT native
       run: ./anod build gcc -v --loglevel DEBUG --enable-cleanup
@@ -100,7 +103,7 @@ jobs:
 
 
   gnat_arm_elf:
-    name: GNAT arm-elf-linux
+    name: GNAT arm-elf-darwin
     needs: gnat_gprbuild
     runs-on: ubuntu-latest
     steps:
@@ -142,7 +145,7 @@ jobs:
 
 
   gnat_riscv64_elf:
-    name: GNAT riscv64-elf-linux
+    name: GNAT riscv64-elf-darwin
     needs: gnat_gprbuild
     runs-on: ubuntu-latest
     steps:
