@@ -91,8 +91,7 @@ class GCC(spec('gh-artifact')):
     def configure_args(self):
         args = ["--disable-nls", # Disable Native Language Support (NLS)
                 "--without-libiconv-prefix",
-                "--disable-libstdcxx-pch",
-                "--enable-lto"]
+                "--disable-libstdcxx-pch"]
 
         # Linux64 Native
         if self.env.target.triplet == "x86_64-pc-linux-gnu":
@@ -111,14 +110,17 @@ class GCC(spec('gh-artifact')):
             args.append("--disable-multilib")
             args.append("--with-stage1-ldflags=-static-libstdc++")
             args.append("--with-boot-ldflags=-static-libstdc++")
-            args.append("--disable-libcilkrts")
-            args.append("--with-build-sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk")
-            args.append("--with-sysroot=")
-            args.append("--with-specs=%{!sysroot=*:--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk}")
+            args.append("--with-sysroot=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk")
+
+            #args.append("--disable-libcilkrts")
+            #args.append("--with-build-sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk")
+            #args.append("--with-sysroot=")
+            #args.append("--with-specs=%{!sysroot=*:--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk}")
             #args.append("--with-specs='%{!sysroot=*:--sysroot=%:xcode-path(/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk)}'")
         else:
             args.append("--with-gnu-ld")
             args.append("--with-gnu-as")
+            args.append("--enable-lto")
 
         cross_commons = ["--enable-plugins",
                          "--disable-decimal-float",
