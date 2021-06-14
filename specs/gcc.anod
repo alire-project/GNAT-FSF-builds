@@ -91,7 +91,8 @@ class GCC(spec('gh-artifact')):
     def configure_args(self):
         args = ["--disable-nls", # Disable Native Language Support (NLS)
                 "--without-libiconv-prefix",
-                "--disable-libstdcxx-pch"]
+                "--disable-libstdcxx-pch",
+                "--enable-lto"]
 
         # Linux64 Native
         if self.env.target.triplet == "x86_64-pc-linux-gnu":
@@ -106,21 +107,22 @@ class GCC(spec('gh-artifact')):
                         unixpath(os.path.join(self["INSTALL_DIR"], 'include')))
 
         # macOS Native
-        if self.env.target.triplet.startswith("x86_64-apple-darwin"):
+        if self.env.target.os.name == 'darwin':
+
+            # Xcode 10 dropped 32-bit support
             args.append("--disable-multilib")
-            #args.append("--with-stage1-ldflags=-static-libstdc++")
-            #args.append("--with-boot-ldflags=-static-libstdc++")
+
+            args.append("--disable-libcilkrts")
+
+            # Workaround for Xcode 12.5 bug on Intel
+            # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100340
+            args.append("--without-build-config")
+
             args.append("--with-sysroot=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk")
 
-            #args.append("--disable-libcilkrts")
-            #args.append("--with-build-sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk")
-            #args.append("--with-sysroot=")
-            #args.append("--with-specs=%{!sysroot=*:--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk}")
-            #args.append("--with-specs='%{!sysroot=*:--sysroot=%:xcode-path(/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk)}'")
-        else:
+        if self.env.host.os.name != 'darwin':
             args.append("--with-gnu-ld")
             args.append("--with-gnu-as")
-            args.append("--enable-lto")
 
         cross_commons = ["--enable-plugins",
                          "--disable-decimal-float",
@@ -193,9 +195,6 @@ class GCC(spec('gh-artifact')):
             )
 
         configure = Configure(self)
-        configure.add("--build=%s" % self.env.build.triplet)
-        configure.add("--host=%s" % self.env.host.triplet)
-        configure.add("--target=%s" % self.env.target.triplet)
         configure.add('--prefix=%s' % unixpath(self['INSTALL_DIR']))
 
         if 'binutils' in self.deps:
@@ -228,7 +227,15 @@ class GCC(spec('gh-artifact')):
             make('all-gcc')
             make('install-gcc')
         else:
-            make('all')
+
+            if self.env.target.os.name == 'darwin':
+                # Use -headerpad_max_install_names in the build,
+                # otherwise updated load commands won't fit in the Mach-O header.
+                # This is needed because `gcc` avoids the superenv shim.
+                # https://github.com/Homebrew/homebrew-core/blob/98064198c7e5464124f53bbdb47bec3e03f1a0cd/Formula/gcc.rb#L136
+                make('all', 'BOOT_LDFLAGS=-Wl,-headerpad_max_install_names')
+            else:
+                make('all')
 
             if self.env.is_cross:
                 make('cross-gnattools', exec_dir='gcc')
