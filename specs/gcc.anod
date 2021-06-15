@@ -59,18 +59,20 @@ class GCC(spec('gh-artifact')):
                 Anod.Dependency("mpfr",     host='build', target='host'),
                 Anod.Dependency("mpc",      host='build', target='host')]
 
+        if self.env.build.os.name != 'darwin':
+            deps.append(Anod.Dependency('isl', host='build', target='host'))
+
         if self.env.target.os.name != 'darwin':
-            deps.append(Anod.Dependency('isl', host='build'))
-            deps.append(Anod.Dependency('binutils', host='build'))
+            deps.append(Anod.Dependency('binutils', target='target'))
 
         # We se the system's GCC/GNAT to build native GCC/GNAT, that's why it
         # is not specified as a dependency here.
 
         if self.env.target.os.is_bareboard and not self.bootstrap:
-            deps.append (Anod.Dependency("newlib"))
+            deps.append(Anod.Dependency("newlib"))
 
         if self.env.is_cross and not self.bootstrap:
-            deps.append (Anod.Dependency("gcc", local_name='gcc_native', target='host'))
+            deps.append(Anod.Dependency("gcc", local_name='gcc_native', target='host'))
 
         if self.env.target.os.name == "windows":
             deps.append(Anod.Dependency("mingw", host="build", target="target", track=True))
@@ -135,7 +137,7 @@ class GCC(spec('gh-artifact')):
                          "--disable-nls",
                          "--disable-shared",
                          "--disable-threads",
-                         "--disable-tls"
+                         "--disable-tls",
                          "--with-newlib"]
 
         if self.env.target.triplet == "arm-eabi":
