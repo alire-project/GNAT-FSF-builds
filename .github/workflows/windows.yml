@@ -15,6 +15,9 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
+    - name: Checkout Project
+      uses: actions/checkout@v2
+
     - name: Install msys2
       uses: msys2/setup-msys2@v2
       with:
@@ -30,8 +33,11 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install e3-core
+
     - name: Prepare msys2 build setup
-      run: mkdir /d/aaa; mount D:/aaa /aaa ; ls /aaa; cd /aaa/ && git clone -b win-canadian https://github.com/alire-project/GNAT-FSF-builds
+      # We need a path that is compatible between Windows and Unix world
+      run: mkdir /d/aaa; mount D:/aaa /aaa ; cd ..; cp -r GNAT-FSF-builds /d/aaa
+
 
     - name: Build GNAT native
       run: mount D:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gcc -v --loglevel DEBUG --enable-cleanup
@@ -76,6 +82,9 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
+    - name: Checkout Project
+      uses: actions/checkout@v2
+
     - name: Install msys2
       uses: msys2/setup-msys2@v2
       with:
@@ -83,7 +92,6 @@ jobs:
           base-devel
           git
           mingw-w64-x86_64-github-cli
-          mingw-w64-x86_64-gcc-ada
           mingw-w64-x86_64-python
           mingw-w64-x86_64-python-pip
           mingw-w64-x86_64-python-psutil
@@ -91,13 +99,16 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install e3-core
+
     - name: Prepare msys2 build setup
-      run: mkdir /d/aaa; mount D:/aaa /aaa ; ls /aaa; cd /aaa/ && git clone -b win-canadian https://github.com/alire-project/GNAT-FSF-builds
+      # We need a path that is compatible between Windows and Unix world
+      run: mkdir /d/aaa; mount D:/aaa /aaa ; cd ..; cp -r GNAT-FSF-builds /d/aaa
 
     - uses: actions/download-artifact@v2
       with:
         name: anod-artifacts
         path: D:/aaa/GNAT-FSF-builds/in_artifacts/
+
 
     - name: Build GNATcov
       run: mount D:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gnatcov -v --loglevel DEBUG --enable-cleanup
@@ -125,6 +136,9 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
+    - name: Checkout Project
+      uses: actions/checkout@v2
+
     - name: Install msys2
       uses: msys2/setup-msys2@v2
       with:
@@ -132,7 +146,6 @@ jobs:
           base-devel
           git
           mingw-w64-x86_64-github-cli
-          mingw-w64-x86_64-gcc-ada
           mingw-w64-x86_64-python
           mingw-w64-x86_64-python-pip
           mingw-w64-x86_64-python-psutil
@@ -141,12 +154,14 @@ jobs:
         python -m pip install --upgrade pip
         pip install e3-core
     - name: Prepare msys2 build setup
-      run: mkdir /d/aaa; mount D:/aaa /aaa ; ls /aaa; cd /aaa/ && git clone -b win-canadian https://github.com/alire-project/GNAT-FSF-builds
+      # We need a path that is compatible between Windows and Unix world
+      run: mkdir /d/aaa; mount D:/aaa /aaa ; cd ..; cp -r GNAT-FSF-builds /d/aaa
 
     - uses: actions/download-artifact@v2
       with:
         name: anod-artifacts
         path: D:/aaa/GNAT-FSF-builds/in_artifacts/
+
 
     - name: Build GNAT arm-elf
       run: mount D:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gcc -v --loglevel DEBUG --target=arm-elf --enable-cleanup
@@ -177,6 +192,9 @@ jobs:
       run:
         shell: msys2 {0}
     steps:
+    - name: Checkout Project
+      uses: actions/checkout@v2
+
     - name: Install msys2
       uses: msys2/setup-msys2@v2
       with:
@@ -184,7 +202,6 @@ jobs:
           base-devel
           git
           mingw-w64-x86_64-github-cli
-          mingw-w64-x86_64-gcc-ada
           mingw-w64-x86_64-python
           mingw-w64-x86_64-python-pip
           mingw-w64-x86_64-python-psutil
@@ -193,7 +210,8 @@ jobs:
         python -m pip install --upgrade pip
         pip install e3-core
     - name: Prepare msys2 build setup
-      run: mkdir /d/aaa; mount D:/aaa /aaa ; ls /aaa; cd /aaa/ && git clone -b win-canadian https://github.com/alire-project/GNAT-FSF-builds
+      # We need a path that is compatible between Windows and Unix world
+      run: mkdir /d/aaa; mount D:/aaa /aaa ; cd ..; cp -r GNAT-FSF-builds /d/aaa
 
     - uses: actions/download-artifact@v2
       with:
