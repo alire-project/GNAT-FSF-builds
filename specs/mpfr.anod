@@ -4,27 +4,26 @@ from e3.anod.spec import Anod
 from e3.anod.loader import spec
 
 
-class MPFR(spec('gnu')):
-
+class MPFR(spec("gnu")):
     @property
     def version(self):
         return "4.1.0"
 
     @property
     def tarball(self):
-        return 'mpfr-%s.tar.bz2' % self.version
+        return "mpfr-%s.tar.bz2" % self.version
 
     @property
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
-                name=self.tarball,
-                url='https://ftp.gnu.org/gnu/mpfr/' + self.tarball)]
+                name=self.tarball, url="https://ftp.gnu.org/gnu/mpfr/" + self.tarball
+            )
+        ]
 
     @property
     def build_source_list(self):
-        return [Anod.Source(name=self.tarball,
-                            publish=True, dest='')]
+        return [Anod.Source(name=self.tarball, publish=True, dest="")]
 
     @property
     def build_deps(self):
@@ -32,7 +31,7 @@ class MPFR(spec('gnu')):
 
     def setup(self):
         configure = Configure(self)
-        configure.add('--prefix=%s' % unixpath(self['INSTALL_DIR']))
+        configure.add("--prefix=%s" % unixpath(self["INSTALL_DIR"]))
         configure.add("--disable-shared")
         configure.add("--with-gmp=%s" % unixpath(self.deps["gmp"]["INSTALL_DIR"]))
 

@@ -1,33 +1,34 @@
 import os
 
 from e3.os.fs import unixpath
-from e3.fs import mkdir, rm, sync_tree
+from e3.fs import mkdir, rm
 from e3.anod.helper import Configure, Make
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
 
 
-class MINGW(spec('common')):
-
+class MINGW(spec("common")):
     @property
     def version(self):
         return "9.0.0"
 
     @property
     def tarball(self):
-        return 'mingw-w64-v%s.tar.bz2' % self.version
+        return "mingw-w64-v%s.tar.bz2" % self.version
 
     @property
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url='https://nav.dl.sourceforge.net/project/mingw-w64/mingw-w64/mingw-w64-release/' + self.tarball)]
+                url="https://nav.dl.sourceforge.net/project/mingw-w64/mingw-w64/mingw-w64-release/"
+                + self.tarball,
+            )
+        ]
 
     @property
     def build_source_list(self):
-        return [Anod.Source(name=self.tarball,
-                            publish=True, dest='')]
+        return [Anod.Source(name=self.tarball, publish=True, dest="")]
 
     @property
     def build_deps(self):

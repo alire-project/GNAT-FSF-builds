@@ -1,17 +1,14 @@
-from e3.os.fs import unixpath
 from e3.fs import mkdir
-from e3.anod.helper import Configure, Make
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
 from e3.anod.helper import log
 from e3.archive import create_archive, unpack_archive
 
 import os
-import glob
 
 
-class GHArtifact(spec('common')):
-    """ This anod spec provides a generic way of passing build results from one
+class GHArtifact(spec("common")):
+    """This anod spec provides a generic way of passing build results from one
     GitHub (GH) Action (GHA) job to the other. This is required to overcome the
     6 hours time limit on GHA jobs, which makes impossible the build of GNAT
     native and multiple cross GNAT on Windows in one job.
@@ -49,17 +46,15 @@ class GHArtifact(spec('common')):
 
     @property
     def artifacts_out_dir(self):
-        return os.path.join(self.spec_dir, '..', 'out_artifacts')
+        return os.path.join(self.spec_dir, "..", "out_artifacts")
 
     @property
     def artifacts_in_dir(self):
-        return os.path.join(self.spec_dir, '..', 'in_artifacts')
+        return os.path.join(self.spec_dir, "..", "in_artifacts")
 
     @property
     def artifact_name(self):
-        return "%s-%s-%s" % (self.build_space_name,
-                             self.version,
-                             self.env.platform)
+        return "%s-%s-%s" % (self.build_space_name, self.version, self.env.platform)
 
     @property
     def artifact_archive(self):
@@ -76,23 +71,25 @@ class GHArtifact(spec('common')):
             for name in files:
                 if name == self.artifact_archive:
                     ret = os.path.join(root, name)
-                    log.debug("Found '%s' for '%s' artifact" % (ret, self.artifact_name))
+                    log.debug(
+                        "Found '%s' for '%s' artifact" % (ret, self.artifact_name)
+                    )
                     return ret
         return None
 
     def publish_artifact(self):
         log.debug("Building artifact for '%s'" % self.artifact_name)
         mkdir(self.artifacts_out_dir)
-        create_archive(filename=self.artifact_archive,
-                       from_dir=self["INSTALL_DIR"],
-                       dest=self.artifacts_out_dir,
-                       from_dir_rename=self.artifact_name)
+        create_archive(
+            filename=self.artifact_archive,
+            from_dir=self["INSTALL_DIR"],
+            dest=self.artifacts_out_dir,
+            from_dir_rename=self.artifact_name,
+        )
 
     def install_from_artifact(self, arti):
         log.debug("Installing from artifact: '%s'" % arti)
-        unpack_archive(filename=arti,
-                       dest=self["INSTALL_DIR"],
-                       remove_root_dir=True)
+        unpack_archive(filename=arti, dest=self["INSTALL_DIR"], remove_root_dir=True)
 
     @Anod.primitive(pre="setup")
     def build(self):

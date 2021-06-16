@@ -1,38 +1,42 @@
 from e3.os.fs import unixpath
-from e3.anod.helper import Configure, Make
+from e3.anod.helper import Make
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
 
 import os
 
-class GNATcoll(spec('common')):
 
+class GNATcoll(spec("common")):
     @property
     def version(self):
         return "21.0.0"
 
     @property
     def tarball(self):
-        return 'gnatcoll-core-%s.tar.gz' % self.version
+        return "gnatcoll-core-%s.tar.gz" % self.version
 
     @property
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url='https://github.com/AdaCore/gnatcoll-core/archive/v%s.tar.gz' % self.version)]
+                url="https://github.com/AdaCore/gnatcoll-core/archive/v%s.tar.gz"
+                % self.version,
+            )
+        ]
 
     @property
     def build_source_list(self):
-        return [Anod.Source(name=self.tarball,
-                            publish=True, dest='')]
+        return [Anod.Source(name=self.tarball, publish=True, dest="")]
 
     @property
     def build_deps(self):
-        return [Anod.Dependency("gcc", track=True),
-                Anod.Dependency("gprbuild", track=True),
-                Anod.Dependency("xmlada", track=True),
-                Anod.Dependency("libgpr", track=True)]
+        return [
+            Anod.Dependency("gcc", track=True),
+            Anod.Dependency("gprbuild", track=True),
+            Anod.Dependency("xmlada", track=True),
+            Anod.Dependency("libgpr", track=True),
+        ]
 
     @Anod.primitive()
     def build(self):
@@ -46,6 +50,6 @@ class GNATcoll(spec('common')):
         make.set_var("INTEGRATED", "no")
         make.set_var("BUILD", "PROD")
         make()
-        make('install')
+        make("install")
 
         self.clean()

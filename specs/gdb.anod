@@ -1,50 +1,51 @@
 from e3.os.fs import unixpath, touch
-from e3.fs import sync_tree, cp
-from e3.anod.helper import Configure, Make, text_replace
+from e3.fs import cp
+from e3.anod.helper import Configure, Make
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
 from e3.diff import patch
 import os
-from datetime import date
 
-# patch from msys2: 
+# patch from msys2:
 # https://github.com/msys2/MINGW-packages/blob/master/mingw-w64-gdb/gdb-lib-order.patch
-patch_name='gdb-lib-order.patch'
+patch_name = "gdb-lib-order.patch"
 
 
-class GDB(spec('common')):
-
+class GDB(spec("common")):
     @property
     def version(self):
         return "10.2"
 
     @property
     def tarball(self):
-        return 'gdb-%s.tar.gz' % self.version
+        return "gdb-%s.tar.gz" % self.version
 
     @property
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
-                name=self.tarball,
-                url='https://ftp.gnu.org/gnu/gdb/%s' % self.tarball),
-                self.LocalSourceBuilder(name=patch_name)]
+                name=self.tarball, url="https://ftp.gnu.org/gnu/gdb/%s" % self.tarball
+            ),
+            self.LocalSourceBuilder(name=patch_name),
+        ]
 
     @property
     def build_source_list(self):
-        return [Anod.Source(name=self.tarball,
-                            publish=True, dest=''),
-                self.Source(name=patch_name, publish=True,
-                            unpack_cmd=cp, dest='patches')]
+        return [
+            Anod.Source(name=self.tarball, publish=True, dest=""),
+            self.Source(name=patch_name, publish=True, unpack_cmd=cp, dest="patches"),
+        ]
 
     @property
     def build_deps(self):
-        deps = [Anod.Dependency('gcc', target='host'),
-                Anod.Dependency('mpfr', target='host'),
-                Anod.Dependency('gmp', target='host')]
+        deps = [
+            Anod.Dependency("gcc", target="host"),
+            Anod.Dependency("mpfr", target="host"),
+            Anod.Dependency("gmp", target="host"),
+        ]
 
         if self.env.host.os.name == "windows":
-            deps.append(Anod.Dependency('libiconv', target='host'))
+            deps.append(Anod.Dependency("libiconv", target="host"))
 
         return deps
 
@@ -53,48 +54,54 @@ class GDB(spec('common')):
         for m in self.deps:
             self.deps[m].setenv()
 
-        # Little hack to apply the patch only once, there is probably a clean 
+        # Little hack to apply the patch only once, there is probably a clean
         # way to do that.
-        patched = os.path.join(self['SRC_DIR'], 'patches', '.patched')
+        patched = os.path.join(self["SRC_DIR"], "patches", ".patched")
         if not os.path.exists(patched):
-            patch(os.path.join(self['SRC_DIR'], 'patches', patch_name),
-                  self.build_space.src_dir)
+            patch(
+                os.path.join(self["SRC_DIR"], "patches", patch_name),
+                self.build_space.src_dir,
+            )
             touch(patched)
 
         configure = Configure(self)
-        configure.add('--prefix=%s' % unixpath(self['INSTALL_DIR']))
-        configure.add("--disable-nls", # Disable Native Language Support (NLS)
-                      "--disable-werror",
-                      "--disable-binutils",
-                      "--disable-gas",
-                      "--disable-ld",
-                      "--disable-gprof",
-                      "--disable-libctf",
-                      "--with-zlib",
-                      "--without-libusb",
-                      "--without-bugurl",
-                      "--without-guile",
-                      "--disable-plugins",
-                      "--disable-gdbserver",
-                      "--with-static-standard-libraries",
-                      "--disable-source-highlight", # Incomaptible with static std libs
-                      "--with-curses",
-                      "--disable-sim",
-                      "--with-mpfr",
-                      "--with-libmpfr-prefix=%s" % unixpath(self.deps['mpfr']['INSTALL_DIR']),
-                      "--with-libgmp-prefix=%s" % unixpath(self.deps['gmp']['INSTALL_DIR']))
+        configure.add("--prefix=%s" % unixpath(self["INSTALL_DIR"]))
+        configure.add(
+            "--disable-nls",  # Disable Native Language Support (NLS)
+            "--disable-werror",
+            "--disable-binutils",
+            "--disable-gas",
+            "--disable-ld",
+            "--disable-gprof",
+            "--disable-libctf",
+            "--with-zlib",
+            "--without-libusb",
+            "--without-bugurl",
+            "--without-guile",
+            "--disable-plugins",
+            "--disable-gdbserver",
+            "--with-static-standard-libraries",
+            "--disable-source-highlight",  # Incomaptible with static std libs
+            "--with-curses",
+            "--disable-sim",
+            "--with-mpfr",
+            "--with-libmpfr-prefix=%s" % unixpath(self.deps["mpfr"]["INSTALL_DIR"]),
+            "--with-libgmp-prefix=%s" % unixpath(self.deps["gmp"]["INSTALL_DIR"]),
+        )
 
         if self.env.host.os.name == "windows":
             configure.add("--disable-tui")
-            configure.add("--with-libiconv-prefix=%s" % unixpath(self.deps['libiconv']['INSTALL_DIR']))
-        else:   
+            configure.add(
+                "--with-libiconv-prefix=%s"
+                % unixpath(self.deps["libiconv"]["INSTALL_DIR"])
+            )
+        else:
             configure.add("--enable-tui")
-
 
         configure()
 
         make = Make(self)
         make()
-        make('install')
+        make("install")
 
         self.clean()

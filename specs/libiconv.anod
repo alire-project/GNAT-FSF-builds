@@ -1,40 +1,44 @@
-from e3.os.fs import unixpath, cd
+from e3.os.fs import unixpath
 from e3.anod.helper import Configure, Make
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
 
 import os
 
-class LibIconv(spec('common')):
 
+class LibIconv(spec("common")):
     @property
     def version(self):
         return "1.16"
 
     @property
     def tarball(self):
-        return 'libiconv-%s.tar.gz' % self.version
+        return "libiconv-%s.tar.gz" % self.version
 
     @property
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url='https://ftp.gnu.org/pub/gnu/libiconv/%s' % self.tarball)]
+                url="https://ftp.gnu.org/pub/gnu/libiconv/%s" % self.tarball,
+            )
+        ]
 
     @property
     def build_source_list(self):
-        return [Anod.Source(name=self.tarball, publish=True, dest='')]
+        return [Anod.Source(name=self.tarball, publish=True, dest="")]
 
     @property
     def build_deps(self):
         return [Anod.Dependency("gcc")]
 
     def setenv(self):
-        self.env.add_search_path('C_INCLUDE_PATH',
-                                 os.path.join(self['INSTALL_DIR'], 'include'))
-        self.env.add_search_path('LIBRARY_PATH',
-                                 os.path.join(self['INSTALL_DIR'], 'lib'))
+        self.env.add_search_path(
+            "C_INCLUDE_PATH", os.path.join(self["INSTALL_DIR"], "include")
+        )
+        self.env.add_search_path(
+            "LIBRARY_PATH", os.path.join(self["INSTALL_DIR"], "lib")
+        )
 
     @Anod.primitive()
     def build(self):
@@ -42,15 +46,15 @@ class LibIconv(spec('common')):
             self.deps[m].setenv()
 
         configure = Configure(self)
-        configure.add('--prefix=%s' % unixpath(self['INSTALL_DIR']))
-        configure.add('--enable-static')
-        configure.add('--enable-extra-encodings')
-        configure.add('--disable-rpath')
-        configure.add('--enable-silent-rules')
+        configure.add("--prefix=%s" % unixpath(self["INSTALL_DIR"]))
+        configure.add("--enable-static")
+        configure.add("--enable-extra-encodings")
+        configure.add("--disable-rpath")
+        configure.add("--enable-silent-rules")
         configure()
 
         make = Make(self)
         make()
-        make('install', jobs=1)
+        make("install", jobs=1)
 
         self.clean()

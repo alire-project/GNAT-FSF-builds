@@ -1,6 +1,6 @@
 from e3.os.fs import unixpath, cd, touch
 from e3.fs import sync_tree, cp
-from e3.anod.helper import Configure, Make, text_replace
+from e3.anod.helper import Make, text_replace
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
 from e3.diff import patch
@@ -9,44 +9,62 @@ from datetime import date
 
 # patch from gprbuild repo:
 # https://github.com/AdaCore/gprbuild/commit/0b775473a8eb5f820f487869d31ac534a437826c
-patch_name='libgpr-fix-macos-build.patch'
+patch_name = "libgpr-fix-macos-build.patch"
 
-class GPRbuild(spec('gh-artifact')):
 
+class GPRbuild(spec("gh-artifact")):
     @property
     def version(self):
         return "21.0.0"
 
     @property
     def tarball(self):
-        return 'gprbuild-%s.tar.gz' % self.version
+        return "gprbuild-%s.tar.gz" % self.version
 
     @property
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url='https://github.com/AdaCore/gprbuild/archive/v%s/%s' % (self.version,
-                                                                            self.tarball)),
-                self.LocalSourceBuilder(name=patch_name)]
+                url="https://github.com/AdaCore/gprbuild/archive/v%s/%s"
+                % (self.version, self.tarball),
+            ),
+            self.LocalSourceBuilder(name=patch_name),
+        ]
 
     @property
     def build_source_list(self):
         if self.bootstrap:
-            return [Anod.Source(name=self.tarball, publish=True, dest=''),
-                    self.Source(name=patch_name, publish=True,
-                                unpack_cmd=cp, dest='patches'),
-                    Anod.Source(name=self.deps['gprconfig_kb'].tarball, publish=True, dest='gprconfig_kb'),
-                    Anod.Source(name=self.deps['xmlada'].tarball, publish=True, dest='xmlada')]
+            return [
+                Anod.Source(name=self.tarball, publish=True, dest=""),
+                self.Source(
+                    name=patch_name, publish=True, unpack_cmd=cp, dest="patches"
+                ),
+                Anod.Source(
+                    name=self.deps["gprconfig_kb"].tarball,
+                    publish=True,
+                    dest="gprconfig_kb",
+                ),
+                Anod.Source(
+                    name=self.deps["xmlada"].tarball, publish=True, dest="xmlada"
+                ),
+            ]
         else:
-            return [Anod.Source(name=self.tarball, publish=True, dest=''),
-                    self.Source(name=patch_name, publish=True,
-                                unpack_cmd=cp, dest='patches'),
-                    Anod.Source(name=self.deps['gprconfig_kb'].tarball, publish=True, dest='gprconfig_kb')]
+            return [
+                Anod.Source(name=self.tarball, publish=True, dest=""),
+                self.Source(
+                    name=patch_name, publish=True, unpack_cmd=cp, dest="patches"
+                ),
+                Anod.Source(
+                    name=self.deps["gprconfig_kb"].tarball,
+                    publish=True,
+                    dest="gprconfig_kb",
+                ),
+            ]
 
     @property
     def bootstrap(self):
-        return 'bootstrap' in self.parsed_qualifier
+        return "bootstrap" in self.parsed_qualifier
 
     @property
     def build_space_name(self):
@@ -57,8 +75,10 @@ class GPRbuild(spec('gh-artifact')):
 
     @property
     def build_deps(self):
-        deps = [Anod.Dependency("gcc", track=True),
-                Anod.Dependency("gprconfig_kb", require="source_pkg", track=True)]
+        deps = [
+            Anod.Dependency("gcc", track=True),
+            Anod.Dependency("gprconfig_kb", require="source_pkg", track=True),
+        ]
 
         if not self.bootstrap:
             deps.append(Anod.Dependency("xmlada", track=True))
@@ -70,42 +90,56 @@ class GPRbuild(spec('gh-artifact')):
 
     def update_version(self):
         text_replace(
-            os.path.join(self['SRC_DIR'], "gpr", "src", "gpr-version.ads"),
-            [("Build_Type : constant Gnat_Build_Type := Gnatpro;",
-              "Build_Type : constant Gnat_Build_Type := FSF;")],
+            os.path.join(self["SRC_DIR"], "gpr", "src", "gpr-version.ads"),
+            [
+                (
+                    "Build_Type : constant Gnat_Build_Type := Gnatpro;",
+                    "Build_Type : constant Gnat_Build_Type := FSF;",
+                )
+            ],
         )
         text_replace(
-            os.path.join(self['SRC_DIR'], "gpr", "src", "gpr-version.ads"),
-            [("Gpr_Version : constant String.*",
-              'Gpr_Version : constant String := "%s";' % self.version),
-             ("Date : constant String.*",
-              'Date : constant String := "%s";' % str(date.today())),
-             ("Current_Year : constant String.*",
-              'Current_Year : constant String := "%s";' % str(date.today().year))],
+            os.path.join(self["SRC_DIR"], "gpr", "src", "gpr-version.ads"),
+            [
+                (
+                    "Gpr_Version : constant String.*",
+                    'Gpr_Version : constant String := "%s";' % self.version,
+                ),
+                (
+                    "Date : constant String.*",
+                    'Date : constant String := "%s";' % str(date.today()),
+                ),
+                (
+                    "Current_Year : constant String.*",
+                    'Current_Year : constant String := "%s";' % str(date.today().year),
+                ),
+            ],
         )
 
-
     def do_bootstrap(self):
-        for m in ['gcc']:
+        for m in ["gcc"]:
             if m in self.deps:
                 self.deps[m].setenv()
 
-        if self.env.build.os.name == 'darwin':
+        if self.env.build.os.name == "darwin":
             # macOS' install (from BSD) doesn't support -t switch
-            text_replace(
-                os.path.join(self['SRC_DIR'], "bootstrap.sh"), [(" -t ", " ")])
+            text_replace(os.path.join(self["SRC_DIR"], "bootstrap.sh"), [(" -t ", " ")])
 
-        cd(self['SRC_DIR'])
-        self.shell('./bootstrap.sh',
-                   '--with-xmlada=%s' % os.path.join(self["SRC_DIR"], 'xmlada'),
-                   '--with-kb=%s' % os.path.join(self["SRC_DIR"], 'gprconfig_kb'),
-                   '--build')
+        cd(self["SRC_DIR"])
+        self.shell(
+            "./bootstrap.sh",
+            "--with-xmlada=%s" % os.path.join(self["SRC_DIR"], "xmlada"),
+            "--with-kb=%s" % os.path.join(self["SRC_DIR"], "gprconfig_kb"),
+            "--build",
+        )
 
-        self.shell('./bootstrap.sh',
-                   '--prefix=%s' % unixpath(self['INSTALL_DIR']),
-                   '--with-xmlada=%s' % os.path.join(self["SRC_DIR"], 'xmlada'),
-                   '--with-kb=%s' % os.path.join(self["SRC_DIR"], 'gprconfig_kb'),
-                   '--install')
+        self.shell(
+            "./bootstrap.sh",
+            "--prefix=%s" % unixpath(self["INSTALL_DIR"]),
+            "--with-xmlada=%s" % os.path.join(self["SRC_DIR"], "xmlada"),
+            "--with-kb=%s" % os.path.join(self["SRC_DIR"], "gprconfig_kb"),
+            "--install",
+        )
         self.clean()
 
     def artifact_build(self):
@@ -116,16 +150,18 @@ class GPRbuild(spec('gh-artifact')):
 
         # Little hack to apply the patch only once, there is probably a clean
         # way to do that.
-        patched = os.path.join(self['SRC_DIR'], 'patches', '.patched')
+        patched = os.path.join(self["SRC_DIR"], "patches", ".patched")
         if not os.path.exists(patched):
-            patch(os.path.join(self['SRC_DIR'], 'patches', patch_name),
-                  self.build_space.src_dir)
+            patch(
+                os.path.join(self["SRC_DIR"], "patches", patch_name),
+                self.build_space.src_dir,
+            )
             touch(patched)
 
         if self.bootstrap:
             return self.do_bootstrap()
 
-        for m in ['gcc', 'xmlada', 'gprbuild']:
+        for m in ["gcc", "xmlada", "gprbuild"]:
             if m in self.deps:
                 self.deps[m].setenv()
 
@@ -137,8 +173,8 @@ class GPRbuild(spec('gh-artifact')):
         make("distall", jobs=1)
 
         # Install the gprconfig knowledge-base
-        kb_src = os.path.join(self["SRC_DIR"], 'gprconfig_kb', 'db')
-        kb_dst = os.path.join(self["INSTALL_DIR"], 'share', 'gprconfig')
+        kb_src = os.path.join(self["SRC_DIR"], "gprconfig_kb", "db")
+        kb_dst = os.path.join(self["INSTALL_DIR"], "share", "gprconfig")
         sync_tree(kb_src, kb_dst)
 
         self.clean()
