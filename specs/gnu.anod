@@ -13,16 +13,6 @@ class GNU(spec('gh-artifact')):
 
         # For native builds we use the system compiler
 
-        if self.env.is_canadian:
-            deps.append(
-                Anod.Dependency(
-                    name="gcc",
-                    host="build",
-                    target="host",
-                    local_name="canadian-cross-compiler",
-                )
-            )
-
         return deps
 
     def setenv(self):

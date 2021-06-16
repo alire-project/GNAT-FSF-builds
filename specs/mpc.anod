@@ -32,8 +32,6 @@ class MPC(spec('gnu')):
 
     def setup(self):
         configure = Configure(self)
-        configure.add("--build=%s" % self.env.build.triplet)
-        configure.add("--host=%s" % self.env.target.triplet)
         configure.add('--prefix=%s' % unixpath(self['INSTALL_DIR']))
         configure.add("--disable-shared")
         configure.add("--with-gmp=%s" % unixpath(self.deps["gmp"]["INSTALL_DIR"]))

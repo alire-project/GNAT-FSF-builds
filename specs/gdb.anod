@@ -46,17 +46,6 @@ class GDB(spec('common')):
         if self.env.host.os.name == "windows":
             deps.append(Anod.Dependency('libiconv', target='host'))
 
-        # Environment dependencies
-        if self.env.is_canadian:
-            deps.append(
-                Anod.Dependency(
-                    name="gcc",
-                    host="build",
-                    target="host",
-                    local_name="canadian-cross-compiler",
-                )
-            )
-
         return deps
 
     @Anod.primitive()
@@ -73,9 +62,6 @@ class GDB(spec('common')):
             touch(patched)
 
         configure = Configure(self)
-        configure.add("--build=%s" % self.env.build.triplet)
-        configure.add("--host=%s" % self.env.host.triplet)
-        configure.add("--target=%s" % self.env.target.triplet)
         configure.add('--prefix=%s' % unixpath(self['INSTALL_DIR']))
         configure.add("--disable-nls", # Disable Native Language Support (NLS)
                       "--disable-werror",

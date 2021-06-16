@@ -52,9 +52,6 @@ class XMLAda(spec('common')):
             self.deps[m].setenv()
 
         configure = Configure(self, exec_dir=self["BUILD_DIR"])
-        configure.add("--build=%s" % self.env.build.triplet)
-        configure.add("--host=%s" % self.env.host.triplet)
-        configure.add("--target=%s" % self.env.target.triplet)
         configure.add("--prefix=" + unixpath(self["INSTALL_DIR"]))
 
         make = Make(self)

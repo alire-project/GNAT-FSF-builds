@@ -77,17 +77,6 @@ class GCC(spec('gh-artifact')):
         if self.env.target.os.name == "windows":
             deps.append(Anod.Dependency("mingw", host="build", target="target", track=True))
 
-        # Environment dependencies
-        if self.env.is_canadian:
-            deps.append(
-                Anod.Dependency(
-                    name="gcc",
-                    host="build",
-                    target="target",
-                    local_name="base_compiler_cross_target",
-                )
-            )
-
         return deps
 
     def configure_args(self):

@@ -42,8 +42,6 @@ class LibIconv(spec('common')):
             self.deps[m].setenv()
 
         configure = Configure(self)
-        configure.add("--build=%s" % self.env.build.triplet)
-        configure.add("--host=%s" % self.env.target.triplet)
         configure.add('--prefix=%s' % unixpath(self['INSTALL_DIR']))
         configure.add('--enable-static')
         configure.add('--enable-extra-encodings')
