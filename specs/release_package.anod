@@ -116,7 +116,10 @@ class ReleasePackage(spec('common')):
             return
 
         log.info("Publishing GitHub release for %s..." % (name))
-        self.shell('gh', 'release', 'create', name, archive, sha)
+        self.shell('gh', 'release', 'create', name,
+                   '--notes', name,
+                   '--draft',
+                   archive, sha)
 
     @Anod.primitive()
     def build(self):
