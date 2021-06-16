@@ -31,7 +31,7 @@ class GNATcov(spec('common')):
 
     @property
     def build_deps(self):
-        return [Anod.Dependency("gcc",  track=True),
+        deps = [Anod.Dependency("gcc",  track=True),
                 Anod.Dependency("gprbuild", track=True),
                 Anod.Dependency("libgpr", track=True),
                 Anod.Dependency("gnatcoll", track=True),
@@ -40,7 +40,12 @@ class GNATcov(spec('common')):
                 Anod.Dependency("libadalang",track=True),
                 Anod.Dependency("binutils", track=True),
                 Anod.Dependency("gnatutil", track=True),
-                Anod.Dependency("xmlada", track=True)]
+                Anod.Dependency("xmlada", track=True),
+                Anod.Dependency("zlib", track=True),
+                Anod.Dependency("gmp", track=True)]
+        if self.env.target.os.name == "windows":
+            deps.append(Anod.Dependency("libiconv"))
+        return deps
 
     @Anod.primitive()
     def build(self):

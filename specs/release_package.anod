@@ -34,10 +34,30 @@ class ReleasePackage(spec('common')):
             return self.deps['gcc'].version
 
     @property
+    def package_release(self):
+        """ Allows to differentiate between consecutive builds of the same set
+            of sources. For instance when the build options are changed.
+        """
+        package = self.package
+
+        if package == 'gprbuild':
+            return '1'
+        elif package == 'gnatcov':
+            return '1'
+        elif package == 'gnat':
+            if self.env.target.triplet == 'arm-eabi':
+                return '1'
+            elif self.env.target.triplet == 'riscv64-elf':
+                return '1'
+            else:
+                return '1'
+
+    @property
     def release_name(self):
-        return "%s-%s-%s" % (self.package,
+        return "%s-%s-%s-%s" % (self.package,
                              self.env.platform,
-                             self.version)
+                             self.version,
+                             self.package_release)
 
     @property
     def archive_name(self):
@@ -71,7 +91,7 @@ class ReleasePackage(spec('common')):
                         Anod.Dependency("gdb", track=True),
                         Anod.Dependency("embedded-runtimes", track=True)]
 
-            elif self.env.build.triplet == self.env.target.triplet:
+            elif self.env.host.triplet == self.env.target.triplet:
                 # Native
                 return [Anod.Dependency("gcc", track=True),
                         Anod.Dependency("gdb", track=True)]

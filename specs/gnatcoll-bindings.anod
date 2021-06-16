@@ -29,11 +29,16 @@ class GNATcollBindings(spec('common')):
 
     @property
     def build_deps(self):
-        return [Anod.Dependency("gcc", track=True),
-                Anod.Dependency("gprbuild", track=True),
-                Anod.Dependency("gnatcoll", track=True),
-                Anod.Dependency("libgpr", track=True),
-                Anod.Dependency("xmlada", track=True)]
+        deps = [Anod.Dependency("gcc"),
+                Anod.Dependency("gprbuild"),
+                Anod.Dependency("gnatcoll"),
+                Anod.Dependency("libgpr"),
+                Anod.Dependency("xmlada"),
+                Anod.Dependency("gmp"),
+                Anod.Dependency("zlib")]
+        if self.env.target.os.name == "windows":
+            deps.append(Anod.Dependency("libiconv"))
+        return deps
 
     @Anod.primitive()
     def build(self):

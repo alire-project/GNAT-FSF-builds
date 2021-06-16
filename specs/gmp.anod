@@ -4,7 +4,7 @@ from e3.anod.spec import Anod
 from e3.anod.loader import spec
 
 
-class GMP(spec('common')):
+class GMP(spec('gnu')):
 
     @property
     def version(self):
@@ -23,11 +23,13 @@ class GMP(spec('common')):
 
     @property
     def build_source_list(self):
-        return [Anod.Source(name=self.tarball,
-                            publish=True, dest='')]
+        return [Anod.Source(name=self.tarball, publish=True, dest='')]
 
-    @Anod.primitive()
-    def build(self):
+    @property
+    def build_deps(self):
+        return self.compiler_deps()
+
+    def setup(self):
         configure = Configure(self)
         configure.add("--build=%s" % self.env.build.triplet)
         configure.add("--host=%s" % self.env.target.triplet)
@@ -35,10 +37,6 @@ class GMP(spec('common')):
         configure.add("--disable-shared")
         configure.add("--enable-cxx")
 
-        configure()
-
         make = Make(self)
-        make()
-        make('install')
 
-        self.clean()
+        return {"configure": configure, "make": make}

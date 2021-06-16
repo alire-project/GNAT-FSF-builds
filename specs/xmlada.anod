@@ -30,8 +30,21 @@ class XMLAda(spec('common')):
 
     @property
     def build_deps(self):
-        return [Anod.Dependency("gcc", track=True),
-                Anod.Dependency("gprbuild", qualifier="bootstrap", track=True)]
+        deps = [Anod.Dependency("gprbuild", qualifier="bootstrap")]
+
+        if self.env.is_canadian:
+            deps.append(
+                Anod.Dependency(
+                    name="gcc",
+                    host="build",
+                    target="host",
+                    local_name="canadian-cross-compiler",
+                )
+            )
+        else:
+            deps.append(Anod.Dependency("gcc"))
+
+        return deps
 
     @Anod.primitive()
     def build(self):
@@ -39,6 +52,9 @@ class XMLAda(spec('common')):
             self.deps[m].setenv()
 
         configure = Configure(self, exec_dir=self["BUILD_DIR"])
+        configure.add("--build=%s" % self.env.build.triplet)
+        configure.add("--host=%s" % self.env.host.triplet)
+        configure.add("--target=%s" % self.env.target.triplet)
         configure.add("--prefix=" + unixpath(self["INSTALL_DIR"]))
 
         make = Make(self)

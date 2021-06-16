@@ -4,7 +4,7 @@ from e3.anod.spec import Anod
 from e3.anod.loader import spec
 
 
-class ISL(spec('common')):
+class ISL(spec('gnu')):
 
     @property
     def version(self):
@@ -28,21 +28,16 @@ class ISL(spec('common')):
 
     @property
     def build_deps(self):
-        return [Anod.Dependency("gmp", require='installation', track=True)]
+        return [Anod.Dependency("gmp")] + self.compiler_deps()
 
-    @Anod.primitive()
-    def build(self):
+    def setup(self):
         configure = Configure(self)
         configure.add("--build=%s" % self.env.build.triplet)
         configure.add("--host=%s" % self.env.target.triplet)
         configure.add('--prefix=%s' % unixpath(self['INSTALL_DIR']))
         configure.add("--disable-shared")
-        configure.add("--with-gmp=%s" % unixpath(self.deps["gmp"]["INSTALL_DIR"]))
-
-        configure()
+        configure.add("--with-gmp-prefix=%s" % unixpath(self.deps["gmp"]["INSTALL_DIR"]))
 
         make = Make(self)
-        make()
-        make('install')
 
-        self.clean()
+        return {"configure": configure, "make": make}

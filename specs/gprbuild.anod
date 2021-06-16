@@ -7,7 +7,7 @@ import os
 from datetime import date
 
 
-class GPRbuild(spec('common')):
+class GPRbuild(spec('gh-artifact')):
 
     @property
     def version(self):
@@ -94,8 +94,9 @@ class GPRbuild(spec('common')):
                    '--install')
         self.clean()
 
-    @Anod.primitive()
-    def build(self):
+    def artifact_build(self):
+        # This spec inherit from gh-artifact and therefore has a different
+        # build method.
 
         self.update_version()
 
