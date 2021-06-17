@@ -25,6 +25,7 @@ jobs:
           base-devel
           git
           mingw-w64-x86_64-github-cli
+          mingw-w64-x86_64-toolchain
           mingw-w64-x86_64-gcc-ada
           mingw-w64-x86_64-python
           mingw-w64-x86_64-python-pip
@@ -91,6 +92,7 @@ jobs:
         install: >-
           base-devel
           git
+          mingw-w64-x86_64-toolchain
           mingw-w64-x86_64-github-cli
           mingw-w64-x86_64-python
           mingw-w64-x86_64-python-pip
@@ -145,6 +147,7 @@ jobs:
         install: >-
           base-devel
           git
+          mingw-w64-x86_64-toolchain
           mingw-w64-x86_64-github-cli
           mingw-w64-x86_64-python
           mingw-w64-x86_64-python-pip
@@ -201,6 +204,7 @@ jobs:
         install: >-
           base-devel
           git
+          mingw-w64-x86_64-toolchain
           mingw-w64-x86_64-github-cli
           mingw-w64-x86_64-python
           mingw-w64-x86_64-python-pip
