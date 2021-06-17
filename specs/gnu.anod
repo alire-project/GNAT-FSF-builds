@@ -1,35 +1,26 @@
+from e3.anod.error import ShellError
 from e3.anod.loader import spec
-from e3.anod.spec import Anod
 import os
 
-class GNU(spec('gh-artifact')):
 
+class GNU(spec("gh-artifact")):
     def pre_build(self):
         """Method called just before starting the build."""
-        pass
 
     def compiler_deps(self):
         deps = []
 
         # For native builds we use the system compiler
 
-        if self.env.is_canadian:
-            deps.append(
-                Anod.Dependency(
-                    name="gcc",
-                    host="build",
-                    target="host",
-                    local_name="canadian-cross-compiler",
-                )
-            )
-
         return deps
 
     def setenv(self):
-        self.env.add_search_path('C_INCLUDE_PATH',
-                                 os.path.join(self['INSTALL_DIR'], 'include'))
-        self.env.add_search_path('LIBRARY_PATH',
-                                 os.path.join(self['INSTALL_DIR'], 'lib'))
+        self.env.add_search_path(
+            "C_INCLUDE_PATH", os.path.join(self["INSTALL_DIR"], "include")
+        )
+        self.env.add_search_path(
+            "LIBRARY_PATH", os.path.join(self["INSTALL_DIR"], "lib")
+        )
 
     def artifact_build(self):
         # This spec inherit from gh-artifact and therefore has a different

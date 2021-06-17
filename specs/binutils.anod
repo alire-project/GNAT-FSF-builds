@@ -5,34 +5,36 @@ from e3.anod.spec import Anod
 from e3.anod.loader import spec
 
 
-class Binutils(spec('common')):
-
+class Binutils(spec("common")):
     @property
     def version(self):
         return "2.36"
 
     @property
     def tarball(self):
-        return 'binutils-%s.tar.gz' % self.version
+        return "binutils-%s.tar.gz" % self.version
 
     @property
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url='https://ftp.gnu.org/gnu/binutils/' + self.tarball)]
+                url="https://ftp.gnu.org/gnu/binutils/" + self.tarball,
+            )
+        ]
 
     @property
     def build_source_list(self):
-        return [Anod.Source(name=self.tarball,
-                            publish=True, dest='')]
+        return [Anod.Source(name=self.tarball, publish=True, dest="")]
 
     @property
     def build_deps(self):
-        deps = [Anod.Dependency("gmp",  target='host', track=True),
-                Anod.Dependency("mpfr", target='host', track=True),
-                Anod.Dependency("mpc",  target='host', track=True),
-                Anod.Dependency("isl",  target='host', track=True)]
+        deps = [
+            Anod.Dependency("gmp", target="host", track=True),
+            Anod.Dependency("mpfr", target="host", track=True),
+            Anod.Dependency("mpc", target="host", track=True),
+            Anod.Dependency("isl", target="host", track=True),
+        ]
 
         if self.env.is_canadian:
             deps.append(
@@ -55,20 +57,19 @@ class Binutils(spec('common')):
             self.deps[m].setenv()
 
         configure = Configure(self)
-        configure.add("--build=%s" % self.env.build.triplet)
-        configure.add("--host=%s" % self.env.host.triplet)
-        configure.add("--target=%s" % self.env.target.triplet)
-        configure.add('--prefix=%s' % unixpath(self['INSTALL_DIR']))
-        configure.add("--disable-nls",
-                      "--disable-shared",
-                      "--disable-werror",
-                      "--with-zlib",
-                      "--disable-compressed-debug-sections",
-                      "--disable-separate-code",
-                      "--disable-gdb",
-                      "--disable-sim",
-                      "--disable-libquadmath",
-                      "--disable-readline")
+        configure.add("--prefix=%s" % unixpath(self["INSTALL_DIR"]))
+        configure.add(
+            "--disable-nls",
+            "--disable-shared",
+            "--disable-werror",
+            "--with-zlib",
+            "--disable-compressed-debug-sections",
+            "--disable-separate-code",
+            "--disable-gdb",
+            "--disable-sim",
+            "--disable-libquadmath",
+            "--disable-readline",
+        )
 
         # For embedded only?
         configure.add("--enable-multilib")
@@ -80,7 +81,7 @@ class Binutils(spec('common')):
 
         make = Make(self)
         make()
-        make('install')
+        make("install")
 
         # We do not clean the binutils builds and install as they are used for
         # gnatcov build.

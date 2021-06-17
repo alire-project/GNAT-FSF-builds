@@ -1,41 +1,44 @@
 from e3.os.fs import unixpath
-from e3.fs import cp, echo_to_file, ls, mkdir, mv, rm, sync_tree
-from e3.anod.helper import Configure, Make, log
+from e3.fs import cp, mkdir, sync_tree
+from e3.anod.helper import Configure, Make
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
 import os
 
-class GCC(spec('gh-artifact')):
 
+class GCC(spec("gh-artifact")):
     @property
     def version(self):
         return "10.2.0"
 
     @property
     def tarball(self):
-        return 'gcc-%s.tar.gz' % self.version
+        return "gcc-%s.tar.gz" % self.version
 
     @property
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url='https://ftp.gnu.org/gnu/gcc/gcc-%s/%s' % (self.version,
-                                                               self.tarball))]
+                url="https://ftp.gnu.org/gnu/gcc/gcc-%s/%s"
+                % (self.version, self.tarball),
+            )
+        ]
 
     @property
     def build_source_list(self):
-        return [Anod.Source(name=self.tarball,
-                            publish=True, dest='')]
+        return [Anod.Source(name=self.tarball, publish=True, dest="")]
 
     @property
     def bootstrap(self):
-        return 'bootstrap' in self.parsed_qualifier
+        return "bootstrap" in self.parsed_qualifier
 
     @property
     def is_cross(self):
-        return (self.env.target.triplet == "arm-eabi" or
-                self.env.target.triplet == "riscv64-elf")
+        return (
+            self.env.target.triplet == "arm-eabi"
+            or self.env.target.triplet == "riscv64-elf"
+        )
 
     @property
     def build_space_name(self):
@@ -47,52 +50,49 @@ class GCC(spec('gh-artifact')):
     @property
     def enable_languages(self):
         if self.bootstrap:
-            return ['c']
+            return ["c"]
         elif not self.env.target.os.is_bareboard:
-            return ['c', 'ada', 'c++']
+            return ["c", "ada", "c++"]
         else:
-            return ['c', 'ada']
+            return ["c", "ada"]
 
     @property
     def build_deps(self):
-        deps = [Anod.Dependency("gmp",      host='build', target='host'),
-                Anod.Dependency("mpfr",     host='build', target='host'),
-                Anod.Dependency("mpc",      host='build', target='host'),
-                Anod.Dependency("isl",      host='build', target='host'),
-                Anod.Dependency("binutils")]
+        deps = [
+            Anod.Dependency("gmp", host="build", target="host"),
+            Anod.Dependency("mpfr", host="build", target="host"),
+            Anod.Dependency("mpc", host="build", target="host"),
+        ]
+
+        if self.env.build.os.name != "darwin":
+            deps.append(Anod.Dependency("isl", host="build", target="host"))
+
+        if self.env.target.os.name != "darwin":
+            deps.append(Anod.Dependency("binutils", target="target"))
 
         # We se the system's GCC/GNAT to build native GCC/GNAT, that's why it
         # is not specified as a dependency here.
 
         if self.env.target.os.is_bareboard and not self.bootstrap:
-            deps.append (Anod.Dependency("newlib"))
+            deps.append(Anod.Dependency("newlib"))
 
         if self.env.is_cross and not self.bootstrap:
-            deps.append (Anod.Dependency("gcc", local_name='gcc_native', target='host'))
+            deps.append(Anod.Dependency("gcc", local_name="gcc_native", target="host"))
 
         if self.env.target.os.name == "windows":
-            deps.append(Anod.Dependency("mingw", host="build", target="target", track=True))
-
-        # Environment dependencies
-        if self.env.is_canadian:
             deps.append(
-                Anod.Dependency(
-                    name="gcc",
-                    host="build",
-                    target="target",
-                    local_name="base_compiler_cross_target",
-                )
+                Anod.Dependency("mingw", host="build", target="target", track=True)
             )
 
         return deps
 
     def configure_args(self):
-        args = ["--disable-nls", # Disable Native Language Support (NLS)
-                "--without-libiconv-prefix",
-                "--disable-libstdcxx-pch",
-                "--enable-lto",
-                "--with-gnu-as",
-                "--with-gnu-ld"]
+        args = [
+            "--disable-nls",  # Disable Native Language Support (NLS)
+            "--without-libiconv-prefix",
+            "--disable-libstdcxx-pch",
+            "--enable-lto",
+        ]
 
         # Linux64 Native
         if self.env.target.triplet == "x86_64-pc-linux-gnu":
@@ -103,24 +103,46 @@ class GCC(spec('gh-artifact')):
         if self.env.target.triplet == "x86_64-w64-mingw32":
             args.append("--disable-multilib")
             args.append("--enable-threads=win32")
-            args.append("--with-native-system-header-dir=%s" %
-                        unixpath(os.path.join(self["INSTALL_DIR"], 'include')))
+            args.append(
+                "--with-native-system-header-dir=%s"
+                % unixpath(os.path.join(self["INSTALL_DIR"], "include"))
+            )
 
+        # macOS Native
+        if self.env.target.os.name == "darwin":
 
+            # Xcode 10 dropped 32-bit support
+            args.append("--disable-multilib")
 
-        cross_commons = ["--enable-plugins",
-                         "--disable-decimal-float",
-                         "--disable-libffi",
-                         "--disable-libgomp",
-                         "--disable-libmudflap",
-                         "--disable-libquadmath",
-                         "--disable-libssp",
-                         "--disable-libstdcxx-pch",
-                         "--disable-nls",
-                         "--disable-shared",
-                         "--disable-threads",
-                         "--disable-tls"
-                         "--with-newlib"]
+            args.append("--disable-libcilkrts")
+
+            # Workaround for Xcode 12.5 bug on Intel
+            # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100340
+            args.append("--without-build-config")
+
+            args.append(
+                "--with-sysroot=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
+            )
+
+        if self.env.host.os.name != "darwin":
+            args.append("--with-gnu-ld")
+            args.append("--with-gnu-as")
+
+        cross_commons = [
+            "--enable-plugins",
+            "--disable-decimal-float",
+            "--disable-libffi",
+            "--disable-libgomp",
+            "--disable-libmudflap",
+            "--disable-libquadmath",
+            "--disable-libssp",
+            "--disable-libstdcxx-pch",
+            "--disable-nls",
+            "--disable-shared",
+            "--disable-threads",
+            "--disable-tls",
+            "--with-newlib",
+        ]
 
         if self.env.target.triplet == "arm-eabi":
             args += cross_commons
@@ -142,7 +164,8 @@ class GCC(spec('gh-artifact')):
                 self.deps[m].setenv()
 
         # We need to install binutils in the compiler package
-        self.deps["binutils"].merge(self["INSTALL_DIR"])
+        if "binutils" in self.deps:
+            self.deps["binutils"].merge(self["INSTALL_DIR"])
 
         # Also install newlib for cross
         if "newlib" in self.deps:
@@ -178,13 +201,13 @@ class GCC(spec('gh-artifact')):
             )
 
         configure = Configure(self)
-        configure.add("--build=%s" % self.env.build.triplet)
-        configure.add("--host=%s" % self.env.host.triplet)
-        configure.add("--target=%s" % self.env.target.triplet)
-        configure.add('--prefix=%s' % unixpath(self['INSTALL_DIR']))
+        configure.add("--prefix=%s" % unixpath(self["INSTALL_DIR"]))
 
-        configure.add("--with-build-time-tools=%s" %
-                      unixpath(os.path.join(self.deps["binutils"]["INSTALL_DIR"], 'bin')))
+        if "binutils" in self.deps:
+            configure.add(
+                "--with-build-time-tools=%s"
+                % unixpath(os.path.join(self.deps["binutils"]["INSTALL_DIR"], "bin"))
+            )
 
         configure.add("--enable-languages=" + ",".join(self.enable_languages))
 
@@ -203,22 +226,32 @@ class GCC(spec('gh-artifact')):
 
         for m in ("mpfr", "gmp", "mpc", "isl"):
             if m in self.deps:
-                configure.add("--with-%s=%s" % (m, unixpath(self.deps[m]["INSTALL_DIR"])))
+                configure.add(
+                    "--with-%s=%s" % (m, unixpath(self.deps[m]["INSTALL_DIR"]))
+                )
 
         configure()
 
         make = Make(self)
         if self.bootstrap:
-            make('all-gcc')
-            make('install-gcc')
+            make("all-gcc")
+            make("install-gcc")
         else:
-            make('all')
+
+            if self.env.target.os.name == "darwin":
+                # Use -headerpad_max_install_names in the build,
+                # otherwise updated load commands won't fit in the Mach-O header.
+                # This is needed because `gcc` avoids the superenv shim.
+                # https://github.com/Homebrew/homebrew-core/blob/98064198c7e5464124f53bbdb47bec3e03f1a0cd/Formula/gcc.rb#L136
+                make("all", "BOOT_LDFLAGS=-Wl,-headerpad_max_install_names")
+            else:
+                make("all")
 
             if self.env.is_cross:
-                make('cross-gnattools', exec_dir='gcc')
-                make('ada.all.cross', exec_dir='gcc')
+                make("cross-gnattools", exec_dir="gcc")
+                make("ada.all.cross", exec_dir="gcc")
 
-            make('install-strip')
+            make("install-strip")
 
         # Add mingw
         if self.env.target.os.name == "windows":

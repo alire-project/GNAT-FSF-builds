@@ -4,27 +4,26 @@ from e3.anod.spec import Anod
 from e3.anod.loader import spec
 
 
-class ISL(spec('gnu')):
-
+class ISL(spec("gnu")):
     @property
     def version(self):
         return "0.23"
 
     @property
     def tarball(self):
-        return 'isl-%s.tar.bz2' % self.version
+        return "isl-%s.tar.bz2" % self.version
 
     @property
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
-                name=self.tarball,
-                url='http://isl.gforge.inria.fr/' + self.tarball)]
+                name=self.tarball, url="http://isl.gforge.inria.fr/" + self.tarball
+            )
+        ]
 
     @property
     def build_source_list(self):
-        return [Anod.Source(name=self.tarball,
-                            publish=True, dest='')]
+        return [Anod.Source(name=self.tarball, publish=True, dest="")]
 
     @property
     def build_deps(self):
@@ -32,11 +31,11 @@ class ISL(spec('gnu')):
 
     def setup(self):
         configure = Configure(self)
-        configure.add("--build=%s" % self.env.build.triplet)
-        configure.add("--host=%s" % self.env.target.triplet)
-        configure.add('--prefix=%s' % unixpath(self['INSTALL_DIR']))
+        configure.add("--prefix=%s" % unixpath(self["INSTALL_DIR"]))
         configure.add("--disable-shared")
-        configure.add("--with-gmp-prefix=%s" % unixpath(self.deps["gmp"]["INSTALL_DIR"]))
+        configure.add(
+            "--with-gmp-prefix=%s" % unixpath(self.deps["gmp"]["INSTALL_DIR"])
+        )
 
         make = Make(self)
 

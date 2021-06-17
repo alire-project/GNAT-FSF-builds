@@ -1,0 +1,27 @@
+From 0b775473a8eb5f820f487869d31ac534a437826c Mon Sep 17 00:00:00 2001
+From: Dmitriy Anisimkov <anisimko@adacore.com>
+Date: Fri, 25 Sep 2020 22:49:49 +0600
+Subject: [PATCH] Support build on MacOS
+
+no-tn-check
+
+Change-Id: Id94e09000c847f6deed7416b6a4f4e7838fb420a
+---
+ gpr/src/gpr_imports.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git gpr/src/gpr_imports.c gpr/src/gpr_imports.c
+index b73f63a1..b0572a6f 100644
+--- gpr/src/gpr_imports.c
++++ gpr/src/gpr_imports.c
+@@ -168,6 +168,10 @@ const char *__gnat_default_libgcc_subdir = "lib";
+     //  + sb.st_mtim.tv_nsec;
+     // with check overflow below
+ 
++#if defined(__APPLE__) || defined(__NetBSD__)
++#define st_mtim st_mtimespec
++#endif
++
+     if (__builtin_ssubll_overflow(sb.st_mtim.tv_sec, ada_epoch_offset, &result)) {
+       return LLONG_MIN;
+     }

@@ -2,9 +2,8 @@ from e3.anod.package import UnmanagedSourceBuilder
 from e3.anod.spec import Anod
 from e3.anod.error import AnodError
 import os
-from e3.fs import sync_tree, mkdir, rm
+from e3.fs import rm, sync_tree
 from e3.env import Env
-from e3.os.fs import unixpath
 from e3.anod.helper import log
 
 
@@ -20,23 +19,22 @@ class Common(Anod):
                 name=name,
                 fullname=lambda: name,
                 prepare_src=prepare_src,
-                checkout=None)
+                checkout=None,
+            )
             self.url = url
-            self.base_url, self.filename = url.rsplit('/', 1)
+            self.base_url, self.filename = url.rsplit("/", 1)
 
     class LocalSourceBuilder(UnmanagedSourceBuilder):
         def __init__(self, name):
             UnmanagedSourceBuilder.__init__(
-                self,
-                name=name,
-                fullname=lambda: name,
-                checkout=None)
+                self, name=name, fullname=lambda: name, checkout=None
+            )
             self.url = name
             self.filename = name
 
     def setenv(self, prefix=None, add_dll_path=True):
         """Common setenv for all uxas dependencies."""
-        prefix = self['INSTALL_DIR'] if prefix is None else prefix
+        prefix = self["INSTALL_DIR"] if prefix is None else prefix
         log.debug("Calling %s.setenv prefix=%s", self.name, prefix)
         env_modified = False
 
@@ -56,14 +54,16 @@ class Common(Anod):
                     self.env.add_dll_path(directory)
                     env_modified = True
 
-        if os.path.isdir(os.path.join(prefix, 'share', 'gpr')):
-            self.env.add_search_path('GPR_PROJECT_PATH',
-                                     os.path.join(prefix, 'share', 'gpr'))
+        if os.path.isdir(os.path.join(prefix, "share", "gpr")):
+            self.env.add_search_path(
+                "GPR_PROJECT_PATH", os.path.join(prefix, "share", "gpr")
+            )
             env_modified = True
 
-        if os.path.isdir(os.path.join(prefix, 'lib', 'gnat')):
-            self.env.add_search_path('GPR_PROJECT_PATH',
-                                     os.path.join(prefix, 'lib', 'gnat'))
+        if os.path.isdir(os.path.join(prefix, "lib", "gnat")):
+            self.env.add_search_path(
+                "GPR_PROJECT_PATH", os.path.join(prefix, "lib", "gnat")
+            )
             env_modified = True
 
         if not env_modified:
@@ -82,16 +82,16 @@ class Common(Anod):
 
     @property
     def lib_dir(self):
-        return os.path.join(self['INSTALL_DIR'], 'lib')
+        return os.path.join(self["INSTALL_DIR"], "lib")
 
     @property
     def include_dir(self):
-        return os.path.join(self['INSTALL_DIR'], 'include')
+        return os.path.join(self["INSTALL_DIR"], "include")
 
     def merge(self, prefix):
         sync_tree(self["INSTALL_DIR"], prefix, delete=False)
 
     def clean(self):
         if Env().main_options.enable_cleanup:
-            rm(self['BUILD_DIR'], recursive = True)
-            rm(self['SRC_DIR'], recursive = True)
+            rm(self["BUILD_DIR"], recursive=True)
+            rm(self["SRC_DIR"], recursive=True)
