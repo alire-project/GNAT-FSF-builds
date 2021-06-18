@@ -38,11 +38,23 @@ class GHArtifact(spec("common")):
          - build GNAT arm-elf (uses artifact)
     """
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._disable_out_artifact = False
+
     def setup(self):
         None
 
     def artifact_build(self):
         raise Exception("artifact_build() not implemented")
+
+    def disable_out_artifact(self):
+        """Disable the genration of output artifact tarball
+
+        This can be used when the artifact doesn't need to be generated in a
+        given context, for instance depending on the qualifiers for the spec.
+        """
+        self._disable_out_artifact = True
 
     @property
     def artifacts_out_dir(self):
@@ -78,6 +90,10 @@ class GHArtifact(spec("common")):
         return None
 
     def publish_artifact(self):
+        if self._disable_out_artifact:
+            log.debug("Artifact build disabled for '%s'" % self.artifact_name)
+            return
+
         log.debug("Building artifact for '%s'" % self.artifact_name)
         mkdir(self.artifacts_out_dir)
         create_archive(

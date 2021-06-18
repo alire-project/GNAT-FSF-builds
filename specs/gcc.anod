@@ -234,8 +234,13 @@ class GCC(spec("gh-artifact")):
 
         make = Make(self)
         if self.bootstrap:
+
+            # We don't need to keep the bootstrap compiler so the artifact is
+            # disabled to save disk space.
+            self.disable_out_artifact()
+
             make("all-gcc")
-            make("install-gcc")
+            make("install-gcc", jobs=1)
         else:
 
             if self.env.target.os.name == "darwin":
@@ -251,7 +256,7 @@ class GCC(spec("gh-artifact")):
                 make("cross-gnattools", exec_dir="gcc")
                 make("ada.all.cross", exec_dir="gcc")
 
-            make("install-strip")
+            make("install-strip", jobs=1)
 
         # Add mingw
         if self.env.target.os.name == "windows":
