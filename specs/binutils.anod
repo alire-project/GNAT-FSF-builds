@@ -83,6 +83,7 @@ class Binutils(spec("common")):
         make()
         make("install")
 
-        # We do not clean the binutils builds and install as they are used for
-        # gnatcov build.
-        # self.clean()
+        # We do not clean the binutils builds and install on native targets as
+        # they are used for gnatcov build.
+        if self.env.target.os.is_bareboard:
+            self.clean()
