@@ -33,6 +33,7 @@ class ISL(spec("gnu")):
         configure = Configure(self)
         configure.add("--prefix=%s" % unixpath(self["INSTALL_DIR"]))
         configure.add("--disable-shared")
+        configure.add("--enable-static")
         configure.add(
             "--with-gmp-prefix=%s" % unixpath(self.deps["gmp"]["INSTALL_DIR"])
         )

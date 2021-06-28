@@ -9,7 +9,7 @@ import os
 class GCC(spec("gh-artifact")):
     @property
     def version(self):
-        return "10.3.0"
+        return "11.2.0"
 
     @property
     def tarball(self):
@@ -59,6 +59,7 @@ class GCC(spec("gh-artifact")):
     @property
     def build_deps(self):
         deps = [
+            Anod.Dependency("base_gcc", host="build", target="host"),
             Anod.Dependency("gmp", host="build", target="host"),
             Anod.Dependency("mpfr", host="build", target="host"),
             Anod.Dependency("mpc", host="build", target="host"),
@@ -69,9 +70,6 @@ class GCC(spec("gh-artifact")):
 
         if self.env.target.os.name != "darwin":
             deps.append(Anod.Dependency("binutils", target="target"))
-
-        # We se the system's GCC/GNAT to build native GCC/GNAT, that's why it
-        # is not specified as a dependency here.
 
         if self.env.target.os.is_bareboard and not self.bootstrap:
             deps.append(Anod.Dependency("newlib"))
@@ -159,7 +157,7 @@ class GCC(spec("gh-artifact")):
         # This spec inherit from gh-artifact and therefore has a different
         # build method.
 
-        for m in ("binutils", "gcc_native", "mingw", "base_compiler_cross_target"):
+        for m in ("binutils", "gcc_native", "mingw", "base_gcc"):
             if m in self.deps:
                 self.deps[m].setenv()
 

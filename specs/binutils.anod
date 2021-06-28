@@ -30,10 +30,11 @@ class Binutils(spec("common")):
     @property
     def build_deps(self):
         deps = [
-            Anod.Dependency("gmp", target="host", track=True),
-            Anod.Dependency("mpfr", target="host", track=True),
-            Anod.Dependency("mpc", target="host", track=True),
-            Anod.Dependency("isl", target="host", track=True),
+            Anod.Dependency("base_gcc", host="build", target="host"),
+            Anod.Dependency("gmp", target="host"),
+            Anod.Dependency("mpfr", target="host"),
+            Anod.Dependency("mpc", target="host"),
+            Anod.Dependency("isl", target="host"),
         ]
 
         if self.env.is_canadian:

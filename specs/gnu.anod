@@ -1,4 +1,5 @@
 from e3.anod.error import ShellError
+from e3.anod.spec import Anod
 from e3.anod.loader import spec
 import os
 
@@ -8,9 +9,7 @@ class GNU(spec("gh-artifact")):
         """Method called just before starting the build."""
 
     def compiler_deps(self):
-        deps = []
-
-        # For native builds we use the system compiler
+        deps = [Anod.Dependency("base_gcc", host="build", target="host")]
 
         return deps
 
