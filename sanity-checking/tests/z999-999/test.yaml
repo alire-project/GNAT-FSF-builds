@@ -1,0 +1,3 @@
+driver: python-script
+control:
+- [XFAIL, "True", "Check if we can detect failures"]

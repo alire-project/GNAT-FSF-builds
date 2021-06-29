@@ -239,3 +239,51 @@ jobs:
         name: release-packages
         path: D:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
         retention-days: 5
+
+
+  sanity_checking:
+    name: Sanity Checking
+    needs: [gnat_gprbuild, gnatcov]
+    runs-on: windows-latest
+    env:
+      CONFIG_SHELL: /bin/bash
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v2
+
+    - name: Install msys2
+      uses: msys2/setup-msys2@v2
+      with:
+        install: >-
+          base-devel
+          git
+          mingw-w64-x86_64-toolchain
+          mingw-w64-x86_64-github-cli
+          mingw-w64-x86_64-python
+          mingw-w64-x86_64-python-pip
+          mingw-w64-x86_64-python-psutil
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install e3-testsuite
+
+    - uses: actions/download-artifact@v2
+      with:
+        name: release-packages
+        path: ./sanity-checking/release_packages
+
+    - name: Run testsuite
+      run: |
+          cd ./sanity-checking
+          python3 ./run.py -v --install-deps-from=release_packages --pkgs-install-dir=pkgs_install --failure-exit-code 1
+
+    - uses: actions/upload-artifact@v2
+      if: failure()
+      with:
+        name: testsuite-results-${{runner.os}}
+        path: sanity-checking/out/new
+        retention-days: 5

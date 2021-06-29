@@ -12,6 +12,7 @@ valid_packages = ["gprbuild", "gnat", "gnatcov"]
 
 
 class ReleasePackage(spec("common")):
+
     @property
     def package(self):
         if "package" not in self.parsed_qualifier:
