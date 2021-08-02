@@ -1,0 +1,51 @@
+abstract project Target_Config is
+
+   Board := External ("TEST_BOARD", "native");
+   Compiler_Switches := ();
+   Linker_Switches := ();
+   Languages := ();
+
+   case Board is
+      when "qemu-hifive1" =>
+
+         Languages := ("ASM_CPP");
+
+         Compiler_Switches := ("-march=rv32imac",
+                               "-mabi=ilp32",
+                               "-DTEST_BOARD_HIFIVE1");
+
+         Linker_Switches :=
+           ("-Wl,-T," & Project'Project_Dir & "src/link.ld",
+            "-L" & Project'Project_Dir & "lib",
+            "-nostartfiles",
+            "-lc", "-lgcc", "-lc"
+           ) &
+           Compiler_Switches;
+
+      when others =>
+         Compiler_Switches := ("-DTARGET_BOARD_NATIVE");
+   end case;
+
+   package Device_Configuration is
+
+     case Board is
+        when "qemu-hifive1" =>
+           for CPU_Name use "RISC-V32";
+
+           for Memories use ("flash", "ram");
+           for Boot_Memory use "flash";
+
+           for Mem_Kind ("flash") use "ROM";
+           for Address ("flash")  use "0x20400000";
+           for Size ("flash")     use "512M";
+
+           for Mem_Kind ("ram") use "RAM";
+           for Address ("ram")  use "0x80000000";
+           for Size ("ram")     use "16K";
+        when others =>
+           null;
+     end case;
+
+   end Device_Configuration;
+
+end Target_Config;
