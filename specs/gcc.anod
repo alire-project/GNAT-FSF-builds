@@ -59,11 +59,25 @@ class GCC(spec("gh-artifact")):
     @property
     def build_deps(self):
         deps = [
-            Anod.Dependency("base_gcc", host="build", target="host"),
             Anod.Dependency("gmp", host="build", target="host"),
             Anod.Dependency("mpfr", host="build", target="host"),
             Anod.Dependency("mpc", host="build", target="host"),
         ]
+
+        # Select which compiler to use:
+        # - gcc_native is a native compiler that was built with this script
+        # - base_gcc is a native compiler downloaded from a binray archive
+        #
+        # To build the native compilers we can use a native compiler of the
+        # last major version.
+        #
+        # To build the cross compilers we need to have a native compiler of the
+        # same version that we are building.
+        #
+        if self.env.is_cross and not self.bootstrap:
+            deps.append(Anod.Dependency("gcc", local_name="gcc_native", target="host"))
+        else:
+            deps.append(Anod.Dependency("base_gcc", host="build", target="host"))
 
         if self.env.build.os.name != "darwin":
             deps.append(Anod.Dependency("isl", host="build", target="host"))
@@ -73,9 +87,6 @@ class GCC(spec("gh-artifact")):
 
         if self.env.target.os.is_bareboard and not self.bootstrap:
             deps.append(Anod.Dependency("newlib"))
-
-        if self.env.is_cross and not self.bootstrap:
-            deps.append(Anod.Dependency("gcc", local_name="gcc_native", target="host"))
 
         if self.env.target.os.name == "windows":
             deps.append(
