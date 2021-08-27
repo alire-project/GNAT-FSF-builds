@@ -101,6 +101,14 @@ class EmbeddedRuntimes(spec("common")):
 
         return board
 
+    def rts_root_dir(self):
+        if self.env.target.platform == "arm-elf":
+            return "arm-eabi"
+        elif self.env.target.platform == "riscv64-elf":
+            return "riscv64-elf"
+        else:
+            raise AnodError("Unknown platform: %s" % self.env.target.platform)
+
     @Anod.primitive()
     def build(self):
         self.deps["gcc"].setenv()
@@ -111,7 +119,7 @@ class EmbeddedRuntimes(spec("common")):
                os.path.join(self["SRC_DIR"], "build_rts.py"),
                "--rts-src-descriptor=%s"
                % os.path.join(self['SRC_DIR'], "gnat_rts_sources", "lib", "gnat", "rts-sources.json"),
-               "--output=%s" % self['INSTALL_DIR'],
+               "--output=%s" % os.path.join (self['INSTALL_DIR'], self.rts_root_dir(), 'lib', 'gnat'),
                "--build",
                ]
 
