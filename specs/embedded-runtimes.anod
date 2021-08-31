@@ -8,11 +8,11 @@ import sys
 class EmbeddedRuntimes(spec("common")):
     @property
     def version(self):
-        return "0.1"
+        return "0.2"
 
     @property
     def commit_id(self):
-        return "71a9aa2b63600944e9de6efa00a4beabf0b9714f"
+        return "7a4674ae9221d2fa046bed20fbaf9de9caa09d41"
 
     @property
     def tarball(self):
