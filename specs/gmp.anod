@@ -33,6 +33,7 @@ class GMP(spec("gnu")):
         configure = Configure(self)
         configure.add("--prefix=%s" % unixpath(self["INSTALL_DIR"]))
         configure.add("--disable-shared")
+        configure.add("--enable-static")
         configure.add("--enable-cxx")
 
         if self.env.host.os.name == "darwin":

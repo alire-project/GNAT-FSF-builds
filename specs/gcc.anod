@@ -9,7 +9,7 @@ import os
 class GCC(spec("gh-artifact")):
     @property
     def version(self):
-        return "10.3.0"
+        return "11.2.0"
 
     @property
     def tarball(self):
@@ -64,20 +64,29 @@ class GCC(spec("gh-artifact")):
             Anod.Dependency("mpc", host="build", target="host"),
         ]
 
+        # Select which compiler to use:
+        # - gcc_native is a native compiler that was built with this script
+        # - base_gcc is a native compiler downloaded from a binray archive
+        #
+        # To build the native compilers we can use a native compiler of the
+        # last major version.
+        #
+        # To build the cross compilers we need to have a native compiler of the
+        # same version that we are building.
+        #
+        if self.env.is_cross and not self.bootstrap:
+            deps.append(Anod.Dependency("gcc", local_name="gcc_native", target="host"))
+        else:
+            deps.append(Anod.Dependency("base_gcc", host="build", target="host"))
+
         if self.env.build.os.name != "darwin":
             deps.append(Anod.Dependency("isl", host="build", target="host"))
 
         if self.env.target.os.name != "darwin":
             deps.append(Anod.Dependency("binutils", target="target"))
 
-        # We se the system's GCC/GNAT to build native GCC/GNAT, that's why it
-        # is not specified as a dependency here.
-
         if self.env.target.os.is_bareboard and not self.bootstrap:
             deps.append(Anod.Dependency("newlib"))
-
-        if self.env.is_cross and not self.bootstrap:
-            deps.append(Anod.Dependency("gcc", local_name="gcc_native", target="host"))
 
         if self.env.target.os.name == "windows":
             deps.append(
@@ -159,7 +168,7 @@ class GCC(spec("gh-artifact")):
         # This spec inherit from gh-artifact and therefore has a different
         # build method.
 
-        for m in ("binutils", "gcc_native", "mingw", "base_compiler_cross_target"):
+        for m in ("binutils", "gcc_native", "mingw", "base_gcc"):
             if m in self.deps:
                 self.deps[m].setenv()
 

@@ -1,0 +1,34 @@
+from e3.net.http import HTTPSession
+from e3.fs import rm
+from e3.archive import unpack_archive
+from e3.anod.loader import spec
+from e3.anod.spec import Anod
+
+
+class base_gcc(spec("common")):
+    @property
+    def version(self):
+        return "10.3.0-1"
+
+    @property
+    def tarball(self):
+        return "gnat-%s-%s.tar.gz" % (self.env.platform, self.version)
+
+    @property
+    def url(self):
+        return (
+            "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-%s/%s"
+            % (self.version, self.tarball)
+        )
+
+    @Anod.primitive()
+    def build(self):
+        # Download the archive
+        with HTTPSession() as http:
+            http.download_file(self.url, self["BUILD_DIR"], self.tarball)
+
+        # Exctract the archive
+        unpack_archive(self.tarball, self["INSTALL_DIR"], remove_root_dir=True)
+
+        # Delete the archive
+        rm(self.tarball)

@@ -3,16 +3,16 @@ from e3.anod.loader import spec
 
 import os
 import glob
-
+import sys
 
 class EmbeddedRuntimes(spec("common")):
     @property
     def version(self):
-        return "0.1"
+        return "0.2"
 
     @property
     def commit_id(self):
-        return "a994743"
+        return "7a4674ae9221d2fa046bed20fbaf9de9caa09d41"
 
     @property
     def tarball(self):
@@ -39,20 +39,102 @@ class EmbeddedRuntimes(spec("common")):
             Anod.Dependency("gprbuild", target="host", track=True),
         ]
 
+    @property
+    def board_list(self):
+        board = []
+
+        if self.env.target.platform == "arm-elf":
+            board = [
+                "tms570",
+                "tms570lc",
+                "lm3s",
+                "stm32f4",
+                "zynq7000",
+                "cortex-m0",
+                "cortex-m0p",
+                "cortex-m1",
+                "cortex-m3",
+                "cortex-m4",
+                "cortex-m4f",
+                "cortex-m7f",
+                "cortex-m7df",
+                "cortex-m23",
+                "cortex-m33f",
+                "cortex-m33df",
+                "samv71",
+                "stm32f429disco",
+                "stm32f469disco",
+                "stm32f746disco",
+                "stm32f769disco",
+                "rpi2",
+                "microbit",
+                "feather_stm32f405",
+                "nrf52832",
+                "nrf52840",
+                "nucleo_f401re",
+                "openmv2",
+                "sam4s",
+                "samg55",
+            ]
+
+        elif self.env.target.platform == "riscv64-elf":
+            board = [
+                "spike",
+                "polarfiresoc",
+                "unleashed",
+                "rv64im",
+                "rv64imc",
+                "rv64imac",
+                "rv64imfc",
+                "rv64imafc",
+                "rv64imafdc",
+                "hifive1",
+                "rv32i",
+                "rv32im",
+                "rv32iac",
+                "rv32imac",
+                "rv32imafc",
+                "rv32imafdc",
+            ]
+        else:
+            raise AnodError("Unknown platform: %s" % self.env.target.platform)
+
+        return board
+
+    def rts_root_dir(self):
+        if self.env.target.platform == "arm-elf":
+            return "arm-eabi"
+        elif self.env.target.platform == "riscv64-elf":
+            return "riscv64-elf"
+        else:
+            raise AnodError("Unknown platform: %s" % self.env.target.platform)
+
     @Anod.primitive()
     def build(self):
         self.deps["gcc"].setenv()
         self.deps["gprbuild"].setenv()
 
-        if self.env.target.triplet == "arm-eabi":
-            bsp_dir = os.path.join(self["SRC_DIR"], "gen_rts_arm", "BSPs")
-        elif self.env.target.triplet == "riscv64-elf":
-            bsp_dir = os.path.join(self["SRC_DIR"], "gen_rts_riscv64", "BSPs")
-        else:
-            raise Exception("Unknown target: %s" % self.env.target.triplet)
+        # base build commnad
+        cmd = [sys.executable,
+               os.path.join(self["SRC_DIR"], "build_rts.py"),
+               "--rts-src-descriptor=%s"
+               % os.path.join(self['SRC_DIR'], "gnat_rts_sources", "lib", "gnat", "rts-sources.json"),
+               "--output=%s" % os.path.join (self['INSTALL_DIR'], self.rts_root_dir(), 'lib', 'gnat'),
+               "--build",
+               ]
 
-        for gpr in glob.glob(bsp_dir + "/*.gpr"):
-            self.shell("gprbuild", "-p", "-j0", "-P", gpr)
-            self.shell("gprinstall", "-p", "-P", gpr, "--prefix=" + self["INSTALL_DIR"])
+        # make newlib headers visible
+        if "newlib" in self.deps:
+            newlib_inc = "-I%s" % os.path.join(
+                self.deps["newlib"]["INSTALL_DIR"], self.env.target.triplet, "include"
+            )
+            cmd += ["--build-flag=-cargs:C %s" % newlib_inc]
+
+        # get the list of boards
+        cmd += self.board_list
+
+        # Generate the runtimes and build them
+        self.shell(*cmd)
 
         self.clean()
+

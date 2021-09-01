@@ -133,7 +133,7 @@ class ReleasePackage(spec("common")):
 
     def check_github_release_asset(self, release_name, asset):
         try:
-            p = Run (["gh", "release", "view", release_name])
+            p = Run(["gh", "release", "view", release_name])
             return asset in p.out
         except ShellError:
             return False
@@ -145,22 +145,30 @@ class ReleasePackage(spec("common")):
         sha = archive + ".sha256"
 
         # Disable the pager to avoid being stuck interactive command
-        self.shell ("gh", "config", "set", "pager", "cat")
+        self.shell("gh", "config", "set", "pager", "cat")
 
         if not self.check_github_release(gh_name):
             log.info("Create GitHub release '%s' for '%s'." % (gh_name, pkg_name))
-            self.shell("gh", "release",
-                       "create", gh_name,
-                       "--title", gh_name,
-                       "--notes", gh_name,
-                       "--draft")
+            self.shell(
+                "gh",
+                "release",
+                "create",
+                gh_name,
+                "--title",
+                gh_name,
+                "--notes",
+                gh_name,
+                "--draft",
+            )
         else:
             log.info("There is already a GitHub release for' %s'." % (pkg_name))
 
         if self.check_github_release_asset(gh_name, self.archive_name):
             log.info("Assets for '%s' already in GitHub release." % (pkg_name))
         else:
-            log.info("Upload assets for '%s' in GitHub release '%s'..." % (pkg_name, gh_name))
+            log.info(
+                "Upload assets for '%s' in GitHub release '%s'..." % (pkg_name, gh_name)
+            )
             self.shell("gh", "release", "upload", gh_name, archive, sha)
 
     @Anod.primitive()
