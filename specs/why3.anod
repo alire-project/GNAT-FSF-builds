@@ -1,0 +1,134 @@
+from e3.anod.helper import Configure, Make
+from e3.anod.loader import spec
+from e3.anod.package import SourceBuilder
+from e3.anod.spec import Anod
+from e3.fs import cp, mv, sync_tree
+from e3.os.fs import chmod
+import os
+
+
+class Why3(spec("common")):
+    @property
+    def opam_binary(self):
+        if self.env.host.os.name == "windows":
+            assert false
+        elif self.env.host.os.name == "darwin":
+            fn = "opam-2.1.0-x86_64-macos"
+        else:
+            fn = "opam-2.1.0-i686-linux"
+        return fn
+
+    @property
+    def source_pkg_build(self):
+        return [
+            SourceBuilder(name="why3", fullname=lambda: "why3", checkout=["why3"]),
+            self.HTTPSSourceBuilder(
+                name=self.opam_binary,
+                url="https://github.com/ocaml/opam/releases/download/2.1.0/%s"
+                % self.opam_binary,
+            ),
+            SourceBuilder(
+                name="alt-ergo", fullname=lambda: "alt-ergo", checkout=["alt-ergo"]
+            ),
+        ]
+
+    @property
+    def build_source_list(self):
+        return [
+            Anod.Source(name="why3", publish=True, dest="why3"),
+            Anod.Source(
+                name=self.opam_binary, publish=True, unpack_cmd=cp, dest="opam"
+            ),
+            Anod.Source(name="alt-ergo", publish=True, dest="alt-ergo"),
+        ]
+
+    def build_opam(self):
+        opam_binary = os.path.join(self["SRC_DIR"], "opam", self.opam_binary)
+        chmod("u+x", opam_binary)
+        opamroot = os.path.join(self["TMP_DIR"])
+        self.shell(opam_binary, "init", "--root=" + opamroot, "-n")
+        self.shell(
+            opam_binary,
+            "install",
+            "--root=" + opamroot,
+            "-y",
+            "camlzip",
+            "menhir",
+            "num",
+            "ocamlgraph",
+            "ocplib-simplex",
+            "psmt2-frontend",
+            "re",
+            "seq",
+            "yojson",
+            "zarith",
+        )
+        opam_bin_path = os.path.join(self["TMP_DIR"], "default", "bin")
+        self.env.add_path(opam_bin_path)
+
+    def build_altergo(self):
+        installdir = os.path.join(self["PKG_DIR"], "alt-ergo")
+        sources_dir = os.path.join(self["SRC_DIR"], "alt-ergo", "sources")
+        make = Make(self, exec_dir=sources_dir, jobs=1)
+        make.set_var("PREFIX", installdir)
+
+        configure = Configure(
+            self, auto_target=False, exec_dir=sources_dir, src_dir=sources_dir
+        )
+        configure.add("--prefix=" + installdir)
+        configure.add("alt-ergo-lib")
+        configure()
+        make("alt-ergo-lib")
+        make("install-lib")
+
+        libs = os.path.join(installdir, "lib")
+        self.env.add_search_path("OCAMLPATH", libs)
+
+        configure = Configure(
+            self, auto_target=False, exec_dir=sources_dir, src_dir=sources_dir
+        )
+        configure.add("--prefix=" + installdir)
+        configure.add("alt-ergo-parsers")
+        configure()
+        make("alt-ergo-parsers")
+        make("install-parsers")
+
+        configure = Configure(
+            self, auto_target=False, exec_dir=sources_dir, src_dir=sources_dir
+        )
+        configure.add("--prefix=" + installdir)
+        configure.add("alt-ergo")
+        configure()
+        make("alt-ergo")
+        make("install-bin")
+
+    def build_why3(self):
+        src_dir = os.path.join(self["SRC_DIR"], "why3")
+        configure = Configure(self, src_dir=src_dir, exec_dir=src_dir)
+        configure.add(
+            "--enable-relocation",
+            "--disable-emacs-compilation",
+            "--disable-re",
+            "--disable-hypothesis-selection",
+            "--disable-js-of-ocaml",
+            "--prefix=%s" % os.path.join(self["PKG_DIR"], "why3"),
+        )
+        configure()
+        make = Make(self, exec_dir=src_dir)
+        make()
+        make("install_spark2014")
+
+    @Anod.primitive(post="install")
+    def build(self):
+        self.build_opam()
+        self.build_why3()
+        self.build_altergo()
+        self.install()
+
+    def install(self):
+        sync_tree(
+            os.path.join(self["PKG_DIR"], "alt-ergo"), self["INSTALL_DIR"], delete=True
+        )
+        sync_tree(
+            os.path.join(self["PKG_DIR"], "why3"), self["INSTALL_DIR"], delete=False
+        )

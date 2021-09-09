@@ -1,0 +1,128 @@
+from e3.anod.helper import Make
+from e3.anod.loader import spec
+from e3.anod.package import SourceBuilder
+from e3.anod.spec import Anod
+from e3.fs import cp, mv, sync_tree
+from e3.os.fs import chmod
+import os
+
+
+class SPARK2014(spec("common")):
+    @property
+    def version(self):
+        return "11.2.0"
+
+    @property
+    def gcc_tarball(self):
+        return "gcc-%s.tar.gz" % self.version
+
+    @property
+    def cvc4_binary(self):
+        if self.env.host.os.name == "windows":
+            fn = "cvc4-1.8-win64-opt.exe"
+        elif self.env.host.os.name == "darwin":
+            fn = "cvc4-1.8-macos-opt"
+        else:
+            fn = "cvc4-1.8-x86_64-linux-opt"
+        return fn
+
+    @property
+    def z3_zip(self):
+        if self.env.host.os.name == "windows":
+            fn = "z3-4.8.12-x64-win.zip"
+        elif self.env.host.os.name == "darwin":
+            fn = "z3-4.8.12-x64-osx-10.15.7.zip"
+        else:
+            fn = "z3-4.8.12-x64-glibc-2.31.zip"
+        return fn
+
+    @property
+    def source_pkg_build(self):
+        return [
+            self.HTTPSSourceBuilder(
+                name=self.gcc_tarball,
+                url="https://ftp.gnu.org/gnu/gcc/gcc-%s/%s"
+                % (self.version, self.gcc_tarball),
+            ),
+            SourceBuilder(
+                name="spark2014", fullname=lambda: "spark2014", checkout=["spark2014"]
+            ),
+            self.HTTPSSourceBuilder(
+                name=self.cvc4_binary,
+                url="https://github.com/cvc5/cvc5/releases/download/1.8/%s"
+                % self.cvc4_binary,
+            ),
+            self.HTTPSSourceBuilder(
+                name=self.z3_zip,
+                url="https://github.com/Z3Prover/z3/releases/download/z3-4.8.12/%s"
+                % self.z3_zip,
+            ),
+        ]
+
+    @property
+    def build_source_list(self):
+        return [
+            Anod.Source(name="spark2014", publish=True, dest=""),
+            Anod.Source(name=self.gcc_tarball, publish=True, dest="gcc"),
+            Anod.Source(
+                name=self.cvc4_binary, publish=True, unpack_cmd=cp, dest="cvc4"
+            ),
+            Anod.Source(name=self.z3_zip, publish=True, dest="z3"),
+        ]
+
+    build_space_name = "spark2014"
+
+    @property
+    def build_deps(self):
+        deps = [
+            Anod.Dependency("why3"),
+            Anod.Dependency("gprbuild"),
+            Anod.Dependency("gcc"),
+            Anod.Dependency("gnatcoll"),
+            Anod.Dependency("xmlada"),
+            Anod.Dependency("libgpr"),
+        ]
+        return deps
+
+    @Anod.primitive()
+    def build(self):
+        ada_dir = os.path.join(self["SRC_DIR"], "gcc", "gcc", "ada")
+        gnat_src_dir = os.path.join(self["SRC_DIR"], "gnat2why", "gnat_src")
+        sync_tree(ada_dir, gnat_src_dir, delete=True)
+        make = Make(
+            self,
+            makefile=os.path.join(self["SRC_DIR"], "Makefile"),
+            exec_dir=self["SRC_DIR"],
+        )
+        for dep in self.deps:
+            if dep != "why3":
+                self.deps[dep].setenv()
+        make("all-nightly")
+        self.install()
+
+    def install(self):
+        libexec_spark = os.path.join(self["INSTALL_DIR"], "libexec", "spark")
+        libexec_spark_bin = os.path.join(libexec_spark, "bin")
+        _bin = os.path.join(self["INSTALL_DIR"], "bin")
+        sync_tree(os.path.join(self["SRC_DIR"], "install"), self["INSTALL_DIR"])
+        sync_tree(self.deps["why3"]["INSTALL_DIR"], libexec_spark, delete=False)
+        sync_tree(self.deps["gcc"]["INSTALL_DIR"], libexec_spark, delete=False)
+        sync_tree(self.deps["gprbuild"]["INSTALL_DIR"], libexec_spark, delete=False)
+        cp(os.path.join(self["SRC_DIR"], "z3", "bin", "z3"), libexec_spark_bin)
+        cp(
+            os.path.join(self["SRC_DIR"], "cvc4", self.cvc4_binary),
+            os.path.join(libexec_spark_bin, "cvc4"),
+        )
+        chmod("a+x", os.path.join(libexec_spark_bin, "cvc4"))
+        for fn in [
+            "gnat2why",
+            "spark_codepeer_wrapper",
+            "spark_memcached_wrapper",
+            "spark_report",
+            "spark_semaphore_wrapper",
+            "target.atp",
+        ]:
+            mv(
+                os.path.join(_bin, fn),
+                os.path.join(libexec_spark, "bin"),
+            )
