@@ -103,9 +103,10 @@ class FSFBuildInstallSource(FSFBuildJob):
         filename = os.path.join(self.sandbox.tmp_cache_dir, self.data.source.name)
 
         source.set_other_sources(getattr(spec, "%s_source_list" % spec.kind, []))
+        dest = os.path.join(spec.build_space.src_dir, source.dest)
         if os.path.isdir(filename):
             sync_tree(
-                filename, spec.build_space.src_dir, ignore=source.ignore, delete=True
+                filename, dest, ignore=source.ignore, delete=True
             )
         else:
             mkdir(os.path.join(spec.build_space.src_dir, source.dest))
