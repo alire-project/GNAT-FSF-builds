@@ -46,7 +46,7 @@ class Why3(spec("common")):
         opam_binary = os.path.join(self["SRC_DIR"], "opam", self.opam_binary)
         chmod("u+x", opam_binary)
         opamroot = os.path.join(self["TMP_DIR"])
-        self.shell(opam_binary, "init", "--root=" + opamroot, "-n")
+        self.shell(opam_binary, "init", "--root=" + opamroot, "-n", "--disable-sandboxing")
         self.shell(
             opam_binary,
             "install",
