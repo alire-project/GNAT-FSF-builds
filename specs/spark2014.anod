@@ -13,6 +13,13 @@ class SPARK2014(spec("common")):
         return "11.2.0"
 
     @property
+    def exec_suffix(self):
+        if self.env.host.os.name == "windows":
+            return ".exe"
+        else:
+            return ""
+
+    @property
     def gcc_tarball(self):
         return "gcc-%s.tar.gz" % self.version
 
@@ -108,21 +115,23 @@ class SPARK2014(spec("common")):
         sync_tree(self.deps["why3"]["INSTALL_DIR"], libexec_spark, delete=False)
         sync_tree(self.deps["gcc"]["INSTALL_DIR"], libexec_spark, delete=False)
         sync_tree(self.deps["gprbuild"]["INSTALL_DIR"], libexec_spark, delete=False)
-        cp(os.path.join(self["SRC_DIR"], "z3", "bin", "z3"), libexec_spark_bin)
+        sync_tree(os.path.join(self["SRC_DIR"], "z3"), libexec_spark, delete=False)
+        cvc4_binary_name = "cvc4.exe" if self.env.host.os.name == "windows" else "cvc4"
+        cvc4_binary_name = os.path.join(libexec_spark_bin, cvc4_binary_name)
         cp(
             os.path.join(self["SRC_DIR"], "cvc4", self.cvc4_binary),
-            os.path.join(libexec_spark_bin, "cvc4"),
+            cvc4_binary_name
         )
-        chmod("a+x", os.path.join(libexec_spark_bin, "cvc4"))
+        chmod("a+x", cvc4_binary_name)
         for fn in [
             "gnat2why",
             "spark_codepeer_wrapper",
             "spark_memcached_wrapper",
             "spark_report",
             "spark_semaphore_wrapper",
-            "target.atp",
         ]:
             mv(
-                os.path.join(_bin, fn),
-                os.path.join(libexec_spark, "bin"),
+                os.path.join(_bin, fn + self.exec_suffix),
+                libexec_spark_bin
             )
+        mv (os.path.join(_bin, "target.atp"), libexec_spark_bin)
