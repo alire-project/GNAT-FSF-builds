@@ -178,6 +178,41 @@ jobs:
         retention-days: 5
 
 
+  why3:
+    strategy:
+      matrix:
+        ocaml-version:
+          - 4.12.0
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          repository: 'kanigsson/why3'
+          ref: 'workflow2'
+          
+      - name: Use Setup OCaml v2 ${{ matrix.ocaml-version }}
+        uses: avsm/setup-ocaml@v2
+        with:
+          ocaml-version: ${{ matrix.ocaml-version }}
+
+      - name: opam install depext
+        run: opam depext camlzip zarith re seq why3
+
+      - run: opam install camlzip dune dune-configurator menhir num ocamlgraph re seq yojson zarith
+
+      - run: opam exec -- bash configure --prefix=why3install --enable-relocation --disable-emacs-compilation --disable-hypothesis-selection --disable-js-of-ocaml
+      - run: opam exec -- make
+      - run: opam exec -- make install_spark2014
+
+      - name: Upload the build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: why3
+          path: why3install
+
+
+
   sanity_checking:
     name: Sanity Checking
     needs: [gnat_gprbuild, gnatcov]
