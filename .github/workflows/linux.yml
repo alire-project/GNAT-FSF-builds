@@ -205,9 +205,6 @@ jobs:
       - run: opam exec -- make
       - run: opam exec -- make install_spark2014
 
-      - run: ls -R /tmp/
-      - run: ls -R /tmp/why3install
-
       - name: Upload the build artifact
         uses: actions/upload-artifact@v2
         with:
