@@ -190,7 +190,7 @@ jobs:
         with:
           repository: 'kanigsson/why3'
           ref: 'workflow2'
-          
+
       - name: Use Setup OCaml v2 ${{ matrix.ocaml-version }}
         uses: avsm/setup-ocaml@v2
         with:
@@ -211,6 +211,47 @@ jobs:
           name: why3
           path: /tmp/why3install
 
+
+  alt_ergo:
+    strategy:
+      matrix:
+        ocaml-version:
+          - 4.12.0
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          repository: 'kanigsson/alt-ergo'
+          ref: 'workflow'
+
+      - name: Use Setup OCaml v2 ${{ matrix.ocaml-version }}
+        uses: avsm/setup-ocaml@v2
+        with:
+          ocaml-version: ${{ matrix.ocaml-version }}
+
+      - name: opam install depext
+        run: opam depext alt-ergo-lib alt-ergo-parsers alt-ergo
+
+      - run: opam install camlzip cmdliner dune dune-configurator menhir num ocamlgraph ocplib-simplex psmt2-frontend re seq yojson zarith
+
+      - run: opam exec -- ocaml unix.cma configure.ml alt-ergo-lib
+      - run: opam exec -- make alt-ergo-lib
+      - run: opam exec -- make install-lib
+
+      - run: opam exec -- ocaml unix.cma configure.ml alt-ergo-parsers
+      - run: opam exec -- make alt-ergo-parsers
+      - run: opam exec -- make install-parsers
+
+      - run: opam exec -- ocaml unix.cma configure.ml alt-ergo --prefix=/tmp/alt-ergo-install
+      - run: opam exec -- make alt-ergo
+      - run: opam exec -- make install-bin
+
+      - name: Upload the build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: alt-ergo
+          path: /tmp/alt-ergo-install
 
 
   sanity_checking:
