@@ -238,6 +238,40 @@ jobs:
         path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
         retention-days: 5
 
+  why3:
+    strategy:
+      fail-fast: false
+      matrix:
+        ocaml-version:
+          - 4.12.0
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          repository: 'kanigsson/why3'
+          ref: 'workflow2'
+
+      - name: Use Setup OCaml v1 ${{ matrix.ocaml-version }}
+        uses: avsm/setup-ocaml@v1
+        with:
+          ocaml-version: ${{ matrix.ocaml-version }}
+
+      - name: opam install depext
+        run: opam depext camlzip zarith re seq why3
+
+      - run: opam install camlzip dune dune-configurator menhir num ocamlgraph re seq yojson zarith
+
+      - run: opam exec -- bash configure --prefix=/tmp/why3install --enable-relocation --disable-emacs-compilation --disable-hypothesis-selection --disable-js-of-ocaml
+      - run: opam exec -- make
+      - run: opam exec -- make install_spark2014
+
+      - name: Upload the build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: why3_x86_64-windows
+          path: /tmp/why3install
+
 
   sanity_checking:
     name: Sanity Checking
