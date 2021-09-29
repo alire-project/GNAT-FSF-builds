@@ -10,7 +10,7 @@ jobs:
     name: Sanity Checking
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [macos-latest, windows-latest, ubuntu-18.04]
         gnat_version: [10.3.0-1, 11.2.0-1]
         gprbuild_version: [21.0.0-1]
         gnatcov_version: [21.0-1]

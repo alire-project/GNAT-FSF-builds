@@ -9,7 +9,7 @@ on:
 jobs:
   gnat_gprbuild:
     name: GNAT Linux and GPRbuild
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
     - name: Checkout Project
       uses: actions/checkout@v2
@@ -62,7 +62,7 @@ jobs:
   gnatcov:
     name: GNATcov
     needs: gnat_gprbuild
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
     - name: Checkout Project
       uses: actions/checkout@v2
@@ -100,7 +100,7 @@ jobs:
   gnat_arm_elf:
     name: GNAT arm-elf-linux
     needs: gnat_gprbuild
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
     - name: Checkout Project
       uses: actions/checkout@v2
@@ -141,7 +141,7 @@ jobs:
   gnat_riscv64_elf:
     name: GNAT riscv64-elf-linux
     needs: gnat_gprbuild
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
     - name: Checkout Project
       uses: actions/checkout@v1
@@ -181,7 +181,7 @@ jobs:
   sanity_checking:
     name: Sanity Checking
     needs: [gnat_gprbuild, gnatcov]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
     - name: Checkout Project
       uses: actions/checkout@v2
