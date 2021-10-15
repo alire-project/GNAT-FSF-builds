@@ -2,16 +2,17 @@ from e3.anod.helper import Configure, Make
 from e3.anod.loader import spec
 from e3.anod.package import SourceBuilder
 from e3.anod.spec import Anod
-from e3.fs import cp, mv, sync_tree
+from e3.fs import cp, mv, rm, sync_tree
 from e3.os.fs import chmod
 import os
+import tempfile
 
 
 class Why3(spec("common")):
     @property
     def opam_binary(self):
         if self.env.host.os.name == "windows":
-            assert false
+            fn = "0.0.0.2u.tar.gz"
         elif self.env.host.os.name == "darwin":
             fn = "opam-2.1.0-x86_64-macos"
         else:
@@ -19,13 +20,21 @@ class Why3(spec("common")):
         return fn
 
     @property
+    def opam_url(self):
+        if self.env.host.os.name == "windows":
+            return "https://github.com/kanigsson/opam64/archive/refs/tags/"
+        else:
+            return "https://github.com/ocaml/opam/releases/download/2.1.0/"
+        
+
+    @property
     def source_pkg_build(self):
         return [
             SourceBuilder(name="why3", fullname=lambda: "why3", checkout=["why3"]),
             self.HTTPSSourceBuilder(
                 name=self.opam_binary,
-                url="https://github.com/ocaml/opam/releases/download/2.1.0/%s"
-                % self.opam_binary,
+                url= "%s%s"
+                % (self.opam_url, self.opam_binary),
             ),
             SourceBuilder(
                 name="alt-ergo", fullname=lambda: "alt-ergo", checkout=["alt-ergo"]
@@ -34,10 +43,15 @@ class Why3(spec("common")):
 
     @property
     def build_source_list(self):
+        if self.env.host.os.name == "windows":
+            opam_unpack_cmd = None
+        else:
+            opam_unpack_cmd = cp
+        
         return [
             Anod.Source(name="why3", publish=True, dest="why3"),
             Anod.Source(
-                name=self.opam_binary, publish=True, unpack_cmd=cp, dest="opam"
+                name=self.opam_binary, publish=True, unpack_cmd=opam_unpack_cmd, dest="opam"
             ),
             Anod.Source(name="alt-ergo", publish=True, dest="alt-ergo"),
         ]
@@ -65,6 +79,48 @@ class Why3(spec("common")):
         )
         opam_bin_path = os.path.join(self["TMP_DIR"], "default", "bin")
         self.env.add_path(opam_bin_path)
+
+    def build_opam_win(self):
+        rm(self["TMP_DIR"])
+        tmpdir = self["TMP_DIR"]
+        opam_dir = os.path.join(self["SRC_DIR"], "opam")
+        opamroot = os.path.join(tmpdir, "opamroot")
+        self.shell("bash", os.path.join(opam_dir, "install.sh"), "--prefix", tmpdir)
+        opam_binary = os.path.join(opam_dir, "bin", "opam")
+        variant = "ocaml-variants.4.10.0+mingw64c"
+        self.shell(
+            opam_binary,
+            "init",
+            "default",
+            "https://github.com/fdopen/opam-repository-mingw.git#opam2",
+            "-c",
+            variant,
+            "--disable-sandboxing",
+            "--root=" + opamroot,
+            "-n",
+            "-y",
+        )
+        os.environ["C_INCLUDE_PATH"] = "/usr/include"
+        os.environ["LDFLAGS"] = "-L/usr/lib"
+        self.shell(
+            opam_binary,
+            "install",
+            "--root=" + opamroot,
+            "-y",
+            "camlzip",
+            "menhir",
+            "num",
+            "ocamlgraph",
+            "ocplib-simplex",
+            "psmt2-frontend",
+            "re",
+            "seq",
+            "yojson",
+            "zarith",
+        )
+        variant_dir = os.path.join(opamroot, variant)
+        self.env.add_path(os.path.join(variant_dir, "bin"))
+        os.environ["OCAMLLIB"]= os.path.join(variant_dir, "lib", "ocaml")
 
     def build_altergo(self):
         installdir = os.path.join(self["PKG_DIR"], "alt-ergo")
@@ -113,6 +169,7 @@ class Why3(spec("common")):
             "--disable-js-of-ocaml",
             "--prefix=%s" % os.path.join(self["PKG_DIR"], "why3"),
         )
+        os.environ["CONFIG_SHELL"] = "bash"
         configure()
         make = Make(self, exec_dir=src_dir)
         make()
@@ -120,7 +177,10 @@ class Why3(spec("common")):
 
     @Anod.primitive(post="install")
     def build(self):
-        self.build_opam()
+        if self.env.host.os.name == "windows":
+            self.build_opam_win()
+        else:
+            self.build_opam()
         self.build_why3()
         self.build_altergo()
         self.install()
