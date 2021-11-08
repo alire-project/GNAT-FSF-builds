@@ -17,7 +17,7 @@ class ISL(spec("gnu")):
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
-                name=self.tarball, url="http://isl.gforge.inria.fr/" + self.tarball
+                name=self.tarball, url="https://libisl.sourceforge.io/" + self.tarball
             )
         ]
 
