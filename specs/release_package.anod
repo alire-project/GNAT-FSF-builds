@@ -45,9 +45,9 @@ class ReleasePackage(spec("common")):
         package = self.package
 
         if package == "gprbuild":
-            return "2"
+            return "1"
         elif package == "gnatcov":
-            return "2"
+            return "1"
         elif package == "gnat":
             if self.env.target.triplet == "arm-eabi":
                 return "2"

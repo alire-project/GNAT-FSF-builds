@@ -7,13 +7,13 @@ from e3.diff import patch
 
 import os
 
-patch_name = "gnatcov-macos.patch"
+patch_name = "gnatcov.patch"
 
 
 class GNATcov(spec("common")):
     @property
     def version(self):
-        return "21.0"
+        return "22.0"
 
     @property
     def tarball(self):
@@ -51,7 +51,7 @@ class GNATcov(spec("common")):
             Anod.Dependency("gnatutil", track=True),
             Anod.Dependency("xmlada", track=True),
             Anod.Dependency("zlib", track=True),
-            Anod.Dependency("gmp", track=True),
+            Anod.Dependency("gmp", track=True)
         ]
         if self.env.target.os.name == "windows":
             deps.append(Anod.Dependency("libiconv"))
