@@ -1,5 +1,7 @@
+import os
+
 from e3.os.fs import unixpath
-from e3.fs import sync_tree
+from e3.fs import sync_tree, rm
 from e3.anod.helper import Configure, Make
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
@@ -83,6 +85,12 @@ class Binutils(spec("common")):
         make = Make(self)
         make()
         make("install")
+
+
+        # https://github.com/msys2/MINGW-packages/issues/7890
+        if self.env.target.os.name == "windows":
+            rm(os.path.join(self["INSTALL_DIR"], "lib", "bfd-plugins", "libdep.a"))
+
 
         # We do not clean the binutils builds and install on native targets as
         # they are used for gnatcov build.
