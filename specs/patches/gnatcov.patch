@@ -1,7 +1,16 @@
 diff --git tools/gnatcov/Makefile tools/gnatcov/Makefile
-index 1c157cd88..35033cd2f 100644
+index 1c157cd88..d0d63bc69 100644
 --- tools/gnatcov/Makefile
 +++ tools/gnatcov/Makefile
+@@ -82,7 +82,7 @@ PGM64PATH=obj64/$(BUILD_MODE)/gnatcov64
+ DIRNAME=gnatcoverage
+ 
+ include host.mk
+-include common.mk
++# include common.mk
+ 
+ #####################################################################
+ # Targets to build the core tool and the trace adapters, optionally #
 @@ -299,7 +299,7 @@ install-adapters: $(INSTALL_ADAPTER_TARGETS)
  # which has its own extra info embedded and eventually installs just all what
  # the distrib tree contains. We don't want any toplevel item there.
