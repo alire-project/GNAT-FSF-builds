@@ -151,7 +151,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: 'kanigsson/why3'
-          ref: 'workflow2'
+          ref: 'myfsf'
 
       - name: Use Setup OCaml v2 ${{ matrix.ocaml-version }}
         uses: avsm/setup-ocaml@v2
@@ -185,7 +185,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: 'kanigsson/alt-ergo'
-          ref: 'workflow'
+          ref: 'myfsf'
 
       - name: Use Setup OCaml v2 ${{ matrix.ocaml-version }}
         uses: avsm/setup-ocaml@v2
