@@ -14,201 +14,54 @@ jobs:
     - name: Checkout Project
       uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
+    - uses: pguyot/arm-runner-action@v1
       with:
-        python-version: 3.8
+        image_additional_mb: 4096
+        commands: |
+            uname -a
+            sudo apt-get -y install python3 python3-pip gnat
+            pip3 install e3-core
+            ./anod build gcc -v --loglevel DEBUG --enable-cleanup
 
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install e3-core
-    - name: Install Ada dependencies
-      run: sudo apt-get install gnat
+    #       - name: Set up Python
+    #   uses: actions/setup-python@v2
+    #   with:
+    #     python-version: 3.8
 
-    - name: Build GNAT native
-      run: ./anod build gcc -v --loglevel DEBUG --enable-cleanup
+    # - name: Install Python dependencies
+    #   run: |
+    #     python -m pip install --upgrade pip
+    #     pip install e3-core
+    # - name: Install Ada dependencies
+    #   run: sudo apt-get install gnat
 
-    - name: Build GDB
-      run: ./anod build gdb -v --loglevel DEBUG --enable-cleanup
+    # - name: Build GNAT native
+    #   run: ./anod build gcc -v --loglevel DEBUG --enable-cleanup
 
-    - name: Package GNAT
-      run: ./anod build release_package --qualifier=package=gnat,do_gh_release -v --loglevel DEBUG
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
+    # - name: Build GDB
+    #   run: ./anod build gdb -v --loglevel DEBUG --enable-cleanup
 
-    - name: Build GPRbuild
-      run: ./anod build gprbuild -v --loglevel DEBUG --enable-cleanup
+    # - name: Package GNAT
+    #   run: ./anod build release_package --qualifier=package=gnat,do_gh_release -v --loglevel DEBUG
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
-    - name: Package GPRbuild
-      run: ./anod build release_package --qualifier=package=gprbuild,do_gh_release -v --loglevel DEBUG
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
+    # - name: Build GPRbuild
+    #   run: ./anod build gprbuild -v --loglevel DEBUG --enable-cleanup
 
-    - uses: actions/upload-artifact@v2
-      with:
-        name: anod-artifacts
-        path: out_artifacts/*
-        retention-days: 1
+    # - name: Package GPRbuild
+    #   run: ./anod build release_package --qualifier=package=gprbuild,do_gh_release -v --loglevel DEBUG
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
-    - uses: actions/upload-artifact@v2
-      with:
-        name: release-packages
-        path: sbx/*/release_package*/install/*
-        retention-days: 5
+    # - uses: actions/upload-artifact@v2
+    #   with:
+    #     name: anod-artifacts
+    #     path: out_artifacts/*
+    #     retention-days: 1
 
-
-
-  gnatcov:
-    name: GNATcov
-    needs: gnat_gprbuild
-    runs-on: ubuntu-18.04
-    steps:
-    - name: Checkout Project
-      uses: actions/checkout@v2
-
-    - uses: actions/download-artifact@v2
-      with:
-        name: anod-artifacts
-        path: in_artifacts/
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install e3-core
-    - name: Build GNATcov
-      run: ./anod build gnatcov -v --loglevel DEBUG --enable-cleanup
-
-    - name: Package GNATcov
-      run: ./anod build release_package --qualifier=package=gnatcov,do_gh_release -v --loglevel DEBUG
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: release-packages
-        path: sbx/*/release_package*/install/*
-        retention-days: 5
-
-
-
-  gnat_arm_elf:
-    name: GNAT arm-elf-linux
-    needs: gnat_gprbuild
-    runs-on: ubuntu-18.04
-    steps:
-    - name: Checkout Project
-      uses: actions/checkout@v2
-
-    - uses: actions/download-artifact@v2
-      with:
-        name: anod-artifacts
-        path: in_artifacts/
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install e3-core
-    - name: Build GNAT arm-elf
-      run: ./anod build gcc -v --loglevel DEBUG --target=arm-elf --enable-cleanup
-
-    - name: Build GDB arm-elf
-      run: ./anod build gdb -v --loglevel DEBUG --target=arm-elf --enable-cleanup
-
-    - name: Package GNAT arm-elf
-      run: ./anod build release_package --qualifier=package=gnat,do_gh_release --target=arm-elf -v --loglevel DEBUG
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: release-packages
-        path: sbx/*/release_package*/install/*
-        retention-days: 5
-
-
-
-  gnat_riscv64_elf:
-    name: GNAT riscv64-elf-linux
-    needs: gnat_gprbuild
-    runs-on: ubuntu-18.04
-    steps:
-    - name: Checkout Project
-      uses: actions/checkout@v1
-
-    - uses: actions/download-artifact@v2
-      with:
-        name: anod-artifacts
-        path: in_artifacts/
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install e3-core
-    - name: Build GNAT riscv64-elf
-      run: ./anod build gcc -v --loglevel DEBUG --target=riscv64-elf --enable-cleanup
-
-    - name: Build GDB riscv64-elf
-      run: ./anod build gdb -v --loglevel DEBUG --target=riscv64-elf --enable-cleanup
-
-    - name: Package GNAT riscv64-elf
-      run: ./anod build release_package --qualifier=package=gnat,do_gh_release --target=riscv64-elf -v --loglevel DEBUG
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: release-packages
-        path: sbx/*/release_package*/install/*
-        retention-days: 5
-
-
-  sanity_checking:
-    name: Sanity Checking
-    needs: [gnat_gprbuild, gnatcov]
-    runs-on: ubuntu-18.04
-    steps:
-    - name: Checkout Project
-      uses: actions/checkout@v2
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install e3-testsuite
-
-    - uses: actions/download-artifact@v2
-      with:
-        name: release-packages
-        path: ./sanity-checking/release_packages
-
-    - name: Run testsuite
-      run: |
-          cd ./sanity-checking
-          python3 ./run.py -v --install-deps-from=release_packages --pkgs-install-dir=pkgs_install --failure-exit-code 1
-
-    - uses: actions/upload-artifact@v2
-      if: failure()
-      with:
-        name: testsuite-results-${{runner.os}}
-        path: sanity-checking/out/new
-        retention-days: 5
+    # - uses: actions/upload-artifact@v2
+    #   with:
+    #     name: release-packages
+    #     path: sbx/*/release_package*/install/*
+    #     retention-days: 5
