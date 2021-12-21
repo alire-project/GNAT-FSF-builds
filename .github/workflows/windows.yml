@@ -126,8 +126,14 @@ jobs:
 
 
 
-  gnat_arm_elf:
-    name: GNAT arm-elf-windows
+
+
+
+  gnat_cross:
+    strategy:
+      matrix:
+        target: ["arm-elf", "riscv64-elf", "avr-elf"]
+    name: GNAT ${{ matrix.target }}-windows
     needs: gnat_gprbuild
     runs-on: windows-2019
     env:
@@ -164,71 +170,14 @@ jobs:
         path: C:/aaa/GNAT-FSF-builds/in_artifacts/
 
 
-    - name: Build GNAT arm-elf
-      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gcc -v --loglevel DEBUG --target=arm-elf --enable-cleanup
+    - name: Build GNAT ${{ matrix.target }}
+      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gcc -v --loglevel DEBUG --target=${{ matrix.target }} --enable-cleanup
 
-    - name: Build GDB arm-elf
-      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gdb -v --loglevel DEBUG --target=arm-elf --enable-cleanup
+    - name: Build GDB ${{ matrix.target }}
+      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gdb -v --loglevel DEBUG --target=${{ matrix.target }} --enable-cleanup
 
-    - name: Package GNAT arm-elf
-      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_package --qualifier=package=gnat,do_gh_release --target=arm-elf -v --loglevel DEBUG
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: release-packages
-        path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
-        retention-days: 5
-
-
-
-  gnat_riscv64_elf:
-    name: GNAT riscv64-elf-windows
-    needs: gnat_gprbuild
-    runs-on: windows-2019
-    env:
-      CONFIG_SHELL: /bin/bash
-    defaults:
-      run:
-        shell: msys2 {0}
-    steps:
-    - name: Checkout Project
-      uses: actions/checkout@v2
-
-    - name: Install msys2
-      uses: msys2/setup-msys2@v2
-      with:
-        install: >-
-          base-devel
-          git
-          mingw-w64-x86_64-toolchain
-          mingw-w64-x86_64-github-cli
-          mingw-w64-x86_64-python
-          mingw-w64-x86_64-python-pip
-          mingw-w64-x86_64-python-psutil
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install e3-core
-    - name: Prepare msys2 build setup
-      # We need a path that is compatible between Windows and Unix world
-      run: df -h; mkdir /c/aaa; mount C:/aaa /aaa ; cd ..; cp -r GNAT-FSF-builds /aaa
-
-    - uses: actions/download-artifact@v2
-      with:
-        name: anod-artifacts
-        path: C:/aaa/GNAT-FSF-builds/in_artifacts/
-
-
-    - name: Build GNAT riscv64-elf
-      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gcc -v --loglevel DEBUG --target=riscv64-elf --enable-cleanup
-
-    - name: Build GDB riscv64-elf
-      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gdb -v --loglevel DEBUG --target=riscv64-elf --enable-cleanup
-
-    - name: Package GNAT riscv64-elf
-      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_package --qualifier=package=gnat,do_gh_release --target=riscv64-elf -v --loglevel DEBUG
+    - name: Package GNAT ${{ matrix.target }}
+      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_package --qualifier=package=gnat,do_gh_release --target=${{ matrix.target }} -v --loglevel DEBUG
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
