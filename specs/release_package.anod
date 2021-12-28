@@ -116,7 +116,7 @@ class ReleasePackage(spec("common")):
                     Anod.Dependency("embedded-runtimes", track=True),
                 ]
 
-            elif self.env.target.triplet == "avr-elf":
+            elif self.env.target.triplet == "avr":
                 return [
                     Anod.Dependency("gcc", track=True),
                     Anod.Dependency("gdb", track=True),
@@ -129,7 +129,7 @@ class ReleasePackage(spec("common")):
                     Anod.Dependency("gdb", track=True),
                 ]
             else:
-                raise Exception("Unknown target for gcc package")
+                raise Exception("Unknown target for gcc package: '%s'" % self.env.target.triplet)
 
     def check_github_release(self, release_name):
         try:
