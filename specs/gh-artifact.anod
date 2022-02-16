@@ -79,6 +79,7 @@ class GHArtifact(spec("common")):
 
         Return None if the artifact is not found.
         """
+        log.debug("Looking for artifact: '%s'" % self.artifact_archive)
         for root, dirs, files in os.walk(self.artifacts_in_dir):
             for name in files:
                 if name == self.artifact_archive:

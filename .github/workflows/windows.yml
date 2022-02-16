@@ -267,6 +267,70 @@ jobs:
           path: C:/alt-ergo-install
 
 
+  spark:
+    name: spark
+    needs: [gnat_gprbuild, why3, alt_ergo]
+    runs-on: windows-2019
+    env:
+      CONFIG_SHELL: /bin/bash
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v2
+
+    - name: Install msys2
+      uses: msys2/setup-msys2@v2
+      with:
+        install: >-
+          base-devel
+          git
+          mingw-w64-x86_64-toolchain
+          mingw-w64-x86_64-github-cli
+          mingw-w64-x86_64-python
+          mingw-w64-x86_64-python-pip
+          mingw-w64-x86_64-python-psutil
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install e3-core
+
+    - name: Prepare msys2 build setup
+      # We need a path that is compatible between Windows and Unix world
+      run: df -h; mkdir /c/aaa; mount C:/aaa /aaa ; cd ..; cp -r GNAT-FSF-builds /c/aaa
+
+    - uses: actions/download-artifact@v2
+      with:
+        name: anod-artifacts
+        path: C:/aaa/GNAT-FSF-builds/in_artifacts/
+
+    - uses: actions/download-artifact@v2
+      with:
+        name: alt-ergo
+        path: C:/aaa/GNAT-FSF-builds/alt-ergo_artifact/
+
+    - uses: actions/download-artifact@v2
+      with:
+        name: why3
+        path: C:/aaa/GNAT-FSF-builds/why3_artifact/
+
+    - name: Build SPARK
+      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build spark2014 -v --loglevel DEBUG --enable-cleanup
+
+    # - name: Package SPARK
+    #   run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_package --qualifier=package=spark,do_gh_release -v --loglevel DEBUG
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: release-packages
+        path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
+        retention-days: 5
+
+
+
   sanity_checking:
     name: Sanity Checking
     needs: [gnat_gprbuild, gnatcov]

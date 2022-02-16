@@ -1,5 +1,7 @@
 sbx
 *.pyc
-my-virtual-env
-in_artifacts/
-out_artifacts/
+/my-virtual-env/
+/in_artifacts/
+/out_artifacts/
+/why3_artifact/
+/alt-ergo_artifact/
