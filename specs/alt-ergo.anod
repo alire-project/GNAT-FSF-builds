@@ -3,7 +3,7 @@ from e3.fs import sync_tree
 from e3.anod.spec import Anod
 import os
 
-class Why3(spec("gh-artifact")):
+class AltErgo(spec("gh-artifact")):
 
     @property
     def version(self):
@@ -11,6 +11,6 @@ class Why3(spec("gh-artifact")):
 
     @Anod.primitive()
     def build(self):
-        sync_tree(os.path.join(self.spec_dir, "..", "why3_artifact"),
+        sync_tree(os.path.join(self.spec_dir, "..", "alt-ergo_artifact"),
                   self["INSTALL_DIR"],
                   delete=True)

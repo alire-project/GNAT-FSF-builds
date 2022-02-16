@@ -83,6 +83,7 @@ class SPARK2014(spec("common")):
     def build_deps(self):
         deps = [
             Anod.Dependency("why3"),
+            Anod.Dependency("alt-ergo"),
             Anod.Dependency("gprbuild"),
             Anod.Dependency("gcc"),
             Anod.Dependency("gnatcoll"),
