@@ -13,6 +13,10 @@ class SPARK2014(spec("common")):
         return "11.2.0"
 
     @property
+    def gcc_tarball(self):
+        return "spark2014-%s.tar.gz" % self.version
+
+    @property
     def exec_suffix(self):
         if self.env.host.os.name == "windows":
             return ".exe"
@@ -50,6 +54,10 @@ class SPARK2014(spec("common")):
                 name=self.gcc_tarball,
                 url="https://ftp.gnu.org/gnu/gcc/gcc-%s/%s"
                 % (self.version, self.gcc_tarball),
+            ),
+            self.HTTPSSourceBuilder(
+                name=self.gcc_tarball,
+                url="https://github.com/kanigsson/spark2014/tarball/myfsf",
             ),
             SourceBuilder(
                 name="spark2014", fullname=lambda: "spark2014", checkout=["spark2014"]

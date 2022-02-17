@@ -16,9 +16,7 @@ class GNATUTIL(spec("common")):
 
     @property
     def source_pkg_build(self):
-        return [
-            self.LocalSourceBuilder(self.tarball)
-        ]
+        return [self.LocalSourceBuilder(self.tarball)]
 
     @property
     def build_source_list(self):
