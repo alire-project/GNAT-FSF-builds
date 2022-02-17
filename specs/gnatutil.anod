@@ -17,11 +17,7 @@ class GNATUTIL(spec("common")):
     @property
     def source_pkg_build(self):
         return [
-            self.HTTPSSourceBuilder(
-                name=self.tarball,
-                url="https://community.download.adacore.com/v1/26bd253101b46706f5f8e3d0ca8b3107cde99e99?filename=%s"
-                % self.tarball,
-            )
+            self.LocalSourceBuilder(self.tarball)
         ]
 
     @property
