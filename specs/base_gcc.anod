@@ -8,7 +8,7 @@ from e3.anod.spec import Anod
 class base_gcc(spec("common")):
     @property
     def version(self):
-        return "10.3.0-2"
+        return "11.2.0-3"
 
     @property
     def tarball(self):

@@ -8,7 +8,7 @@ from e3.os.process import Run
 
 import os
 
-valid_packages = ["gprbuild", "gnat", "gnatcov"]
+valid_packages = ["gprbuild", "gnat", "gnatcov", "gnatprove"]
 
 
 class ReleasePackage(spec("common")):
@@ -36,6 +36,8 @@ class ReleasePackage(spec("common")):
             return self.deps[package].version
         elif package == "gnat":
             return self.deps["gcc"].version
+        elif package == "gnatprove":
+            return self.deps["spark2014"].version
 
     @property
     def package_release(self):
@@ -47,6 +49,8 @@ class ReleasePackage(spec("common")):
         if package == "gprbuild":
             return "1"
         elif package == "gnatcov":
+            return "1"
+        elif package == "gnatprove":
             return "1"
         elif package == "gnat":
             if self.env.target.triplet == "arm-eabi":
@@ -98,6 +102,9 @@ class ReleasePackage(spec("common")):
 
         if pck == "gnatcov":
             return [Anod.Dependency("gnatcov", track=True)]
+
+        if pck == "gnatprove":
+            return [Anod.Dependency("spark2014", track=True)]
 
         if pck == "gnat":
             # Note: the binutils are already merged in gcc installation
