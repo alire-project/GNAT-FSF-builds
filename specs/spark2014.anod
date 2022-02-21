@@ -2,7 +2,7 @@ from e3.anod.helper import Make
 from e3.anod.loader import spec
 from e3.anod.package import SourceBuilder
 from e3.anod.spec import Anod
-from e3.fs import cp, mv, sync_tree
+from e3.fs import cp, mv, sync_tree, ls, rm, mkdir
 from e3.os.fs import chmod
 import os
 
@@ -13,7 +13,7 @@ class SPARK2014(spec("common")):
         return "11.2.0"
 
     @property
-    def gcc_tarball(self):
+    def tarball(self):
         return "spark2014-%s.tar.gz" % self.version
 
     @property
@@ -56,11 +56,8 @@ class SPARK2014(spec("common")):
                 % (self.version, self.gcc_tarball),
             ),
             self.HTTPSSourceBuilder(
-                name=self.gcc_tarball,
+                name=self.tarball,
                 url="https://github.com/kanigsson/spark2014/tarball/myfsf",
-            ),
-            SourceBuilder(
-                name="spark2014", fullname=lambda: "spark2014", checkout=["spark2014"]
             ),
             self.HTTPSSourceBuilder(
                 name=self.cvc4_binary,
@@ -77,7 +74,7 @@ class SPARK2014(spec("common")):
     @property
     def build_source_list(self):
         return [
-            Anod.Source(name="spark2014", publish=True, dest=""),
+            Anod.Source(name=self.tarball, publish=True, dest=""),
             Anod.Source(name=self.gcc_tarball, publish=True, dest="gcc"),
             Anod.Source(
                 name=self.cvc4_binary, publish=True, unpack_cmd=cp, dest="cvc4"
@@ -90,10 +87,10 @@ class SPARK2014(spec("common")):
     @property
     def build_deps(self):
         deps = [
+            Anod.Dependency("base_gcc"),
             Anod.Dependency("why3"),
             Anod.Dependency("alt-ergo"),
             Anod.Dependency("gprbuild"),
-            Anod.Dependency("gcc"),
             Anod.Dependency("gnatcoll"),
             Anod.Dependency("xmlada"),
             Anod.Dependency("libgpr"),
@@ -105,25 +102,43 @@ class SPARK2014(spec("common")):
         ada_dir = os.path.join(self["SRC_DIR"], "gcc", "gcc", "ada")
         gnat_src_dir = os.path.join(self["SRC_DIR"], "gnat2why", "gnat_src")
         sync_tree(ada_dir, gnat_src_dir, delete=True)
+
         make = Make(
             self,
             makefile=os.path.join(self["SRC_DIR"], "Makefile"),
             exec_dir=self["SRC_DIR"],
         )
         for dep in self.deps:
-            if dep != "why3":
-                self.deps[dep].setenv()
-        make("all-nightly")
+            self.deps[dep].setenv()
+        make("all-nightly", jobs=1)
         self.install()
 
     def install(self):
         libexec_spark = os.path.join(self["INSTALL_DIR"], "libexec", "spark")
         libexec_spark_bin = os.path.join(libexec_spark, "bin")
+
+        mkdir (libexec_spark)
+        mkdir (libexec_spark_bin)
+
         _bin = os.path.join(self["INSTALL_DIR"], "bin")
         sync_tree(os.path.join(self["SRC_DIR"], "install"), self["INSTALL_DIR"])
         sync_tree(self.deps["why3"]["INSTALL_DIR"], libexec_spark, delete=False)
-        sync_tree(self.deps["gcc"]["INSTALL_DIR"], libexec_spark, delete=False)
+        sync_tree(self.deps["alt-ergo"]["INSTALL_DIR"], libexec_spark, delete=False)
+        sync_tree(self.deps["base_gcc"]["INSTALL_DIR"], libexec_spark, delete=False)
         sync_tree(self.deps["gprbuild"]["INSTALL_DIR"], libexec_spark, delete=False)
+
+        # Remove all gnat* executables except gnatbind/gnatls, only keep
+        # gcc/gnatbind/gpr* executables.
+        gnat_files = ls(os.path.join(libexec_spark, "bin", "gnat*"))
+        for f in gnat_files:
+            if (
+                not os.path.basename(f).startswith("gnatbind")
+                and not os.path.basename(f).startswith("gnatls")
+                and not os.path.basename(f).startswith("gnat_server")
+                and not os.path.basename(f).startswith("gnatwhy3")
+            ):
+                rm(f)
+
         sync_tree(os.path.join(self["SRC_DIR"], "z3"), libexec_spark, delete=False)
         cvc4_binary_name = "cvc4.exe" if self.env.host.os.name == "windows" else "cvc4"
         cvc4_binary_name = os.path.join(libexec_spark_bin, cvc4_binary_name)
@@ -144,3 +159,13 @@ class SPARK2014(spec("common")):
                 libexec_spark_bin
             )
         mv (os.path.join(_bin, "target.atp"), libexec_spark_bin)
+
+        rm(os.path.join(libexec_spark, "share", "doc"), True)
+
+        # delete alt-ergo libs, these are not used by SPARK and take quite
+        # some space
+        for dir in ["alt-ergo", "alt-ergo-lib", "alt-ergo-parsers"]:
+            rm(os.path.join(libexec_spark, "lib", dir), True)
+
+        for f in ls(os.path.join(libexec_spark, "bin", "why3*")):
+            chmod("a+x", f)

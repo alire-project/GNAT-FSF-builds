@@ -221,7 +221,7 @@ jobs:
 
   spark:
     name: spark
-    needs: [gnat_gprbuild, why3, alt_ergo]
+    needs: [why3, alt_ergo]
     runs-on: ubuntu-18.04
     steps:
     - name: Checkout Project
@@ -254,10 +254,10 @@ jobs:
     - name: Build SPARK
       run: ./anod build spark2014 -v --loglevel DEBUG --enable-cleanup
 
-    # - name: Package SPARK
-    #   run: ./anod build release_package --qualifier=package=spark,do_gh_release -v --loglevel DEBUG
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
+    - name: Package GNATprove
+      run: ./anod build release_package --qualifier=package=gnatprove,do_gh_release -v --loglevel DEBUG
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
     - uses: actions/upload-artifact@v2
       with:
