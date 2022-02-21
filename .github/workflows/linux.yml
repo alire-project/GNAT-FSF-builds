@@ -269,7 +269,7 @@ jobs:
 
   sanity_checking:
     name: Sanity Checking
-    needs: [gnat_gprbuild, gnatcov]
+    needs: [gnat_gprbuild, gnatcov, spark]
     runs-on: ubuntu-18.04
     steps:
     - name: Checkout Project
