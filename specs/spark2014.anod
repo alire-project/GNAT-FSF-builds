@@ -87,7 +87,7 @@ class SPARK2014(spec("common")):
     @property
     def build_deps(self):
         deps = [
-            Anod.Dependency("base_gcc"),
+            Anod.Dependency("gcc"),
             Anod.Dependency("why3"),
             Anod.Dependency("alt-ergo"),
             Anod.Dependency("gprbuild"),
@@ -111,6 +111,7 @@ class SPARK2014(spec("common")):
         for dep in self.deps:
             self.deps[dep].setenv()
         make("all-nightly", jobs=1)
+
         self.install()
 
     def install(self):
@@ -122,22 +123,27 @@ class SPARK2014(spec("common")):
 
         _bin = os.path.join(self["INSTALL_DIR"], "bin")
         sync_tree(os.path.join(self["SRC_DIR"], "install"), self["INSTALL_DIR"])
-        sync_tree(self.deps["why3"]["INSTALL_DIR"], libexec_spark, delete=False)
-        sync_tree(self.deps["alt-ergo"]["INSTALL_DIR"], libexec_spark, delete=False)
-        sync_tree(self.deps["base_gcc"]["INSTALL_DIR"], libexec_spark, delete=False)
-        sync_tree(self.deps["gprbuild"]["INSTALL_DIR"], libexec_spark, delete=False)
 
+        sync_tree(self.deps["gcc"]["INSTALL_DIR"], libexec_spark, delete=False)
         # Remove all gnat* executables except gnatbind/gnatls, only keep
         # gcc/gnatbind/gpr* executables.
-        gnat_files = ls(os.path.join(libexec_spark, "bin", "gnat*"))
-        for f in gnat_files:
-            if (
-                not os.path.basename(f).startswith("gnatbind")
-                and not os.path.basename(f).startswith("gnatls")
-                and not os.path.basename(f).startswith("gnat_server")
-                and not os.path.basename(f).startswith("gnatwhy3")
-            ):
-                rm(f)
+        for glob in ["gnat*", "gdb*", "gcov*", "ld*", "nm", "g++", "ar",
+                     "as", "addr2line", "elfedit", "c++*", "lto-dump",
+                     "ranlib", "objdump", "size", "readelf", "strings",
+                     "strip"]:
+            files = ls(os.path.join(libexec_spark, "bin", glob))
+            for f in files:
+                if (
+                    not os.path.basename(f).startswith("gnatbind")
+                    and not os.path.basename(f).startswith("gnatls")
+                    and not os.path.basename(f).startswith("gnat_server")
+                    and not os.path.basename(f).startswith("gnatwhy3")
+                    ):
+                    rm(f)
+
+        sync_tree(self.deps["why3"]["INSTALL_DIR"], libexec_spark, delete=False)
+        sync_tree(self.deps["alt-ergo"]["INSTALL_DIR"], libexec_spark, delete=False)
+        sync_tree(self.deps["gprbuild"]["INSTALL_DIR"], libexec_spark, delete=False)
 
         sync_tree(os.path.join(self["SRC_DIR"], "z3"), libexec_spark, delete=False)
         cvc4_binary_name = "cvc4.exe" if self.env.host.os.name == "windows" else "cvc4"
@@ -146,7 +152,7 @@ class SPARK2014(spec("common")):
             os.path.join(self["SRC_DIR"], "cvc4", self.cvc4_binary),
             cvc4_binary_name
         )
-        chmod("a+x", cvc4_binary_name)
+
         for fn in [
             "gnat2why",
             "spark_codepeer_wrapper",
@@ -166,6 +172,12 @@ class SPARK2014(spec("common")):
         # some space
         for dir in ["alt-ergo", "alt-ergo-lib", "alt-ergo-parsers"]:
             rm(os.path.join(libexec_spark, "lib", dir), True)
+
+        for exe in ["cvc4", "gnat_server", "gnatwhy3", "alt-ergo"]:
+            chmod("a+x",
+                  os.path.join(libexec_spark_bin,
+                               (exe + (".exe" if self.env.host.os.name == "windows"
+                                        else ""))))
 
         for f in ls(os.path.join(libexec_spark, "bin", "why3*")):
             chmod("a+x", f)

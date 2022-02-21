@@ -333,7 +333,7 @@ jobs:
 
   sanity_checking:
     name: Sanity Checking
-    needs: [gnat_gprbuild, gnatcov]
+    needs: [gnat_gprbuild, gnatcov, spark]
     runs-on: windows-2019
     env:
       CONFIG_SHELL: /bin/bash
