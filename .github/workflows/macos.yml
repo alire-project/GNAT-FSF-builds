@@ -228,7 +228,7 @@ jobs:
 
   spark:
     name: SPARK
-    needs: [why3, alt_ergo]
+    needs: [gnat_gprbuild, why3, alt_ergo]
     runs-on: macos-10.15
     steps:
     - name: Checkout Project

@@ -221,7 +221,7 @@ jobs:
 
   spark:
     name: spark
-    needs: [why3, alt_ergo]
+    needs: [gnat_gprbuild, why3, alt_ergo]
     runs-on: ubuntu-18.04
     steps:
     - name: Checkout Project
