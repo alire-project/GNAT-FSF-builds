@@ -1,6 +1,7 @@
 from drivers.toolchain import gprbuild, startup_gen, run_cmd
 from drivers.helpers import check_line_in
 import drivers.target
+from e3.fs import ls
 from e3.os.fs import which
 from e3.os.process import Run
 from e3.anod.helper import log
@@ -67,9 +68,7 @@ run_cmd(
         "coverage",
         "-Ptest",
         "--level=stmt",
-        "--annotate=xcov",
-        "hello%s.srctrace" % Env().target.os.exeext,
-    ]
+        "--annotate=xcov"] + ls("*.srctrace")
 )
 
 check_line_in(
