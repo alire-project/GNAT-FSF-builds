@@ -211,7 +211,7 @@ jobs:
 
       - run: opam install camlzip dune dune-configurator menhir num ocamlgraph re seq yojson zarith
 
-      - run: opam exec -- bash configure --prefix=C:/why3install --enable-relocation --disable-emacs-compilation --disable-hypothesis-selection --disable-js-of-ocaml
+      - run: opam exec -- bash configure --prefix=C:/why3install --enable-relocation --disable-emacs-compilation --disable-hypothesis-selection --disable-js-of-ocaml --disable-zip
       - run: opam exec -- make
       - run: opam exec -- make install_spark2014
 
