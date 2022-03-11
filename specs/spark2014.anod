@@ -90,6 +90,7 @@ class SPARK2014(spec("common")):
             Anod.Dependency("gcc"),
             Anod.Dependency("why3"),
             Anod.Dependency("alt-ergo"),
+            Anod.Dependency("gmp", qualifier="shared_lib"),
             Anod.Dependency("gprbuild"),
             Anod.Dependency("gnatcoll"),
             Anod.Dependency("xmlada"),

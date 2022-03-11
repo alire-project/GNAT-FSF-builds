@@ -26,14 +26,25 @@ class GMP(spec("gnu")):
         return [Anod.Source(name=self.tarball, publish=True, dest="")]
 
     @property
+    def build_space_name(self):
+        if "shared_lib" in self.parsed_qualifier:
+            return "%s-shared" % (self.name)
+        else:
+            return self.name
+
+    @property
     def build_deps(self):
         return self.compiler_deps()
 
     def setup(self):
         configure = Configure(self)
         configure.add("--prefix=%s" % unixpath(self["INSTALL_DIR"]))
-        configure.add("--disable-shared")
-        configure.add("--enable-static")
+        if "shared_lib" in self.parsed_qualifier:
+            configure.add("--enable-shared")
+            configure.add("--disable-static")
+        else:
+            configure.add("--disable-shared")
+            configure.add("--enable-static")
         configure.add("--enable-cxx")
 
         if self.env.host.os.name == "darwin":
