@@ -129,9 +129,12 @@ class GCC(spec("gh-artifact")):
             # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100340
             args.append("--without-build-config")
 
-            args.append(
-                "--with-sysroot=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
-            )
+            xcode = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
+            clu = "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
+
+            args.append("--with-build-sysroot=%s" % xcode)
+            args.append("--with-specs=%%{!sysroot=*:--sysroot=%%:if-exists-else(%s %s)}" %
+                        (xcode, clu))
 
         if self.env.host.os.name != "darwin":
             args.append("--with-gnu-ld")
