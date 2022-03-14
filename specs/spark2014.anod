@@ -145,6 +145,7 @@ class SPARK2014(spec("common")):
         sync_tree(self.deps["why3"]["INSTALL_DIR"], libexec_spark, delete=False)
         sync_tree(self.deps["alt-ergo"]["INSTALL_DIR"], libexec_spark, delete=False)
         sync_tree(self.deps["gprbuild"]["INSTALL_DIR"], libexec_spark, delete=False)
+        sync_tree(self.deps["gmp"]["INSTALL_DIR"], libexec_spark, delete=False)
 
         sync_tree(os.path.join(self["SRC_DIR"], "z3"), libexec_spark, delete=False)
         cvc4_binary_name = "cvc4.exe" if self.env.host.os.name == "windows" else "cvc4"
