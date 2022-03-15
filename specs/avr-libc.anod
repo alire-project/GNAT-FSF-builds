@@ -4,21 +4,21 @@ from e3.anod.spec import Anod
 from e3.anod.loader import spec
 
 
-class Newlib(spec("common")):
+class avrlibc(spec("common")):
     @property
     def version(self):
-        return "4.1.0"
+        return "2.1.0"
 
     @property
     def tarball(self):
-        return "newlib-%s.tar.gz" % self.version
+        return "avr-libc-%s.tar.bz2" % self.version
 
     @property
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://sourceware.org/pub/newlib/" + self.tarball,
+                url="http://download-mirror.savannah.gnu.org/releases/avr-libc/" + self.tarball,
             )
         ]
 
@@ -29,15 +29,7 @@ class Newlib(spec("common")):
     @property
     def build_deps(self):
         deps = [Anod.Dependency("binutils")]
-
-        if self.env.is_canadian:
-            deps.append(
-                Anod.Dependency(
-                    "gcc", qualifier="bootstrap", host="build", target="target"
-                )
-            )
-        else:
-            deps.append(Anod.Dependency("gcc", qualifier="bootstrap"))
+        deps.append(Anod.Dependency("gcc", qualifier="bootstrap"))
 
         return deps
 
@@ -47,23 +39,13 @@ class Newlib(spec("common")):
 
         configure = Configure(self)
         configure.add("--prefix=%s" % unixpath(self["INSTALL_DIR"]))
-
-        configure.add(
-            "--enable-newlib-io-long-long",
-            "--enable-newlib-io-c99-formats",
-            "--enable-newlib-register-fini",
-            "--enable-newlib-retargetable-locking",
-            "--disable-newlib-supplied-syscalls",
-            "--disable-nls",
-        )
-
-        # configure.add("CFLAGS_FOR_TARGET=%s" % cflags)
+        configure.add("--host=avr")
 
         configure()
 
 
         make = Make(self)
         make()
-        make("install-target-newlib")
+        make("install")
 
         self.clean()
