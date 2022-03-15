@@ -150,8 +150,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          repository: 'kanigsson/why3'
-          ref: 'myfsf'
+          repository: 'AdaCore/why3'
+          ref: 'fsf-11.2'
 
       - name: Use Setup OCaml v2 ${{ matrix.ocaml-version }}
         uses: avsm/setup-ocaml@v2
@@ -187,8 +187,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          repository: 'kanigsson/alt-ergo'
-          ref: 'myfsf'
+          repository: 'AdaCore/alt-ergo'
+          ref: 'fsf-11.2'
 
       - name: Use Setup OCaml v2 ${{ matrix.ocaml-version }}
         uses: avsm/setup-ocaml@v2
