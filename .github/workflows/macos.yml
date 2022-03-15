@@ -4,6 +4,8 @@ on:
   #  - cron:  '0 0 * * *'
   #push:
   pull_request:
+env:
+    anod_cmd: ./anod -v --loglevel DEBUG build
 
 
 jobs:
@@ -24,28 +26,22 @@ jobs:
         python -m pip install --upgrade pip
         pip install e3-core
 
-    - name: Install Ada dependencies
-      uses: ada-actions/toolchain@ce2020
-      with:
-        distrib: community
-        target: native
-
     - name: Build GNAT native
-      run: ./anod build gcc -v --loglevel DEBUG --enable-cleanup
+      run: ${{env.anod_cmd}} gcc --enable-cleanup
 
     - name: Build GDB
-      run: ./anod build gdb -v --loglevel DEBUG --enable-cleanup
+      run: ${{env.anod_cmd}} gdb --enable-cleanup
 
     - name: Package GNAT
-      run: ./anod build release_package --qualifier=package=gnat,do_gh_release -v --loglevel DEBUG
+      run: ${{env.anod_cmd}} release_package --qualifier=package=gnat,do_gh_release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
     - name: Build GPRbuild
-      run: ./anod build gprbuild -v --loglevel DEBUG --enable-cleanup
+      run: ${{env.anod_cmd}} gprbuild --enable-cleanup
 
     - name: Package GPRbuild
-      run: ./anod build release_package --qualifier=package=gprbuild,do_gh_release -v --loglevel DEBUG
+      run: ${{env.anod_cmd}} release_package --qualifier=package=gprbuild,do_gh_release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
@@ -87,10 +83,10 @@ jobs:
         pip install e3-core
 
     - name: Build GNATcov
-      run: ./anod build gnatcov -v --loglevel DEBUG --enable-cleanup
+      run: ${{env.anod_cmd}} gnatcov --enable-cleanup
 
     - name: Package GNATcov
-      run: ./anod build release_package --qualifier=package=gnatcov,do_gh_release -v --loglevel DEBUG
+      run: ${{env.anod_cmd}} release_package --qualifier=package=gnatcov,do_gh_release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
@@ -129,13 +125,13 @@ jobs:
         pip install e3-core
 
     - name: Build GNAT ${{ matrix.target }}
-      run: ./anod build gcc -v --loglevel DEBUG --target=${{ matrix.target }} --enable-cleanup
+      run: ${{env.anod_cmd}} gcc --target=${{ matrix.target }} --enable-cleanup
 
     - name: Build GDB ${{ matrix.target }}
-      run: ./anod build gdb -v --loglevel DEBUG --target=${{ matrix.target }} --enable-cleanup
+      run: ${{env.anod_cmd}} gdb --target=${{ matrix.target }} --enable-cleanup
 
     - name: Package GNAT ${{ matrix.target }}
-      run: ./anod build release_package --qualifier=package=gnat,do_gh_release --target=${{ matrix.target }} -v --loglevel DEBUG
+      run: ${{env.anod_cmd}} release_package --qualifier=package=gnat,do_gh_release --target=${{ matrix.target }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
@@ -260,10 +256,10 @@ jobs:
         pip install e3-core
 
     - name: Build SPARK
-      run: ./anod build spark2014 -v --loglevel DEBUG --enable-cleanup
+      run: ${{env.anod_cmd}} spark2014 --enable-cleanup
 
     - name: Package GNATprove
-      run: ./anod build release_package --qualifier=package=gnatprove,do_gh_release -v --loglevel DEBUG
+      run: ${{env.anod_cmd}} release_package --qualifier=package=gnatprove,do_gh_release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
