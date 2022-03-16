@@ -86,10 +86,7 @@ class GCC(spec("gh-artifact")):
             deps.append(Anod.Dependency("binutils", target="target"))
 
         if self.env.target.os.is_bareboard and not self.bootstrap:
-            if self.env.target.triplet == "avr-elf":
-                deps.append(Anod.Dependency("avr-libc"))
-            else:
-                deps.append(Anod.Dependency("newlib"))
+            deps.append(Anod.Dependency("newlib"))
 
         if self.env.target.os.name == "windows":
             deps.append(
@@ -189,9 +186,6 @@ class GCC(spec("gh-artifact")):
         # Also install newlib for cross
         if "newlib" in self.deps:
             self.deps["newlib"].merge(self["INSTALL_DIR"])
-
-        if "avr-libc" in self.deps:
-            self.deps["avr-libc"].merge(self["INSTALL_DIR"])
 
         # The libsubdir relative path
         gcc_libsubdir = os.path.join(
