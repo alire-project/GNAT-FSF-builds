@@ -183,3 +183,16 @@ class SPARK2014(spec("common")):
 
         for f in ls(os.path.join(libexec_spark, "bin", "why3*")):
             chmod("a+x", f)
+
+        if self.env.host.os.name == "darwin":
+
+            # On macOS we need to point alt-ergo to the libgmp that we package
+            # with gnatprove. a) AFAICT, it's not easy/doable to statically
+            # link it in the ocaml/opam build process. b) this lib is usually
+            # available from the system.
+
+            self.shell("install_name_tool",
+                       "-change",
+                       "/usr/local/opt/gmp/lib/libgmp.10.dylib",
+                       "@loader_path/../lib/libgmp.10.dylib",
+                       os.path.join(libexec_spark_bin, "alt-ergo"))
