@@ -32,7 +32,7 @@ class MINGW(spec("common")):
 
     @property
     def build_deps(self):
-        return []
+        return [Anod.Dependency("base_gcc", host="build", target="host")]
 
     @Anod.primitive()
     def build(self):
