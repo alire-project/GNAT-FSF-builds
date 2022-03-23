@@ -85,7 +85,7 @@ class MINGW(spec("common")):
         configure()
 
         make = Make(self, exec_dir=crt_build)
-        make()
+        make(jobs=1)
         make("install", jobs=1)
 
         # Remove crtbegin.o and crtend.o. We are rebuilding them during
