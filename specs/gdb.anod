@@ -14,7 +14,7 @@ patch_name = "gdb-lib-order.patch"
 class GDB(spec("common")):
     @property
     def version(self):
-        return "10.2"
+        return "12.1"
 
     @property
     def tarball(self):

@@ -9,7 +9,7 @@ import os
 class GCC(spec("gh-artifact")):
     @property
     def version(self):
-        return "11.2.0"
+        return "12.1.0"
 
     @property
     def tarball(self):
