@@ -198,8 +198,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          repository: 'kanigsson/why3'
-          ref: 'myfsf'
+          repository: 'adacore/why3'
+          ref: 'a6c3fa06ebcbc1574680576858d236fe60eb1327'
 
       - name: Use Setup OCaml v1 ${{ matrix.ocaml-version }}
         uses: avsm/setup-ocaml@v1
@@ -228,15 +228,12 @@ jobs:
         ocaml-version:
           - 4.12.0
     runs-on: windows-2019
-    defaults:
-      run:
-        working-directory: sources
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          repository: 'kanigsson/alt-ergo'
-          ref: 'myfsf'
+          repository: 'adacore/alt-ergo'
+          ref: 'e4b0cb56033374c923540fbe55847490f1b804c5'
 
       - name: Use Setup OCaml v1 ${{ matrix.ocaml-version }}
         uses: avsm/setup-ocaml@v1
