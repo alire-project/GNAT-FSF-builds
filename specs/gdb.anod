@@ -7,8 +7,8 @@ from e3.diff import patch
 import os
 
 # patch from msys2:
-# https://github.com/msys2/MINGW-packages/blob/master/mingw-w64-gdb/gdb-lib-order.patch
-patch_name = "gdb-lib-order.patch"
+# https://github.com/msys2/MINGW-packages/blob/master/mingw-w64-gdb/0006-Fix-link-on-Windows.patch
+patch_name = "gdb-0006-Fix-link-on-Windows.patch"
 
 
 class GDB(spec("common")):
