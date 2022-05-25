@@ -10,7 +10,7 @@ import os
 class SPARK2014(spec("common")):
     @property
     def version(self):
-        return "11.2.0"
+        return "12.1.0"
 
     @property
     def tarball(self):
@@ -40,11 +40,11 @@ class SPARK2014(spec("common")):
     @property
     def z3_zip(self):
         if self.env.host.os.name == "windows":
-            fn = "z3-4.8.12-x64-win.zip"
+            fn = "z3-4.8.17-x64-win.zip"
         elif self.env.host.os.name == "darwin":
-            fn = "z3-4.8.12-x64-osx-10.15.7.zip"
+            fn = "z3-4.8.17-x64-osx-10.15.7.zip"
         else:
-            fn = "z3-4.8.12-x64-glibc-2.31.zip"
+            fn = "z3-4.8.17-x64-glibc-2.31.zip"
         return fn
 
     @property
@@ -57,7 +57,7 @@ class SPARK2014(spec("common")):
             ),
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/kanigsson/spark2014/tarball/myfsf",
+                url="https://github.com/adacore/spark2014/tarball/ff1771683be2909254f7b94300f9487c2ecf3e6d",
             ),
             self.HTTPSSourceBuilder(
                 name=self.cvc4_binary,
@@ -66,7 +66,7 @@ class SPARK2014(spec("common")):
             ),
             self.HTTPSSourceBuilder(
                 name=self.z3_zip,
-                url="https://github.com/Z3Prover/z3/releases/download/z3-4.8.12/%s"
+                url="https://github.com/Z3Prover/z3/releases/download/z3-4.8.17/%s"
                 % self.z3_zip,
             ),
         ]
