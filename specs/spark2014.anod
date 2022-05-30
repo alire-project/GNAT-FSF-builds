@@ -57,7 +57,7 @@ class SPARK2014(spec("common")):
             ),
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/adacore/spark2014/tarball/ff1771683be2909254f7b94300f9487c2ecf3e6d",
+                url="https://github.com/adacore/spark2014/tarball/fsf-12",
             ),
             self.HTTPSSourceBuilder(
                 name=self.cvc4_binary,
