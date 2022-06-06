@@ -181,10 +181,9 @@ jobs:
 
 
   alt_ergo:
-    strategy:
-      matrix:
-        ocaml-version:
-          - 4.12.0
+    env:
+        OPAMYES: true
+        OCAML_DEFAULT_VERSION: 4.10.0
     runs-on: macos-10.15
     steps:
       - name: Checkout code
@@ -196,7 +195,7 @@ jobs:
       - name: Use Setup OCaml v2 ${{ matrix.ocaml-version }}
         uses: avsm/setup-ocaml@v2
         with:
-          ocaml-version: ${{ matrix.ocaml-version }}
+          ocaml-version: ${{ env.OCAML_DEFAULT_VERSION }}
 
       - name: opam install depext
         run: opam depext alt-ergo-lib alt-ergo-parsers alt-ergo
