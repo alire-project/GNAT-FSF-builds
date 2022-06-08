@@ -42,7 +42,7 @@ class SPARK2014(spec("common")):
         if self.env.host.os.name == "windows":
             fn = "z3-4.8.17-x64-win.zip"
         elif self.env.host.os.name == "darwin":
-            fn = "z3-4.8.17-x64-osx-10.15.7.zip"
+            fn = "z3-4.8.17-x64-osx-10.16.zip"
         else:
             fn = "z3-4.8.17-x64-glibc-2.31.zip"
         return fn
