@@ -8,11 +8,11 @@ import sys
 class EmbeddedRuntimes(spec("common")):
     @property
     def version(self):
-        return "0.2"
+        return "12.1"
 
     @property
     def commit_id(self):
-        return "7a4674ae9221d2fa046bed20fbaf9de9caa09d41"
+        return "c1d089bd8880cec250266cf71d6a22cc74fdba79"
 
     @property
     def tarball(self):
@@ -75,13 +75,14 @@ class EmbeddedRuntimes(spec("common")):
                 "openmv2",
                 "sam4s",
                 "samg55",
+                "rpi-pico",
+                "rpi-pico-smp"
             ]
 
         elif self.env.target.platform == "riscv64-elf":
             board = [
                 "spike",
                 "polarfiresoc",
-                "unleashed",
                 "rv64im",
                 "rv64imc",
                 "rv64imac",
