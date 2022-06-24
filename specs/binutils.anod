@@ -1,7 +1,7 @@
 import os
 
 from e3.os.fs import unixpath
-from e3.fs import sync_tree, rm
+from e3.fs import sync_tree, mv
 from e3.anod.helper import Configure, Make
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
@@ -88,8 +88,10 @@ class Binutils(spec("common")):
 
 
         # https://github.com/msys2/MINGW-packages/issues/7890
-        if self.env.target.os.name == "windows":
-            rm(os.path.join(self["INSTALL_DIR"], "lib", "bfd-plugins", "libdep.a"))
+        if self.env.build.os.name == "windows":
+            # for some reason 'rm' doesn't seem to work, so we are moving the file to the build dir
+            mv(os.path.join(self["INSTALL_DIR"], "lib", "bfd-plugins", "libdep.a"), 
+               os.path.join(self["BUILD_DIR"], "libdep.a.disable"))
 
 
         # We do not clean the binutils builds and install on native targets as
