@@ -9,7 +9,7 @@ import os
 class GCC(spec("gh-artifact")):
     @property
     def version(self):
-        return "12.1.0"
+        return "12.2.0"
 
     @property
     def tarball(self):
@@ -38,6 +38,7 @@ class GCC(spec("gh-artifact")):
         return (
             self.env.target.triplet == "arm-eabi"
             or self.env.target.triplet == "riscv64-elf"
+            or self.env.target.triplet == "avr-elf"
         )
 
     @property
