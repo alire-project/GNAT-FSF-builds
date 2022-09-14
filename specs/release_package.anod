@@ -127,6 +127,7 @@ class ReleasePackage(spec("common")):
                 return [
                     Anod.Dependency("gcc", track=True),
                     Anod.Dependency("gdb", track=True),
+                    Anod.Dependency("avrlibc", track=True),
                 ]
 
             elif self.env.host.triplet == self.env.target.triplet:

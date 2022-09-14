@@ -1,0 +1,44 @@
+from e3.os.fs import unixpath
+from e3.anod.helper import Configure, Make
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+
+
+class AVRLibc(spec("common")):
+    @property
+    def version(self):
+        return "2.1.0"
+
+    @property
+    def tarball(self):
+        return "avr-libc-%s.tar.bz2" % self.version
+
+    @property
+    def source_pkg_build(self):
+        return [
+            self.HTTPSSourceBuilder(
+                name=self.tarball,
+                url="http://download.savannah.gnu.org/releases/avr-libc/" + self.tarball,
+            )
+        ]
+
+    @property
+    def build_source_list(self):
+        return [Anod.Source(name=self.tarball, publish=True, dest="")]
+
+    @property
+    def build_deps(self):
+        return [Anod.Dependency("gcc")]
+
+    @Anod.primitive()
+    def build(self):
+        self.deps["gcc"].setenv()
+
+        configure = Configure(self)
+        configure.add("--host=avr")
+        configure.add("--prefix=%s" % unixpath(self["INSTALL_DIR"]))
+        configure()
+
+        make = Make(self)
+        make()
+        make("install")
