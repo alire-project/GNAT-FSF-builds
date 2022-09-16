@@ -57,7 +57,7 @@ class ReleasePackage(spec("common")):
                 return "1"
             elif self.env.target.triplet == "riscv64-elf":
                 return "1"
-            elif self.env.target.triplet == "arv-elf":
+            elif self.env.target.triplet == "avr-elf":
                 return "1"
             else:
                 return "1"
