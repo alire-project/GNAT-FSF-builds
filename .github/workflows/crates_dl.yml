@@ -1,0 +1,24 @@
+name: Check Crates Download
+on:
+  schedule:
+    - cron:  '0 0 * * *' # Every day at midnight
+  push:
+  pull_request:
+
+jobs:
+  check_crate_download:
+    name: Check Crate Download
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+    steps:
+
+    - name: Checkout Project
+      uses: actions/checkout@v2
+
+    - uses: alire-project/setup-alire@v1
+
+    - run: bash -x ./scripts/download_all_bin_crates.bash
