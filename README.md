@@ -8,13 +8,23 @@ This can be done in a virtual env, e.g.:
 ```console
 $ python3 -m venv my-virtual-env
 $ source my-virtual-env/bin/activate
-$ pip install e3-core
+$ pip install e3-core==22.1.0
 ```
 
 To build a spec, for example `mpc`, run the `anod` script:
 ```console
-$ ./anod build mpc
+$ ./anod build mpc -v --loglevel DEBUG
 ```
+
+`-v --loglevel DEBUG` will produce many information log about the build.
+
+For a cross compiler:
+
+```console
+$ ./anod build gcc --target=avr-elf -v --loglevel DEBUG
+```
+
+
 ## On Windows
 Only builds in the msys2 mingw64 environement are supported.
 You will need:
