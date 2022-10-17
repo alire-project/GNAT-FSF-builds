@@ -60,8 +60,8 @@ else:
 assert_eq(
     """Constructor says "Hi!"
 Hello, there!
-argv[0]: 'main'
-modified argv[0]: 'test'
+argv[0]: main
+modified argv[0]: test
 Destructor says "Hi!"
 """,
     p.out,

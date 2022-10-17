@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <libgen.h>
 
 __attribute__((constructor))
 static void init () {
@@ -21,14 +22,15 @@ int main (int argc, char **argv) {
       printf ("Error: argv[argc] != NULL\n");
   }
 
-  printf ("argv[0]: '%s'\n", argv[0]);
+  printf ("argv[0]: %s\n", basename(argv[0]));
 
   /* argv strings should be writable */
-  argv[0][0] = 't';
-  argv[0][1] = 'e';
-  argv[0][2] = 's';
-  argv[0][3] = 't';
-  printf ("modified argv[0]: '%s'\n", argv[0]);
+  const int len = strlen(argv[0]);
+  argv[0][len - 4] = 't';
+  argv[0][len - 3] = 'e';
+  argv[0][len - 2] = 's';
+  argv[0][len - 1] = 't';
+  printf ("modified argv[0]: %s\n", basename(argv[0]));
 
   for (int j = 1; j < argc; j++) {
     printf (" ... arg: %s\n", argv[j]);
