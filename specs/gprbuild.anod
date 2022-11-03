@@ -9,7 +9,7 @@ from datetime import date
 class GPRbuild(spec("gh-artifact")):
     @property
     def version(self):
-        return "22.0.0"
+        return "23.0.0"
 
     @property
     def tarball(self):

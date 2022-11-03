@@ -7,7 +7,7 @@ import os
 class Langkit(spec("common")):
     @property
     def version(self):
-        return "22.0.0"
+        return "23.0.0"
 
     @property
     def tarball(self):
@@ -35,7 +35,7 @@ class Langkit(spec("common")):
             Anod.Dependency("libgpr", track=True),
             Anod.Dependency("gnatcoll", track=True),
             Anod.Dependency("gnatcoll-bindings", track=True),
-            Anod.Dependency("langkit", track=True),
+            Anod.Dependency("langkit_support", track=True),
             Anod.Dependency("xmlada", track=True),
         ]
 

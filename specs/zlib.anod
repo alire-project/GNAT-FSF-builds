@@ -25,7 +25,7 @@ class ZLib(spec("common")):
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
-                name=self.tarball, url="https://zlib.net/current/%s" % self.tarball
+                name=self.tarball, url="https://zlib.net/fossils/%s" % self.tarball
             ),
             self.LocalSourceBuilder(name=patch_name),
         ]

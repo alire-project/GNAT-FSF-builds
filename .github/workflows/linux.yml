@@ -81,7 +81,7 @@ jobs:
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install e3-core==22.1.0
+        pip install e3-core==22.1.0 funcy docutils mako
 
     - name: Build GNATcov
       run: ./anod build gnatcov -v --loglevel DEBUG --enable-cleanup

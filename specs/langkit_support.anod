@@ -4,14 +4,14 @@ from e3.anod.loader import spec
 import os
 
 
-class Langkit(spec("common")):
+class LangkikSupport(spec("common")):
     @property
     def version(self):
-        return "22.0.0"
+        return "23.0.0"
 
     @property
     def tarball(self):
-        return "langkit-%s.tar.gz" % self.version
+        return "langkit_support-%s.tar.gz" % self.version
 
     @property
     def source_pkg_build(self):
