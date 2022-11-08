@@ -6,8 +6,8 @@ on:
   pull_request:
 
 jobs:
-  gnat_gprbuild:
-    name: GNAT Windows and gprbuild
+  gnat:
+    name: GNAT Windows
     runs-on: windows-2019
     env:
       CONFIG_SHELL: /bin/bash
@@ -49,14 +49,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
-    - name: Build GPRbuild
-      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gprbuild -v --loglevel DEBUG --enable-cleanup
-
-    - name: Package GPRbuild
-      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_package --qualifier=package=gprbuild,do_gh_release -v --loglevel DEBUG
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
-
     - uses: actions/upload-artifact@v2
       with:
         name: anod-artifacts
@@ -71,9 +63,8 @@ jobs:
 
 
 
-  gnatcov:
-    name: GNATcov
-    needs: gnat_gprbuild
+  gprbuild_gnatcov:
+    name: GPRbuild and GNATcov
     runs-on: windows-2019
     env:
       CONFIG_SHELL: /bin/bash
@@ -104,10 +95,14 @@ jobs:
       # We need a path that is compatible between Windows and Unix world
       run: df -h; mkdir /c/aaa; mount C:/aaa /aaa ; cd ..; cp -r GNAT-FSF-builds /c/aaa
 
-    - uses: actions/download-artifact@v2
-      with:
-        name: anod-artifacts
-        path: C:/aaa/GNAT-FSF-builds/in_artifacts/
+
+    - name: Build GPRbuild
+      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gprbuild -v --loglevel DEBUG --enable-cleanup
+
+    - name: Package GPRbuild
+      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_package --qualifier=package=gprbuild,do_gh_release -v --loglevel DEBUG
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
 
     - name: Build GNATcov
@@ -134,7 +129,7 @@ jobs:
       matrix:
         target: ["arm-elf", "riscv64-elf", "avr-elf"]
     name: GNAT ${{ matrix.target }}-windows
-    needs: gnat_gprbuild
+    needs: gnat
     runs-on: windows-2019
     env:
       CONFIG_SHELL: /bin/bash
@@ -266,7 +261,7 @@ jobs:
 
   spark:
     name: spark
-    needs: [gnat_gprbuild, why3, alt_ergo]
+    needs: [gnat, why3, alt_ergo]
     runs-on: windows-2019
     env:
       CONFIG_SHELL: /bin/bash
@@ -330,7 +325,7 @@ jobs:
 
   sanity_checking:
     name: Sanity Checking
-    needs: [gnat_gprbuild, gnatcov, spark]
+    needs: [gnat, gprbuild_gnatcov, spark]
     runs-on: windows-2019
     env:
       CONFIG_SHELL: /bin/bash

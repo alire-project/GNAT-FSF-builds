@@ -39,7 +39,7 @@ class ZLib(spec("common")):
 
     @property
     def build_deps(self):
-        return [Anod.Dependency("gcc")]
+        return [Anod.Dependency("base_gcc")]
 
     def setenv(self):
         self.env.add_search_path(

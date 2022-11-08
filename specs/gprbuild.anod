@@ -63,7 +63,7 @@ class GPRbuild(spec("gh-artifact")):
     @property
     def build_deps(self):
         deps = [
-            Anod.Dependency("gcc", track=True),
+            Anod.Dependency("base_gcc", track=True),
             Anod.Dependency("gprconfig_kb", require="source_pkg", track=True),
         ]
 
@@ -104,7 +104,7 @@ class GPRbuild(spec("gh-artifact")):
         )
 
     def do_bootstrap(self):
-        for m in ["gcc"]:
+        for m in ["base_gcc"]:
             if m in self.deps:
                 self.deps[m].setenv()
 
@@ -138,7 +138,7 @@ class GPRbuild(spec("gh-artifact")):
         if self.bootstrap:
             return self.do_bootstrap()
 
-        for m in ["gcc", "xmlada", "gprbuild"]:
+        for m in ["base_gcc", "xmlada", "gprbuild"]:
             if m in self.deps:
                 self.deps[m].setenv()
 

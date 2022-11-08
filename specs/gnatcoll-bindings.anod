@@ -31,7 +31,7 @@ class GNATcollBindings(spec("common")):
     @property
     def build_deps(self):
         deps = [
-            Anod.Dependency("gcc"),
+            Anod.Dependency("base_gcc"),
             Anod.Dependency("gprbuild"),
             Anod.Dependency("gnatcoll"),
             Anod.Dependency("libgpr"),

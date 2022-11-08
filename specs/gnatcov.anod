@@ -40,7 +40,7 @@ class GNATcov(spec("common")):
     @property
     def build_deps(self):
         deps = [
-            Anod.Dependency("gcc", track=True),
+            Anod.Dependency("base_gcc", track=True),
             Anod.Dependency("gprbuild", track=True),
             Anod.Dependency("libgpr", track=True),
             Anod.Dependency("gnatcoll", track=True),
