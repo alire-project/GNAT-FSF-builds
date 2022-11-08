@@ -7,13 +7,13 @@ from e3.diff import patch
 
 import os
 
-patch_name = "gnatcov.patch"
+patch_name = "gnatcov-23.0.patch"
 
 
 class GNATcov(spec("common")):
     @property
     def version(self):
-        return "22.0"
+        return "23.0"
 
     @property
     def tarball(self):
@@ -35,23 +35,24 @@ class GNATcov(spec("common")):
         return [
             Anod.Source(name=self.tarball, publish=True, dest=""),
             self.Source(name=patch_name, publish=True, unpack_cmd=cp, dest="patches"),
-        ]
+    ]
 
     @property
     def build_deps(self):
         deps = [
-            Anod.Dependency("gcc", track=True),
+            Anod.Dependency("base_gcc", track=True),
             Anod.Dependency("gprbuild", track=True),
             Anod.Dependency("libgpr", track=True),
             Anod.Dependency("gnatcoll", track=True),
             Anod.Dependency("gnatcoll-bindings", track=True),
-            Anod.Dependency("langkit", track=True),
+            Anod.Dependency("langkit_support", track=True),
             Anod.Dependency("libadalang", track=True),
             Anod.Dependency("binutils", track=True),
             Anod.Dependency("gnatutil", track=True),
             Anod.Dependency("xmlada", track=True),
             Anod.Dependency("zlib", track=True),
-            Anod.Dependency("gmp", track=True)
+            Anod.Dependency("gmp", track=True),
+            Anod.Dependency("libgpr2", track=True)
         ]
         if self.env.target.os.name == "windows":
             deps.append(Anod.Dependency("libiconv"))
@@ -86,6 +87,7 @@ class GNATcov(spec("common")):
         make_distrib.set_default_target("distrib-without-doc")
 
         for m in (make_all, make_distrib):
+            m.set_var("C_SUPPORT", "False")
             m.set_var("BITS_ARCH", str(self.env.target.cpu.bits))
             m.set_var("DISTRIB_ARCH", self.env.build.cpu.name)
             m.set_var("BUILD_MODE", build_mode)

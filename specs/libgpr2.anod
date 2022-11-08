@@ -1,0 +1,90 @@
+from e3.os.fs import touch
+from e3.anod.helper import Make
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+from e3.fs import cp, sync_tree
+from e3.diff import patch
+import os
+
+class LibGPR2(spec("common")):
+    @property
+    def version(self):
+        return "23.0.0"
+
+    @property
+    def tarball(self):
+        return "gpr-%s.tar.gz" % self.version
+
+    @property
+    def lk_tarball(self):
+        return "langkit-py-%s.tar.gz" % self.version
+
+    @property
+    def source_pkg_build(self):
+        return [
+            self.HTTPSSourceBuilder(
+                name=self.tarball,
+                url="https://github.com/AdaCore/gpr/archive/v%s.tar.gz"
+                % self.version,
+            ),
+            self.HTTPSSourceBuilder(
+                name=self.lk_tarball,
+                url="https://github.com/AdaCore/langkit/archive/v%s.tar.gz"
+                % self.version,
+            )
+        ]
+
+    @property
+    def build_source_list(self):
+        return [
+            Anod.Source(name=self.tarball, publish=True, dest=""),
+            Anod.Source(name=self.lk_tarball, publish=True, dest="langkit_src"),
+            Anod.Source(
+            name=self.deps["gprconfig_kb"].tarball,
+            publish=True,
+            dest="gprconfig_kb",
+            ),
+        ]
+
+    @property
+    def build_deps(self):
+        return [
+            Anod.Dependency("base_gcc", track=True),
+            Anod.Dependency("gprbuild", track=True),
+            Anod.Dependency("libgpr", track=True),
+            Anod.Dependency("xmlada", track=True),
+            Anod.Dependency("gnatcoll", track=True),
+            Anod.Dependency("gnatcoll-bindings", track=True),
+            Anod.Dependency("langkit_support", track=True),
+            Anod.Dependency("libadalang", track=True),
+            Anod.Dependency("gprconfig_kb", require="source_pkg", track=True),
+        ]
+
+    @Anod.primitive()
+    def build(self):
+        for m in self.deps:
+            if m != "gprconfig_kb":
+                self.deps[m].setenv()
+
+        self.env.add_search_path("PYTHONPATH", os.path.join(self["SRC_DIR"], "langkit_src"))
+
+        make = Make(self,
+                    makefile=os.path.join(self["SRC_DIR"], "Makefile"),
+                    exec_dir=self["BUILD_DIR"],
+                    jobs=1)
+
+        make.set_var("prefix", self["INSTALL_DIR"])
+        make.set_var("GPR2_BUILD", "release")
+        make.set_var("FORCE_PARSER_GEN", "force")
+        make.set_var("GPR2KBDIR", os.path.join(self["SRC_DIR"], "gprconfig_kb", "db"))
+
+        for build_kind in ["static"]:
+            make("build-lib-%s" % build_kind)
+            make("install-lib-%s" % build_kind)
+        sync_tree(
+            os.path.join(self["SRC_DIR"], "examples"),
+            os.path.join(self["INSTALL_DIR"], "share", "examples", "gpr2"),
+            delete=True,
+            )
+
+        self.clean()
