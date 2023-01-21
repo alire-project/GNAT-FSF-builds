@@ -4,6 +4,7 @@ class PlatDB(PlatformDBPlugin):
     def update_db(self) -> None:
         self.cpu_info.update(
             {
+                "msp430": {"endian": "little", "bits": 16},
                 "riscv32": {"endian": "little", "bits": 32},
                 "riscv64": {"endian": "little", "bits": 64},
             }
@@ -32,6 +33,7 @@ class PlatDB(PlatformDBPlugin):
 
         self.platform_info.update(
             {
+                "msp430-elf": {"cpu": "msp430", "os": "none", "is_hie": True},
                 "riscv32-elf": {"cpu": "riscv32", "os": "none", "is_hie": True},
                 "riscv64-elf": {"cpu": "riscv64", "os": "none", "is_hie": True},
                 "riscv32-unknown-elf": {"cpu": "riscv32", "os": "none", "is_hie": True},
@@ -41,10 +43,10 @@ class PlatDB(PlatformDBPlugin):
 
         self.build_targets.update(
             {
+                "msp430-elf": {"name": "msp430-elf"},
                 "riscv32-elf": {"name": "riscv32-elf"},
                 "riscv64-elf": {"name": "riscv64-elf"},
                 "riscv32-unknown-elf": {"name": "riscv32-unknown-elf"},
                 "riscv64-unknown-elf": {"name": "riscv64-unknown-elf"},
-
             }
         )

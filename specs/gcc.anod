@@ -39,6 +39,7 @@ class GCC(spec("gh-artifact")):
             self.env.target.triplet == "arm-eabi"
             or self.env.target.triplet == "riscv64-elf"
             or self.env.target.triplet == "avr-elf"
+            or self.env.target.triplet == "msp430-elf"
         )
 
     @property
@@ -163,6 +164,10 @@ class GCC(spec("gh-artifact")):
             args.append("--with-multilib-list=rmprofile")
 
         if self.env.target.triplet == "riscv64-elf":
+            args += cross_commons
+            args.append("--enable-multilib")
+
+        if self.env.target.triplet == "msp430-elf":
             args += cross_commons
             args.append("--enable-multilib")
 
