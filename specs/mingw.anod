@@ -10,7 +10,7 @@ from e3.anod.loader import spec
 class MINGW(spec("common")):
     @property
     def version(self):
-        return "9.0.0"
+        return "10.0.0"
 
     @property
     def tarball(self):

@@ -7,7 +7,7 @@ from e3.anod.loader import spec
 class ISL(spec("gnu")):
     @property
     def version(self):
-        return "0.24"
+        return "0.26"
 
     @property
     def tarball(self):

@@ -14,7 +14,7 @@ patch_name = "gdb-0006-Fix-link-on-Windows.patch"
 class GDB(spec("common")):
     @property
     def version(self):
-        return "12.1"
+        return "13.1"
 
     @property
     def tarball(self):
