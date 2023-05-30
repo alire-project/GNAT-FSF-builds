@@ -25,7 +25,7 @@ jobs:
         pip install e3-core==22.1.0
 
     - name: Install Ada dependencies
-      run: sudo apt-get install gnat
+      run: sudo apt-get install gnat bison
 
     - name: Build GNAT native
       run: ./anod build gcc -v --loglevel DEBUG --enable-cleanup
