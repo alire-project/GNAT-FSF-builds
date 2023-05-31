@@ -9,7 +9,7 @@ on:
 jobs:
   gnat_gprbuild:
     name: GNAT macOS and GPRbuild
-    runs-on: macos-10.15
+    runs-on: macos-11
     steps:
     - name: Checkout Project
       uses: actions/checkout@v2
@@ -60,7 +60,7 @@ jobs:
   gnatcov:
     name: GNATcov
     needs: gnat_gprbuild
-    runs-on: macos-10.15
+    runs-on: macos-11
     steps:
     - name: Checkout Project
       uses: actions/checkout@v2
@@ -102,7 +102,7 @@ jobs:
         target: ["arm-elf", "riscv64-elf", "avr-elf"]
     name: GNAT ${{ matrix.target }}-darwin
     needs: gnat_gprbuild
-    runs-on: macos-10.15
+    runs-on: macos-11
     steps:
     - name: Checkout Project
       uses: actions/checkout@v2
@@ -145,7 +145,7 @@ jobs:
       matrix:
         ocaml-version:
           - 4.12.0
-    runs-on: macos-10.15
+    runs-on: macos-11
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -178,7 +178,7 @@ jobs:
     env:
         OPAMYES: true
         OCAML_DEFAULT_VERSION: 4.10.0
-    runs-on: macos-10.15
+    runs-on: macos-11
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -219,7 +219,7 @@ jobs:
   spark:
     name: SPARK
     needs: [gnat_gprbuild, why3, alt_ergo]
-    runs-on: macos-10.15
+    runs-on: macos-11
     steps:
     - name: Checkout Project
       uses: actions/checkout@v2
@@ -269,7 +269,7 @@ jobs:
   sanity_checking:
     name: Sanity Checking
     needs: [gnat_gprbuild, gnatcov, spark]
-    runs-on: macos-10.15
+    runs-on: macos-11
     steps:
     - name: Checkout Project
       uses: actions/checkout@v2
