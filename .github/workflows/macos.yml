@@ -153,10 +153,10 @@ jobs:
           repository: 'adacore/why3'
           ref: 'fsf-12'
 
-      - name: Use Setup OCaml v2 ${{ matrix.ocaml-version }}
-        uses: avsm/setup-ocaml@v2
+      - name: Use Setup OCaml {{ matrix.ocaml-version }}
+        uses: ocaml/setup-ocaml@v1.1.11
         with:
-          ocaml-version: ${{ matrix.ocaml-version }}
+          ocaml-compiler: ${{ matrix.ocaml-version }}
 
       - name: opam install depext
         run: opam depext camlzip zarith re seq why3
@@ -178,6 +178,10 @@ jobs:
     env:
         OPAMYES: true
         OCAML_DEFAULT_VERSION: 4.10.0
+    strategy:
+      matrix:
+        ocaml-version:
+          - 4.10.0
     runs-on: macos-11
     steps:
       - name: Checkout code
@@ -186,10 +190,10 @@ jobs:
           repository: 'adacore/alt-ergo'
           ref: 'fsf-12'
 
-      - name: Use Setup OCaml v2 ${{ matrix.ocaml-version }}
-        uses: avsm/setup-ocaml@v2
+      - name: Use Setup OCaml {{ matrix.ocaml-version }}
+        uses: ocaml/setup-ocaml@v1.1.11
         with:
-          ocaml-version: ${{ env.OCAML_DEFAULT_VERSION }}
+          ocaml-compiler: ${{ matrix.ocaml-version }}
 
       - name: opam install depext
         run: opam depext alt-ergo-lib alt-ergo-parsers alt-ergo
