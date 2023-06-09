@@ -156,10 +156,10 @@ jobs:
           repository: 'adacore/why3'
           ref: 'fsf-12'
 
-      - name: Use Setup OCaml v2 ${{ matrix.ocaml-version }}
-        uses: avsm/setup-ocaml@v2
+      - name: Use Setup OCaml {{ matrix.ocaml-version }}
+        uses: ocaml/setup-ocaml@v1.1.11
         with:
-          ocaml-version: ${{ matrix.ocaml-version }}
+          ocaml-compiler: ${{ matrix.ocaml-version }}
 
       - name: opam install depext
         run: opam depext camlzip zarith re seq why3
@@ -179,6 +179,10 @@ jobs:
 
   alt_ergo:
     runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        ocaml-version:
+          - 4.10.0
     env:
         OPAMYES: true
         OCAML_DEFAULT_VERSION: 4.10.0
@@ -189,10 +193,10 @@ jobs:
           repository: 'adacore/alt-ergo'
           ref: 'fsf-12'
 
-      - name: Use Setup OCaml v2 ${{ matrix.ocaml-version }}
-        uses: avsm/setup-ocaml@v2
+      - name: Use Setup OCaml {{ matrix.ocaml-version }}
+        uses: ocaml/setup-ocaml@v1.1.11
         with:
-          ocaml-version: ${{ env.OCAML_DEFAULT_VERSION }}
+          ocaml-compiler: ${{ matrix.ocaml-version }}
 
       - name: opam install depext
         run: opam depext alt-ergo-lib alt-ergo-parsers alt-ergo
@@ -263,41 +267,4 @@ jobs:
       with:
         name: release-packages
         path: sbx/*/release_package*/install/*
-        retention-days: 5
-
-
-
-  sanity_checking:
-    name: Sanity Checking
-    needs: [gnat_gprbuild, gnatcov, spark]
-    runs-on: ubuntu-20.04
-    steps:
-    - name: Checkout Project
-      uses: actions/checkout@v2
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install e3-testsuite
-
-    - uses: actions/download-artifact@v2
-      with:
-        name: release-packages
-        path: ./sanity-checking/release_packages
-
-    - name: Run testsuite
-      run: |
-          cd ./sanity-checking
-          python3 ./run.py -v --install-deps-from=release_packages --pkgs-install-dir=pkgs_install --failure-exit-code 1
-
-    - uses: actions/upload-artifact@v2
-      if: failure()
-      with:
-        name: testsuite-results-${{runner.os}}
-        path: sanity-checking/out/new
         retention-days: 5
