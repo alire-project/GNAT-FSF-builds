@@ -188,29 +188,16 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: 'adacore/alt-ergo'
-          ref: 'fsf-12'
+          ref: 'master'
 
       - name: Use Setup OCaml {{ matrix.ocaml-version }}
         uses: ocaml/setup-ocaml@v1.1.11
         with:
           ocaml-compiler: ${{ matrix.ocaml-version }}
 
-      - name: opam install depext
-        run: opam depext alt-ergo-lib alt-ergo-parsers alt-ergo
+      - run: opam pin alt-ergo . -y
 
-      - run: opam install camlzip cmdliner dune dune-configurator menhir num ocamlgraph ocplib-simplex psmt2-frontend re seq yojson zarith
-
-      - run: opam exec -- ocaml unix.cma configure.ml alt-ergo-lib
-      - run: opam exec -- make alt-ergo-lib
-      - run: opam exec -- make install-lib
-
-      - run: opam exec -- ocaml unix.cma configure.ml alt-ergo-parsers
-      - run: opam exec -- make alt-ergo-parsers
-      - run: opam exec -- make install-parsers
-
-      - run: opam exec -- ocaml unix.cma configure.ml alt-ergo --prefix=/tmp/alt-ergo-install
-      - run: opam exec -- make alt-ergo
-      - run: opam exec -- make install-bin
+      - run: opam install alt-ergo --destdir=/tmp/alt-ergo-install
 
       - name: Upload the build artifact
         uses: actions/upload-artifact@v2
