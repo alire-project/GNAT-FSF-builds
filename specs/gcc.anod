@@ -3,6 +3,7 @@ from e3.fs import cp, mkdir, sync_tree
 from e3.anod.helper import Configure, Make
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
+from e3.env import Env
 import os
 
 
@@ -242,6 +243,10 @@ class GCC(spec("gh-artifact")):
                 configure.add(
                     "--with-%s=%s" % (m, unixpath(self.deps[m]["INSTALL_DIR"]))
                 )
+
+        if self.env.target.os.name == "windows":
+            # https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=902c755930326cb4405672aa3ea13c35c653cbff
+            os.environ["CPPFLAGS"] = "-DWIN32_LEAN_AND_MEAN -DCOM_NO_WINDOWS_H"
 
         configure()
 
