@@ -57,7 +57,7 @@ class SPARK2014(spec("common")):
             ),
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/adacore/spark2014/tarball/12db22e8",
+                url="https://github.com/adacore/spark2014/tarball/fsf-13",
             ),
             self.HTTPSSourceBuilder(
                 name=self.cvc5_binary,
@@ -114,6 +114,7 @@ class SPARK2014(spec("common")):
         make("all-nightly", jobs=1)
 
         self.install()
+
 
     def install(self):
         libexec_spark = os.path.join(self["INSTALL_DIR"], "libexec", "spark")
