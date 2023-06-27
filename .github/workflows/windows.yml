@@ -200,7 +200,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: 'adacore/why3'
-          ref: '6645456c7c40d4bd1baada795f0afc65e3840228'
+          ref: 'fsf-13'
 
       - name: Use Setup OCaml v1 ${{ matrix.ocaml-version }}
         uses: avsm/setup-ocaml@v1
