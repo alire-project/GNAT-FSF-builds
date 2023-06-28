@@ -156,7 +156,7 @@ jobs:
       - name: Use Setup OCaml {{ matrix.ocaml-version }}
         uses: ocaml/setup-ocaml@v1.1.11
         with:
-          ocaml-compiler: ${{ matrix.ocaml-version }}
+          ocaml-version: ${{ matrix.ocaml-version }}
 
       - name: opam install depext
         run: opam depext camlzip zarith re seq why3
@@ -166,6 +166,8 @@ jobs:
       - run: opam exec -- bash configure --prefix=/tmp/why3install --enable-relocation --disable-emacs-compilation --disable-hypothesis-selection --disable-js-of-ocaml
       - run: opam exec -- make
       - run: opam exec -- make install_spark2014
+
+      - run: git log --format="%H" -n 1 > /tmp/why3install/why3-version.txt
 
       - name: Upload the build artifact
         uses: actions/upload-artifact@v2
@@ -193,11 +195,13 @@ jobs:
       - name: Use Setup OCaml {{ matrix.ocaml-version }}
         uses: ocaml/setup-ocaml@v1.1.11
         with:
-          ocaml-compiler: ${{ matrix.ocaml-version }}
+          ocaml-version: ${{ matrix.ocaml-version }}
 
       - run: opam pin alt-ergo . -y
 
       - run: opam install alt-ergo --destdir=/tmp/alt-ergo-install
+
+      - run: git log --format="%H" -n 1 > /tmp/alt-ergo-install/alt-ergo-version.txt
 
       - name: Upload the build artifact
         uses: actions/upload-artifact@v2
