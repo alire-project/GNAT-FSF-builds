@@ -52,10 +52,18 @@ class MINGW(spec("common")):
         )
         configure.add("--prefix=%s" % unixpath(self["INSTALL_DIR"]))
         configure.add("--with-default-win32-winnt=0x0600")
-        configure.add("CFLAGS=-Wno-expansion-to-defined")
+        configure.add("--enable-sdk=all")
+        configure.add("--enable-idl")
+        configure.add("--without-widl")
+        configure.add("--with-default-msvcrt=msvcrt")
         configure()
         make = Make(self, exec_dir=hdr_build)
         make("install")
+
+        rm(os.path.join(self["INSTALL_DIR"], "include", "pthread_time.h"))
+        rm(os.path.join(self["INSTALL_DIR"], "include", "pthread_signal.h"))
+        rm(os.path.join(self["INSTALL_DIR"], "include", "pthread_unistd.h"))
+
 
         # Now take care of crt part.
         configure = Configure(
@@ -82,6 +90,9 @@ class MINGW(spec("common")):
         # of log and might turn into errors in some build setups using
         # -Werror (see: U128-016).
         configure.add("CFLAGS=-Wno-expansion-to-defined")
+
+        configure.add("--disable-dependency-tracking") 
+        configure.add("--with-default-msvcrt=msvcrt")
         configure()
 
         make = Make(self, exec_dir=crt_build)
