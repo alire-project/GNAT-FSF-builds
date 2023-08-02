@@ -244,9 +244,9 @@ class GCC(spec("gh-artifact")):
                     "--with-%s=%s" % (m, unixpath(self.deps[m]["INSTALL_DIR"]))
                 )
 
-        if self.env.target.os.name == "windows":
+        if self.env.host.os.name == "windows":
             # https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=902c755930326cb4405672aa3ea13c35c653cbff
-            os.environ["CPPFLAGS"] = "-DWIN32_LEAN_AND_MEAN -DCOM_NO_WINDOWS_H"
+            os.environ["CPPFLAGS"] = "-DCOM_NO_WINDOWS_H"
 
         configure()
 
