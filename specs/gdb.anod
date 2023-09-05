@@ -81,7 +81,9 @@ class GDB(spec("common")):
             "--disable-plugins",
             "--disable-gdbserver",
             "--with-static-standard-libraries",
-            "--disable-source-highlight",  # Incomaptible with static std libs
+            "--enable-static",
+            "--disable-interprocess-agent", # Incompatible with static linking
+            "--disable-source-highlight",   # Incompatible with static std libs
             "--with-curses",
             "--disable-sim",
             "--with-mpfr",
