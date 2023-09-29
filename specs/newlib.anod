@@ -62,7 +62,7 @@ class Newlib(spec("common")):
         configure()
 
         make = Make(self)
-        make()
+        make(jobs=self.jobs)
         make("install-target-newlib")
 
         self.clean()
