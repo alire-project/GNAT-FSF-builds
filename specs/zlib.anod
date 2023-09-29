@@ -70,7 +70,7 @@ class ZLib(spec("common")):
         configure()
 
         make = Make(self, exec_dir=self["SRC_DIR"])
-        make()
+        make(jobs=self.jobs)
         make("install", jobs=1)
 
         self.clean()

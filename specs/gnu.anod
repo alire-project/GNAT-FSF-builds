@@ -33,7 +33,7 @@ class GNU(spec("gh-artifact")):
         except ShellError:
             self.add_log_file("config.log")
             raise
-        self["make"]()
+        self["make"](jobs=self.jobs)
         # Many projects fail when running `make install` with parallel jobs
         self["make"]("install", jobs=1)
 
