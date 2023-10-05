@@ -261,14 +261,7 @@ class GCC(spec("gh-artifact")):
             make("install-gcc", jobs=1)
         else:
 
-            if self.env.target.os.name == "darwin":
-                # Use -headerpad_max_install_names in the build,
-                # otherwise updated load commands won't fit in the Mach-O header.
-                # This is needed because `gcc` avoids the superenv shim.
-                # https://github.com/Homebrew/homebrew-core/blob/98064198c7e5464124f53bbdb47bec3e03f1a0cd/Formula/gcc.rb#L136
-                make("all", "BOOT_LDFLAGS=-Wl,-headerpad_max_install_names")
-            else:
-                make("all", jobs=self.jobs)
+            make("all", jobs=self.jobs)
 
             if self.env.is_cross:
                 make("cross-gnattools", exec_dir="gcc", jobs=self.jobs)
