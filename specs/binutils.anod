@@ -66,6 +66,7 @@ class Binutils(spec("common")):
             "--disable-shared",
             "--disable-werror",
             "--with-zlib",
+            "--without-zstd",
             "--disable-compressed-debug-sections",
             "--disable-separate-code",
             "--disable-gdb",
