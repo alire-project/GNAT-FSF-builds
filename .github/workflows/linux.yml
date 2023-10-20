@@ -213,16 +213,11 @@ jobs:
 
   spark:
     name: spark
-    needs: [gnat_gprbuild, why3, alt_ergo]
+    needs: [why3, alt_ergo]
     runs-on: ubuntu-20.04
     steps:
     - name: Checkout Project
       uses: actions/checkout@v2
-
-    - uses: actions/download-artifact@v2
-      with:
-        name: anod-artifacts
-        path: in_artifacts/
 
     - uses: actions/download-artifact@v2
       with:

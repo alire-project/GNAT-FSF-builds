@@ -211,16 +211,11 @@ jobs:
 
   spark:
     name: SPARK
-    needs: [gnat_gprbuild, why3, alt_ergo]
+    needs: [why3, alt_ergo]
     runs-on: macos-12
     steps:
     - name: Checkout Project
       uses: actions/checkout@v2
-
-    - uses: actions/download-artifact@v2
-      with:
-        name: anod-artifacts
-        path: in_artifacts/
 
     - uses: actions/download-artifact@v2
       with:

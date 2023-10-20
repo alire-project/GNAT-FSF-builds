@@ -87,7 +87,7 @@ class SPARK2014(spec("common")):
     @property
     def build_deps(self):
         deps = [
-            Anod.Dependency("gcc"),
+            Anod.Dependency("base_gcc"),
             Anod.Dependency("why3"),
             Anod.Dependency("alt-ergo"),
             Anod.Dependency("gmp", qualifier="shared_lib"),
@@ -108,6 +108,7 @@ class SPARK2014(spec("common")):
             self,
             makefile=os.path.join(self["SRC_DIR"], "Makefile"),
             exec_dir=self["SRC_DIR"],
+            jobs=self.jobs
         )
         for dep in self.deps:
             self.deps[dep].setenv()
@@ -126,7 +127,7 @@ class SPARK2014(spec("common")):
         _bin = os.path.join(self["INSTALL_DIR"], "bin")
         sync_tree(os.path.join(self["SRC_DIR"], "install"), self["INSTALL_DIR"])
 
-        sync_tree(self.deps["gcc"]["INSTALL_DIR"], libexec_spark, delete=False)
+        sync_tree(self.deps["base_gcc"]["INSTALL_DIR"], libexec_spark, delete=False)
         # Remove all gnat* executables except gnatbind/gnatls, only keep
         # gcc/gnatbind/gpr* executables.
         for glob in ["gnat*", "gdb*", "gcov*", "ld*", "nm", "g++", "ar",
