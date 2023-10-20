@@ -30,21 +30,8 @@ class XMLAda(spec("common")):
 
     @property
     def build_deps(self):
-        deps = [Anod.Dependency("gprbuild", qualifier="bootstrap")]
-
-        if self.env.is_canadian:
-            deps.append(
-                Anod.Dependency(
-                    name="gcc",
-                    host="build",
-                    target="host",
-                    local_name="canadian-cross-compiler",
-                )
-            )
-        else:
-            deps.append(Anod.Dependency("gcc"))
-
-        return deps
+        return [Anod.Dependency("gprbuild", qualifier="bootstrap"),
+                Anod.Dependency("base_gcc")]
 
     @Anod.primitive()
     def build(self):
