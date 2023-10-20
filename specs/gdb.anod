@@ -82,7 +82,12 @@ class GDB(spec("common")):
             "--disable-plugins",
             "--disable-gdbserver",
             "--with-static-standard-libraries",
-            "--disable-source-highlight",  # Incomaptible with static std libs
+
+            # Static link to avoid dyn dependencies (e.g. on libpython)
+            "--enable-static",
+
+            "--disable-interprocess-agent", # Incomaptible with static linking
+            "--disable-source-highlight",   # Incomaptible with static std libs
             "--with-curses",
             "--disable-sim",
             "--with-mpfr",
