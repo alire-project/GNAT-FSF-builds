@@ -1,0 +1,120 @@
+from e3.os.fs import touch
+from e3.anod.helper import Make, text_replace
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+from e3.fs import cp, rm, ls
+from e3.diff import patch
+import os
+from datetime import date
+
+
+class LibGPR2(spec("common")):
+    @property
+    def version(self):
+        return "24.0.0"
+
+    @property
+    def tarball(self):
+        return "gpr-%s.tar.gz" % self.version
+
+    @property
+    def tools_only(self):
+        return "tools_only" in self.parsed_qualifier
+
+    @property
+    def source_pkg_build(self):
+        return [
+            self.HTTPSSourceBuilder(
+                name=self.tarball,
+                url="https://github.com/AdaCore/gpr/archive/v%s.tar.gz"
+                % self.version,
+            )
+        ]
+
+    @property
+    def build_source_list(self):
+        return [
+            Anod.Source(name=self.tarball, publish=True, dest=""),
+        ]
+
+    @property
+    def build_deps(self):
+        return [
+            Anod.Dependency("base_gcc", track=True),
+            Anod.Dependency("gprbuild", track=True),
+            Anod.Dependency("xmlada", track=True),
+            Anod.Dependency("libgpr", track=True),
+            Anod.Dependency("gnatcoll", track=True),
+            Anod.Dependency("gnatcoll-bindings", track=True),
+            Anod.Dependency("gprconfig_kb", track=True),
+        ]
+
+    def update_version(self):
+        text_replace(
+            os.path.join(self["SRC_DIR"], "src", "lib", "gpr2-version.ads"),
+            [
+                (
+                    "Build_Type : constant GNAT_Build_Type.*",
+                    "Build_Type : constant GNAT_Build_Type := FSF;",
+                ),
+                (
+                    "Short_Value : constant String.*",
+                    'Short_Value : constant String := "%s";' % self.version,
+                ),
+                (
+                    "Date : constant String.*",
+                    'Date : constant String := "%s-gpr2";' % str(date.today()),
+                ),
+                (
+                    "Current_Year : constant String.*",
+                    'Current_Year : constant String := "%s";' % str(date.today().year),
+                ),
+            ],
+        )
+
+    @property
+    def productized_tools(self):
+        """List of tools from gpr2-tools.gpr we want to push in the released
+        package"""
+        return [
+            "gprclean",
+            "gprinspect",
+            "gprinstall",
+            "gprls",
+            "gprremote",
+            "gprconfig",
+        ]
+
+
+    @Anod.primitive()
+    def build(self):
+        for m in self.deps:
+            if m != "gprconfig_kb":
+                self.deps[m].setenv()
+
+        self.update_version()
+
+        gprconfig_kb_dir = os.path.join(self.deps["gprconfig_kb"]["SRC_DIR"],
+                                        "db")
+        
+        make = Make(self, exec_dir=self["SRC_DIR"])
+        make("setup")
+        make.set_var("GPR2KBDIR", gprconfig_kb_dir)
+        make.set_var("prefix", self["INSTALL_DIR"])
+        make.set_var("ENABLE_SHARED", "no")
+
+        make()
+        make("install")
+
+        if self.tools_only:
+           rm(os.path.join(self["INSTALL_DIR"], 'share'), recursive=True)
+           rm(os.path.join(self["INSTALL_DIR"], 'include'), recursive=True)
+           rm(os.path.join(self["INSTALL_DIR"], 'lib'), recursive=True)
+
+           bin_dir = os.path.join(self["INSTALL_DIR"], 'bin', "*")
+           for file in ls(bin_dir):
+               if os.path.basename(file) not in self.productized_tools:
+                  rm(file)
+           
+
+        self.clean()

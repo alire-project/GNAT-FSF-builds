@@ -7,15 +7,10 @@ from e3.diff import patch
 
 import os
 
-# patch from msys2:
-# https://github.com/msys2/MINGW-packages/blob/master/mingw-w64-zlib/01-zlib-1.2.11-1-buildsys.mingw.patch
-patch_name = "zlib-buildsys-mingw.patch"
-
-
 class ZLib(spec("common")):
     @property
     def version(self):
-        return "1.2.11"
+        return "1.3"
 
     @property
     def tarball(self):
@@ -27,19 +22,17 @@ class ZLib(spec("common")):
             self.HTTPSSourceBuilder(
                 name=self.tarball, url="https://zlib.net/current/%s" % self.tarball
             ),
-            self.LocalSourceBuilder(name=patch_name),
         ]
 
     @property
     def build_source_list(self):
         return [
             Anod.Source(name=self.tarball, publish=True, dest=""),
-            self.Source(name=patch_name, publish=True, unpack_cmd=cp, dest="patches"),
         ]
 
     @property
     def build_deps(self):
-        return [Anod.Dependency("gcc")]
+        return [Anod.Dependency("base_gcc")]
 
     def setenv(self):
         self.env.add_search_path(
@@ -53,16 +46,6 @@ class ZLib(spec("common")):
     def build(self):
         for m in self.deps:
             self.deps[m].setenv()
-
-        # Little hack to apply the patch only once, there is probably a clean
-        # way to do that.
-        patched = os.path.join(self["SRC_DIR"], "patches", ".patched")
-        if not os.path.exists(patched):
-            patch(
-                os.path.join(self["SRC_DIR"], "patches", patch_name),
-                self.build_space.src_dir,
-            )
-            touch(patched)
 
         configure = Configure(self, exec_dir=self["SRC_DIR"], auto_target=False)
         configure.add("--prefix=%s" % unixpath(self["INSTALL_DIR"]))
