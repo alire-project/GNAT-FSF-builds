@@ -8,7 +8,7 @@ import os
 class GNATcollBindings(spec("common")):
     @property
     def version(self):
-        return "22.0.0"
+        return "24.0.0"
 
     @property
     def tarball(self):
@@ -31,7 +31,7 @@ class GNATcollBindings(spec("common")):
     @property
     def build_deps(self):
         deps = [
-            Anod.Dependency("gcc"),
+            Anod.Dependency("base_gcc"),
             Anod.Dependency("gprbuild"),
             Anod.Dependency("gnatcoll"),
             Anod.Dependency("libgpr"),
