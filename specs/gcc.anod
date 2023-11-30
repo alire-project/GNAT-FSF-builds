@@ -218,6 +218,13 @@ class GCC(spec("gh-artifact")):
         configure = Configure(self)
         configure.add("--prefix=%s" % unixpath(self["INSTALL_DIR"]))
 
+
+        # For a native build, the default configuration is to perform a 3-stage
+        # bootstrap of the compiler when "make" is invoked, testing that GCC
+        # can compile itself correctly. If you want to disable this process,
+        # you can configure with --disable-bootstrap.
+        configure.add("--disable-bootstrab")
+
         if "binutils" in self.deps:
             configure.add(
                 "--with-build-time-tools=%s"
