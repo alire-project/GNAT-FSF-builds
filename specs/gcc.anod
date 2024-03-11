@@ -4,8 +4,11 @@ from e3.anod.helper import Configure, Make
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
 from e3.env import Env
+from e3.os.process import Run
 import os
 
+# A wrapper to call ld-classic on MacOS X
+patch_name = "ld"
 
 class GCC(spec("gh-artifact")):
     @property
@@ -21,14 +24,24 @@ class GCC(spec("gh-artifact")):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://ftp.gnu.org/gnu/gcc/gcc-%s/%s"
-                % (self.version, self.tarball),
-            )
+                url=(
+                    "https://ftp.gnu.org/gnu/gcc/gcc-%s/%s"
+                    % (self.version, self.tarball)
+                    if self.env.target.cpu.name == "x86_64"
+                    else
+                    "https://github.com/iains/gcc-13-branch/archive/refs/"
+                    + "tags/gcc-13.2-darwin-r0.tar.gz"
+                )
+            ),
+            self.LocalSourceBuilder(name=patch_name)
         ]
 
     @property
     def build_source_list(self):
-        return [Anod.Source(name=self.tarball, publish=True, dest="")]
+        return [
+            Anod.Source(name=self.tarball, publish=True, dest=""),
+            self.Source(name=patch_name, publish=True, unpack_cmd=cp, dest="patches")
+        ]
 
     @property
     def bootstrap(self):
@@ -287,4 +300,13 @@ class GCC(spec("gh-artifact")):
                 delete=False,
             )
 
+        # Add ld-classic wrapper
+        if self.env.target.os.name == "darwin":
+            gcc = os.path.join(self["INSTALL_DIR"], "bin", "gcc")
+            p = Run([gcc, "--print-prog-name=cc1"])
+            libexec = os.path.dirname(p.out.strip())
+            cp(
+                os.path.join(self["SRC_DIR"], "patches", patch_name),
+                libexec,
+            )
         self.clean()

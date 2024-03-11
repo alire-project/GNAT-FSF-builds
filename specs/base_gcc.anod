@@ -12,13 +12,21 @@ class base_gcc(spec("common")):
 
     @property
     def tarball(self):
-        return "gnat-%s-%s.tar.gz" % (self.env.platform, self.version)
+        return (
+            "gnat-%s-%s.tar.gz" % (self.env.platform, self.version)
+            if self.env.target.cpu.name == "x86_64"
+            # To be reverted after the bootstrap
+            else "gnat-macos-aarch64-13.2.1.tar.gz"
+        )
 
     @property
     def url(self):
         return (
             "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-%s/%s"
             % (self.version, self.tarball)
+            if self.env.target.cpu.name == "x86_64" else
+            "https://github.com/simonjwright/alire-index.mac/releases/download/toolchain-13.2.1/%s"
+            % (self.tarball)
         )
 
     @Anod.primitive()
