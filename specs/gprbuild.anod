@@ -3,8 +3,11 @@ from e3.fs import sync_tree, cp
 from e3.anod.helper import Make, text_replace
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
+from e3.diff import patch
 import os
 from datetime import date
+
+patch_name = "gprbuild-no-static.patch"
 
 class GPRbuild(spec("gh-artifact")):
     @property
@@ -23,6 +26,7 @@ class GPRbuild(spec("gh-artifact")):
                 url="https://github.com/AdaCore/gprbuild/archive/v%s/%s"
                 % (self.version, self.tarball),
             ),
+            self.LocalSourceBuilder(name=patch_name),
         ]
 
     @property
@@ -38,6 +42,7 @@ class GPRbuild(spec("gh-artifact")):
                 Anod.Source(
                     name=self.deps["xmlada"].tarball, publish=True, dest="xmlada"
                 ),
+                Anod.Source(name=patch_name, publish=True, unpack_cmd=cp, dest="patches"),
             ]
         else:
             return [
@@ -47,6 +52,7 @@ class GPRbuild(spec("gh-artifact")):
                     publish=True,
                     dest="gprconfig_kb",
                 ),
+                Anod.Source(name=patch_name, publish=True, unpack_cmd=cp, dest="patches"),
             ]
 
     @property
@@ -134,6 +140,13 @@ class GPRbuild(spec("gh-artifact")):
         # build method.
 
         self.update_version()
+
+        if self.env.host.os.name == "darwin":
+            # MacOS X can't execute 'gcc -static', patching gprbuild
+            patch(
+                os.path.join(self["SRC_DIR"], "patches", patch_name),
+                self.build_space.src_dir,
+            )
 
         if self.bootstrap:
             return self.do_bootstrap()
