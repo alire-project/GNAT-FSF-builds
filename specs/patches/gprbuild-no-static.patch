@@ -1,0 +1,11 @@
+diff -Naur src/gprbuild-link.adb src/gprbuild-link.adb
+--- src/gprbuild-link.adb	2023-10-09 21:31:11.000000000 +0300
++++ src/gprbuild-link.adb	2024-03-12 23:46:51.766005336 +0200
+@@ -1880,6 +1880,7 @@
+                               when Resulting_Options =>
+                                  if not Apply_Bindfile_Option_Substitution
+                                           (Line (1 .. Last))
++                                    and then Line (1 .. Last) /= "-static"
+                                  then
+                                     Binding_Options.Append (Line (1 .. Last));
+                                  end if;
