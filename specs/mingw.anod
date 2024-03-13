@@ -21,7 +21,7 @@ class MINGW(spec("common")):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://nav.dl.sourceforge.net/project/mingw-w64/mingw-w64/mingw-w64-release/"
+                url="https://download.sourceforge.net/project/mingw-w64/mingw-w64/mingw-w64-release/"
                 + self.tarball,
             )
         ]
