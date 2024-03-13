@@ -39,7 +39,7 @@ class LibGPR2(spec("common")):
 
     @property
     def build_deps(self):
-        return [
+        deps = [
             Anod.Dependency("base_gcc", track=True),
             Anod.Dependency("gprbuild", track=True),
             Anod.Dependency("xmlada", track=True),
@@ -47,7 +47,13 @@ class LibGPR2(spec("common")):
             Anod.Dependency("gnatcoll", track=True),
             Anod.Dependency("gnatcoll-bindings", track=True),
             Anod.Dependency("gprconfig_kb", track=True),
+            Anod.Dependency("gmp", track=True),
         ]
+        # gnatcoll-bindings doesn't pass -Lgmp&iconv, so let's depend on them
+        if self.env.target.os.name == "windows":
+            deps.append(Anod.Dependency("libiconv", track=True))
+
+        return deps
 
     def update_version(self):
         text_replace(
