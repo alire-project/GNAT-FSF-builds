@@ -1,7 +1,7 @@
 name: macOS_arm
 on:
   pull_request:
-
+  workflow_dispatch:
 
 jobs:
   gnat_gprbuild:
