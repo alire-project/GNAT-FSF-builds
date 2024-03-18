@@ -31,8 +31,11 @@ class SPARK2014(spec("common")):
     def cvc5_binary(self):
         if self.env.host.os.name == "windows":
             fn = "cvc5-Win64.exe"
-        elif self.env.host.os.name == "darwin":
+        elif self.env.host.os.name == "darwin" and \
+             self.env.target.cpu.name == "x86_64":
             fn = "cvc5-macOS"
+        elif self.env.host.os.name == "darwin":
+            fn = "cvc5-macOS-arm64"
         else:
             fn = "cvc5-linux"
         return fn
@@ -41,8 +44,11 @@ class SPARK2014(spec("common")):
     def z3_zip(self):
         if self.env.host.os.name == "windows":
             fn = "z3-4.12.2-x64-win.zip"
-        elif self.env.host.os.name == "darwin":
+        elif self.env.host.os.name == "darwin" and \
+             self.env.target.cpu.name == "x86_64":
             fn = "z3-4.12.2-x64-osx-10.16.zip"
+        elif self.env.host.os.name == "darwin":
+            fn = "z3-4.12.2-arm64-osx-11.0.zip"
         else:
             fn = "z3-4.12.2-x64-glibc-2.31.zip"
         return fn
