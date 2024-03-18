@@ -8,26 +8,16 @@ from e3.anod.spec import Anod
 class base_gcc(spec("common")):
     @property
     def version(self):
-        return "13.2.0-1"
+        return "13.2.0-2"
 
     @property
     def tarball(self):
-        return (
-            "gnat-%s-%s.tar.gz" % (self.env.platform, self.version)
-            if self.env.target.cpu.name == "x86_64"
-            # To be reverted after the bootstrap
-            else "gnat-macos-aarch64-13.2.1.tar.gz"
-        )
+        return "gnat-%s-%s.tar.gz" % (self.env.platform, self.version)
 
     @property
     def url(self):
-        return (
-            "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-%s/%s"
-            % (self.version, self.tarball)
-            if self.env.target.cpu.name == "x86_64" else
-            "https://github.com/simonjwright/alire-index.mac/releases/download/toolchain-13.2.1/%s"
-            % (self.tarball)
-        )
+        return "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-%s/%s" \
+                    % (self.version, self.tarball)
 
     @Anod.primitive()
     def build(self):
