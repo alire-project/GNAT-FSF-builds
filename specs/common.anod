@@ -66,6 +66,15 @@ class Common(Anod):
             )
             env_modified = True
 
+        if os.path.isdir(os.path.join(prefix, "include")):
+            self.env.add_search_path(
+                "C_INCLUDE_PATH", os.path.join(prefix, "include")
+            )
+            self.env.add_search_path(
+                "CPLUS_INCLUDE_PATH", os.path.join(prefix, "include")
+            )
+            env_modified = True
+
         if not env_modified:
             if os.path.exists(prefix) and os.path.isdir(prefix) and os.listdir(prefix):
                 raise AnodError(

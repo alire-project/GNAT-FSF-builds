@@ -8,11 +8,11 @@ import sys
 class EmbeddedRuntimes(spec("common")):
     @property
     def version(self):
-        return "13.1"
+        return "14.1"
 
     @property
     def commit_id(self):
-        return "1cdb8f472d4af20a14e42230fb28837777a42fa6"
+        return "0d5e0999c7bf5e8f29aeb69b9cb3d0b687c6d373"
 
     @property
     def tarball(self):
@@ -70,6 +70,7 @@ class EmbeddedRuntimes(spec("common")):
                 "microbit",
                 "feather_stm32f405",
                 "nrf52832",
+                "nrf52833",
                 "nrf52840",
                 "nucleo_f401re",
                 "openmv2",

@@ -13,7 +13,7 @@ patch_name = "gdb-0002-Fix-using-gnu-print.patch"
 class GDB(spec("common")):
     @property
     def version(self):
-        return "13.2"
+        return "14.2"
 
     @property
     def tarball(self):
@@ -74,6 +74,7 @@ class GDB(spec("common")):
             "--disable-ld",
             "--disable-gprof",
             "--disable-libctf",
+            "--enable-gdb",
             "--with-zlib",
             "--without-libusb",
             "--without-bugurl",
@@ -85,10 +86,11 @@ class GDB(spec("common")):
             "--disable-source-highlight",  # Incomaptible with static std libs
             "--with-curses",
             "--disable-sim",
-            "--with-mpfr",
-            "--with-libmpfr-prefix=%s" % unixpath(self.deps["mpfr"]["INSTALL_DIR"]),
-            "--with-libgmp-prefix=%s" % unixpath(self.deps["gmp"]["INSTALL_DIR"]),
-            "--with-mpc-prefix=%s" % unixpath(self.deps["mpc"]["INSTALL_DIR"]),
+            "--with-mpfr=%s" % unixpath(self.deps["mpfr"]["INSTALL_DIR"]),
+            "--with-libmpfr=%s" % unixpath(self.deps["mpfr"]["INSTALL_DIR"]),
+            "--with-gmp=%s" % unixpath(self.deps["gmp"]["INSTALL_DIR"]),
+            "--with-libgmp=%s" % unixpath(self.deps["gmp"]["INSTALL_DIR"]),
+            "--with-mpc=%s" % unixpath(self.deps["mpc"]["INSTALL_DIR"]),
         )
 
         if self.env.host.os.name == "windows":
