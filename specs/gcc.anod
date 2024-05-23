@@ -1,4 +1,4 @@
-from e3.os.fs import unixpath, cd
+from e3.os.fs import unixpath
 from e3.fs import cp, mkdir, sync_tree
 from e3.anod.helper import Configure, Make
 from e3.anod.spec import Anod
@@ -93,6 +93,9 @@ class GCC(spec("gh-artifact")):
             deps.append(Anod.Dependency("gcc", local_name="gcc_native", target="host"))
         else:
             deps.append(Anod.Dependency("base_gcc", host="build", target="host"))
+
+        if self.env.build.os.name != "darwin":
+            deps.append(Anod.Dependency("isl", host="build", target="host"))
 
         if self.env.target.os.name != "darwin":
             deps.append(Anod.Dependency("binutils", target="target"))
@@ -200,10 +203,6 @@ class GCC(spec("gh-artifact")):
             "lib", "gcc", self.env.target.triplet, self.version
         )
 
-        cd(self["SRC_DIR"])
-        self.shell(os.path.join(self['SRC_DIR'], 'contrib', 'download_prerequisites'))
-        cd(self["BUILD_DIR"])
-
         if self.env.target.os.name == "windows":
             # Deploy the mingw dependency in the ./mingw64 directory
             self.deps["mingw"].merge(os.path.join(self["SRC_DIR"], "mingw64"))
@@ -251,6 +250,12 @@ class GCC(spec("gh-artifact")):
 
         for a in self.configure_args():
             configure.add(a)
+
+        for m in ("mpfr", "gmp", "mpc", "isl"):
+            if m in self.deps:
+                configure.add(
+                    "--with-%s=%s" % (m, unixpath(self.deps[m]["INSTALL_DIR"]))
+                )
 
         if self.env.host.os.name == "windows":
             # https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=902c755930326cb4405672aa3ea13c35c653cbff
