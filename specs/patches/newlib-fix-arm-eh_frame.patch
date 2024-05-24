@@ -1,0 +1,84 @@
+diff --git newlib/libc/machine/arm/aeabi_memmove-thumb2.S newlib/libc/machine/arm/aeabi_memmove-thumb2.S
+index 20ca993e56651796ef515ed646776bc58bdb69cd..3018e74126925277d4bbaff7ff7c4144ef2522c8 100644
+--- newlib/libc/machine/arm/aeabi_memmove-thumb2.S
++++ newlib/libc/machine/arm/aeabi_memmove-thumb2.S
+@@ -36,6 +36,7 @@
+ 	ASM_ALIAS __aeabi_memmove8 __aeabi_memmove
+ __aeabi_memmove:
+ 	.fnstart
++	.cfi_sections .debug_frame
+ 	.cfi_startproc
+ 	prologue 4
+ 	cmp	r0, r1
+diff --git newlib/libc/machine/arm/aeabi_memset-thumb2.S newlib/libc/machine/arm/aeabi_memset-thumb2.S
+index 6b77d3820eef22bb256b59bf4cbd0da9a72c1dd9..a1b8f053229cf8ec2b6132253b90948c0f43c870 100644
+--- newlib/libc/machine/arm/aeabi_memset-thumb2.S
++++ newlib/libc/machine/arm/aeabi_memset-thumb2.S
+@@ -33,6 +33,7 @@
+ 	.global __aeabi_memset
+ 	.type	__aeabi_memset, %function
+ 	.fnstart
++	.cfi_sections .debug_frame
+ 	.cfi_startproc
+ 	ASM_ALIAS __aeabi_memset4 __aeabi_memset
+ 	ASM_ALIAS __aeabi_memset8 __aeabi_memset
+diff --git newlib/libc/machine/arm/memchr.S newlib/libc/machine/arm/memchr.S
+index d13ef8d65454a1e493b74333071b4875577d214b..f0b3650aa336214e88dbe1617e9e8178f152c028 100644
+--- newlib/libc/machine/arm/memchr.S
++++ newlib/libc/machine/arm/memchr.S
+@@ -293,6 +293,7 @@ memchr:
+ 	.global memchr
+ 	.type memchr,%function
+ 	.fnstart
++	.cfi_sections .debug_frame
+ 	.cfi_startproc
+ memchr:
+ 	@ r0 = start of memory to scan
+diff --git newlib/libc/machine/arm/memcpy-armv7m.S newlib/libc/machine/arm/memcpy-armv7m.S
+index ec1ad6485e582592ed578024e7a3d8959f99ab1d..13ffdb343f013d6fdbda51319a2b26c59ad9df36 100644
+--- newlib/libc/machine/arm/memcpy-armv7m.S
++++ newlib/libc/machine/arm/memcpy-armv7m.S
+@@ -88,6 +88,7 @@
+ 	.thumb
+ 	.thumb_func
+ 	.fnstart
++	.cfi_sections .debug_frame
+ 	.cfi_startproc
+ 	.type	memcpy, %function
+ memcpy:
+diff --git newlib/libc/machine/arm/setjmp.S newlib/libc/machine/arm/setjmp.S
+index 5e5952296c9daa0197b74e157a9068ef9d115cc8..0070f17cdcef9e1b70aeded257019a55d61f035e 100644
+--- newlib/libc/machine/arm/setjmp.S
++++ newlib/libc/machine/arm/setjmp.S
+@@ -183,6 +183,7 @@ SYM (.arm_start_of.\name):
+ 	MODE
+ 	.globl SYM (\name)
+ 	.fnstart
++	.cfi_sections .debug_frame
+ 	.cfi_startproc
+ 	TYPE (\name)
+ SYM (\name):
+diff --git newlib/libc/machine/arm/strlen-armv7.S newlib/libc/machine/arm/strlen-armv7.S
+index 6aa122c075bbd395c1c1b53925b0a28c3be7294e..1c2b5c532bb4a6392159b4284cfe48d318e19b62 100644
+--- newlib/libc/machine/arm/strlen-armv7.S
++++ newlib/libc/machine/arm/strlen-armv7.S
+@@ -106,6 +106,7 @@
+ 
+ def_fn	strlen p2align=6
+ 	.fnstart
++	.cfi_sections .debug_frame
+ 	.cfi_startproc
+ 	prologue 4 5 push_ip=HAVE_PAC_LEAF
+ 	pld	[srcin, #0]
+diff --git newlib/libc/machine/arm/strlen-thumb2-Os.S newlib/libc/machine/arm/strlen-thumb2-Os.S
+index 4adbc61d2e032ca7593db6b39e938202058583ba..b8a615a15d8fb0cf4221fbe439f8989e277f201a 100644
+--- newlib/libc/machine/arm/strlen-thumb2-Os.S
++++ newlib/libc/machine/arm/strlen-thumb2-Os.S
+@@ -47,6 +47,7 @@
+ 
+ def_fn	strlen p2align=1
+ 	.fnstart
++	.cfi_sections .debug_frame
+ 	.cfi_startproc
+ 	prologue
+ 	mov     r3, r0

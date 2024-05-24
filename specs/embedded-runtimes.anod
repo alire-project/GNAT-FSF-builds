@@ -12,7 +12,7 @@ class EmbeddedRuntimes(spec("common")):
 
     @property
     def commit_id(self):
-        return "0d5e0999c7bf5e8f29aeb69b9cb3d0b687c6d373"
+        return "4386b1dcd0e995ac9b9e1b221cf386238d3c1537"
 
     @property
     def tarball(self):
