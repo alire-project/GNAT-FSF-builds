@@ -29,8 +29,8 @@ class GCC(spec("gh-artifact")):
                     % (self.version, self.tarball)
                     if self.env.target.cpu.name == "x86_64"
                     else
-                    "https://github.com/iains/gcc-13-branch/archive/refs/"
-                    + "tags/gcc-13.2-darwin-r0.tar.gz"
+                    "https://github.com/iains/gcc-14-branch/archive/refs/"
+                    + "tags/gcc-14.1-darwin-r0.tar.gz"
                 )
             ),
             self.LocalSourceBuilder(name=patch_name)
