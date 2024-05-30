@@ -10,7 +10,7 @@ import os
 class SPARK2014(spec("common")):
     @property
     def version(self):
-        return "13.2.0"
+        return "14.1.0"
 
     @property
     def tarball(self):
@@ -28,29 +28,33 @@ class SPARK2014(spec("common")):
         return "gcc-%s.tar.gz" % self.version
 
     @property
-    def cvc5_binary(self):
+    def sparklib_tarball(self):
+        return "sparkib-%s.tar.gz" % self.version
+
+    @property
+    def cvc5_zip(self):
         if self.env.host.os.name == "windows":
-            fn = "cvc5-Win64.exe"
+            fn = "cvc5-Win64-static.zip"
         elif self.env.host.os.name == "darwin" and \
              self.env.target.cpu.name == "x86_64":
-            fn = "cvc5-macOS"
+            fn = "cvc5-macOS-static.zip"
         elif self.env.host.os.name == "darwin":
-            fn = "cvc5-macOS-arm64"
+            fn = "cvc5-macOS-arm64-static.zip"
         else:
-            fn = "cvc5-linux"
+            fn = "cvc5-linux-static.zip"
         return fn
 
     @property
     def z3_zip(self):
         if self.env.host.os.name == "windows":
-            fn = "z3-4.12.2-x64-win.zip"
+            fn = "z3-4.13.0-x64-win.zip"
         elif self.env.host.os.name == "darwin" and \
              self.env.target.cpu.name == "x86_64":
-            fn = "z3-4.12.2-x64-osx-10.16.zip"
+            fn = "z3-4.13.0-x64-osx-11.7.10.zip"
         elif self.env.host.os.name == "darwin":
-            fn = "z3-4.12.2-arm64-osx-11.0.zip"
+            fn = "z3-4.13.0-arm64-osx-11.0.zip"
         else:
-            fn = "z3-4.12.2-x64-glibc-2.31.zip"
+            fn = "z3-4.13.0-x64-glibc-2.35.zip"
         return fn
 
     @property
@@ -63,16 +67,20 @@ class SPARK2014(spec("common")):
             ),
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/adacore/spark2014/tarball/fsf-13",
+                url="https://github.com/adacore/spark2014/tarball/fsf-14",
             ),
             self.HTTPSSourceBuilder(
-                name=self.cvc5_binary,
-                url="https://github.com/cvc5/cvc5/releases/download/cvc5-1.0.5/%s"
-                % self.cvc5_binary,
+                name=self.sparklib_tarball,
+                url="https://github.com/adacore/sparklib/tarball/master",
+            ),
+            self.HTTPSSourceBuilder(
+                name=self.cvc5_zip,
+                url="https://github.com/cvc5/cvc5/releases/download/cvc5-1.1.2/%s"
+                % self.cvc5_zip,
             ),
             self.HTTPSSourceBuilder(
                 name=self.z3_zip,
-                url="https://github.com/Z3Prover/z3/releases/download/z3-4.12.2/%s"
+                url="https://github.com/Z3Prover/z3/releases/download/z3-4.13.0/%s"
                 % self.z3_zip,
             ),
         ]
@@ -82,9 +90,8 @@ class SPARK2014(spec("common")):
         return [
             Anod.Source(name=self.tarball, publish=True, dest=""),
             Anod.Source(name=self.gcc_tarball, publish=True, dest="gcc"),
-            Anod.Source(
-                name=self.cvc5_binary, publish=True, unpack_cmd=cp, dest="cvc5"
-            ),
+            Anod.Source(name=self.sparklib_tarball, publish=True, dest="include"),
+            Anod.Source(name=self.cvc5_zip, publish=True, dest="cvc5"),
             Anod.Source(name=self.z3_zip, publish=True, dest="z3"),
         ]
 
@@ -99,8 +106,12 @@ class SPARK2014(spec("common")):
             Anod.Dependency("gmp", qualifier="shared_lib"),
             Anod.Dependency("gprbuild"),
             Anod.Dependency("gnatcoll"),
+            Anod.Dependency("gnatcoll-bindings"),
             Anod.Dependency("xmlada"),
+            Anod.Dependency("libgpr2", qualifier="next"),
             Anod.Dependency("libgpr"),
+            Anod.Dependency("langkit_support"),
+            Anod.Dependency("libadalang"),
         ]
         return deps
 
@@ -156,12 +167,7 @@ class SPARK2014(spec("common")):
         sync_tree(self.deps["gmp"]["INSTALL_DIR"], libexec_spark, delete=False)
 
         sync_tree(os.path.join(self["SRC_DIR"], "z3"), libexec_spark, delete=False)
-        cvc5_binary_name = "cvc5.exe" if self.env.host.os.name == "windows" else "cvc5"
-        cvc5_binary_name = os.path.join(libexec_spark_bin, cvc5_binary_name)
-        cp(
-            os.path.join(self["SRC_DIR"], "cvc5", self.cvc5_binary),
-            cvc5_binary_name
-        )
+        sync_tree(os.path.join(self["SRC_DIR"], "cvc5"), libexec_spark, delete=False)
 
         for fn in [
             "gnat2why",
