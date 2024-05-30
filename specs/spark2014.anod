@@ -156,7 +156,6 @@ class SPARK2014(spec("common")):
                 if (
                     not os.path.basename(f).startswith("gnatbind")
                     and not os.path.basename(f).startswith("gnatls")
-                    and not os.path.basename(f).startswith("gnat_server")
                     and not os.path.basename(f).startswith("gnatwhy3")
                     ):
                     rm(f)
@@ -188,7 +187,7 @@ class SPARK2014(spec("common")):
         for dir in ["alt-ergo", "alt-ergo-lib", "alt-ergo-parsers"]:
             rm(os.path.join(libexec_spark, "lib", dir), True)
 
-        for exe in ["cvc5", "gnat_server", "gnatwhy3", "alt-ergo"]:
+        for exe in ["cvc5", "gnatwhy3", "alt-ergo"]:
             chmod("a+x",
                   os.path.join(libexec_spark_bin,
                                (exe + (".exe" if self.env.host.os.name == "windows"
