@@ -7,8 +7,8 @@ import tempfile
 import os
 import shutil
 
-PKG_VERSION = "13.2.0-1"
-CRATE_VERSION = "13.2.1"
+PKG_VERSION = "14.1.0-2"
+CRATE_VERSION = "14.1.2"
 
 targets = {
     "x86_64": {"crate": "gnat_native", "description": "Native"},
@@ -87,14 +87,17 @@ disabled = true
 PATH.prepend = "${{CRATE_ROOT}}/bin"
 
 [origin."case(os)".linux."case(host-arch)".x86-64]
+binary = true
 url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-{PKG_VERSION}/{linux_package}"
 hashes = ["sha256:{linux_sha256}"]
 
 [origin."case(os)".windows."case(host-arch)".x86-64]
+binary = true
 url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-{PKG_VERSION}/{windows_package}"
 hashes = ["sha256:{windows_sha256}"]
 
 [origin."case(os)".macos."case(host-arch)".x86-64]
+binary = true
 url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-{PKG_VERSION}/{macos_package}"
 hashes = ["sha256:{macos_sha256}"]
 """

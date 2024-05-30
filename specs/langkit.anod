@@ -30,7 +30,7 @@ class Langkit(spec("common")):
     @property
     def build_deps(self):
         return [
-            Anod.Dependency("gcc", track=True),
+            Anod.Dependency("base_gcc", track=True),
             Anod.Dependency("gprbuild", track=True),
             Anod.Dependency("libgpr", track=True),
             Anod.Dependency("gnatcoll", track=True),

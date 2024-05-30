@@ -39,16 +39,6 @@ class Binutils(spec("common")):
             Anod.Dependency("isl", target="host"),
         ]
 
-        if self.env.is_canadian:
-            deps.append(
-                Anod.Dependency(
-                    name="gcc",
-                    host="build",
-                    target="host",
-                    local_name="canadian-cross-compiler",
-                )
-            )
-
         return deps
 
     def merge(self, prefix):

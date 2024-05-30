@@ -25,7 +25,7 @@ class GNATUTIL(spec("common")):
     @property
     def build_deps(self):
         return [
-            Anod.Dependency("gcc", track=True),
+            Anod.Dependency("base_gcc", track=True),
             Anod.Dependency("gprbuild", track=True),
         ]
 
