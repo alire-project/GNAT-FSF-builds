@@ -71,7 +71,7 @@ class SPARK2014(spec("common")):
             ),
             self.HTTPSSourceBuilder(
                 name=self.sparklib_tarball,
-                url="https://github.com/adacore/sparklib/tarball/master",
+                url="https://github.com/adacore/sparklib/tarball/d4f3dc1c6c8ce441472b1bd5df00777eec799eb2",
             ),
             self.HTTPSSourceBuilder(
                 name=self.cvc5_zip,
