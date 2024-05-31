@@ -113,6 +113,10 @@ class SPARK2014(spec("common")):
             Anod.Dependency("langkit_support"),
             Anod.Dependency("libadalang"),
         ]
+
+        if self.env.target.os.name == "windows":
+            deps.append(Anod.Dependency("libiconv"))
+
         return deps
 
     @Anod.primitive()
