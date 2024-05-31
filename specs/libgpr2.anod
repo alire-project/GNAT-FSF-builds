@@ -1,10 +1,11 @@
 from e3.os.fs import touch
-from e3.anod.helper import Make
+from e3.anod.helper import Make, text_replace
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
 from e3.fs import cp, sync_tree
 from e3.diff import patch
 import os
+from datetime import date
 
 class LibGPR2(spec("common")):
 
@@ -58,9 +59,7 @@ class LibGPR2(spec("common")):
         return [
             Anod.Source(name=self.tarball, publish=True, dest=""),
             Anod.Source(name=self.lk_tarball, publish=True, dest="langkit_src"),
-            Anod.Source(
-            name=self.deps["gprconfig_kb"].tarball,
-            publish=True,
+            Anod.Source(name=self.deps["gprconfig_kb"].tarball, publish=True,
             dest="gprconfig_kb",
             ),
         ]
@@ -79,11 +78,43 @@ class LibGPR2(spec("common")):
             Anod.Dependency("gprconfig_kb", require="source_pkg", track=True),
         ]
 
+    def update_version(self):
+        text_replace(
+            os.path.join(self["SRC_DIR"], "src", "lib", "gpr2-version.ads"),
+            [
+                (
+                    "Build_Type : constant GNAT_Build_Type.*",
+                    "Build_Type : constant GNAT_Build_Type := FSF;",
+                ),
+                (
+                    "Short_Value : constant String.*",
+                    'Short_Value : constant String := "%s";' % self.version,
+                ),
+                (
+                    "Date : constant String.*",
+                    'Date : constant String := "%s-gpr2";' % str(date.today()),
+                ),
+                (
+                    "Current_Year : constant String.*",
+                    'Current_Year : constant String := "%s";' % str(date.today().year),
+                ),
+            ],
+        )
+
     @Anod.primitive()
     def build(self):
         for m in self.deps:
             if m != "gprconfig_kb":
                 self.deps[m].setenv()
+
+        self.update_version()
+
+        # The SOURCE_DIR detection doesn't work on macOS, so we replace it with
+        # an absolute path.
+        print(os.path.join(self["SRC_DIR"], "Makefile"))
+        text_replace(os.path.join(self["SRC_DIR"], "Makefile"),
+                                  [("SOURCE_DIR := .*",
+                                   "SOURCE_DIR := " + self["SRC_DIR"])])
 
         self.env.add_search_path("PYTHONPATH", os.path.join(self["SRC_DIR"], "langkit_src"))
 
