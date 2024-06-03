@@ -38,7 +38,7 @@ class GDB(spec("common")):
     @property
     def build_deps(self):
         deps = [
-            Anod.Dependency("gcc", target="host"),
+            Anod.Dependency("base_gcc", target="host"),
             Anod.Dependency("mpfr", target="host"),
             Anod.Dependency("mpc", target="host"),
             Anod.Dependency("gmp", target="host"),
@@ -91,6 +91,7 @@ class GDB(spec("common")):
             "--with-gmp=%s" % unixpath(self.deps["gmp"]["INSTALL_DIR"]),
             "--with-libgmp=%s" % unixpath(self.deps["gmp"]["INSTALL_DIR"]),
             "--with-mpc=%s" % unixpath(self.deps["mpc"]["INSTALL_DIR"]),
+            "--with-python=no"
         )
 
         if self.env.host.os.name == "windows":
