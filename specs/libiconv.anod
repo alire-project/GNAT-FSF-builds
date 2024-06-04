@@ -47,7 +47,8 @@ class LibIconv(spec("common")):
 
         configure = Configure(self)
         configure.add("--prefix=%s" % unixpath(self["INSTALL_DIR"]))
-        configure.add("--enable-static")
+        configure.add("--enable-static=yes")
+        configure.add("--enable-shared=no")
         configure.add("--enable-extra-encodings")
         configure.add("--disable-rpath")
         configure.add("--enable-silent-rules")
