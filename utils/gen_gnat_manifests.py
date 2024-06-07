@@ -7,8 +7,8 @@ import tempfile
 import os
 import shutil
 
-PKG_VERSION = "14.1.0-2"
-CRATE_VERSION = "14.1.2"
+PKG_VERSION = "14.1.0-3"
+CRATE_VERSION = "14.1.3"
 
 targets = {
     "x86_64": {"crate": "gnat_native", "description": "Native"},
@@ -69,6 +69,31 @@ for target, params in targets.items():
     windows_sha256 = check_sha256(windows_package)
     macos_sha256 = check_sha256(macos_package)
 
+    if target == "x86_64":
+       environment = """
+[environment."case(os)".linux."case(host-arch)".x86-64]
+PATH.prepend = "${CRATE_ROOT}/bin"
+LIBRARY_PATH.prepend = "${CRATE_ROOT}/lib64"
+LD_LIBRARY_PATH.prepend = "${CRATE_ROOT}/lib64"
+LD_RUN_PATH.prepend = "${CRATE_ROOT}/lib64"
+
+[environment."case(os)".windows."case(host-arch)".x86-64]
+PATH.prepend = "${CRATE_ROOT}/bin"
+LIBRARY_PATH.prepend = "${CRATE_ROOT}/lib"
+LD_LIBRARY_PATH.prepend = "${CRATE_ROOT}/lib"
+LD_RUN_PATH.prepend = "${CRATE_ROOT}/lib"
+
+[environment."case(os)".macos."case(host-arch)".x86-64]
+PATH.prepend = "${CRATE_ROOT}/bin"
+LIBRARY_PATH.prepend = "${CRATE_ROOT}/lib"
+LD_LIBRARY_PATH.prepend = "${CRATE_ROOT}/lib"
+LD_RUN_PATH.prepend = "${CRATE_ROOT}/lib"
+"""
+    else:
+        environment = """
+[environment]
+PATH.prepend = "${CRATE_ROOT}/bin"
+"""
     MANIFEST_CONTENT = f"""
 name = "{CRATE}"
 version = "{CRATE_VERSION}"
@@ -82,10 +107,7 @@ auto-gpr-with = false
 
 [configuration]
 disabled = true
-
-[environment]
-PATH.prepend = "${{CRATE_ROOT}}/bin"
-
+{environment}
 [origin."case(os)".linux."case(host-arch)".x86-64]
 binary = true
 url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-{PKG_VERSION}/{linux_package}"
