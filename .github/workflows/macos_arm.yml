@@ -8,6 +8,9 @@ jobs:
     name: GNAT macOS
     runs-on: macos-14
     steps:
+    - name: Set Xcode 15.3
+      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
+
     - name: Checkout Project
       uses: actions/checkout@v2
 
@@ -133,6 +136,9 @@ jobs:
     steps:
     - name: Checkout Project
       uses: actions/checkout@v2
+
+    - name: Set Xcode 15.3
+      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
 
     - uses: actions/download-artifact@v2
       with:

@@ -16,8 +16,11 @@ class base_gcc(spec("common")):
 
     @property
     def url(self):
-        return "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-%s/%s" \
+        # Use Simon's GCC 13.3 compiler on Mac OS X ARM64 for bootstrap
+        return ("https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-%s/%s" \
                     % (self.version, self.tarball)
+                if self.env.target.cpu.name == "x86_64" else
+                "https://github.com/simonjwright/alire-index.mac/releases/download/toolchain-13.2.1/gcc-13.3.0-aarch64.tar.gz")
 
     @Anod.primitive()
     def build(self):
@@ -25,7 +28,7 @@ class base_gcc(spec("common")):
         with HTTPSession() as http:
             http.download_file(self.url, self["BUILD_DIR"], self.tarball)
 
-        # Exctract the archive
+        # Extract the archive
         unpack_archive(self.tarball, self["INSTALL_DIR"], remove_root_dir=True)
 
         # Delete the archive
