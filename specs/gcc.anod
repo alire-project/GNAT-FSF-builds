@@ -30,7 +30,7 @@ class GCC(spec("gh-artifact")):
                     if self.env.target.cpu.name == "x86_64"
                     else
                     "https://github.com/iains/gcc-14-branch/archive/refs/"
-                    + "tags/gcc-14.1-darwin-r0.tar.gz"
+                    + "tags/gcc-14.1-darwin-r1.tar.gz"
                 )
             ),
             self.LocalSourceBuilder(name=patch_name)
@@ -139,10 +139,6 @@ class GCC(spec("gh-artifact")):
             args.append("--disable-multilib")
 
             args.append("--disable-libcilkrts")
-
-            # Workaround for Xcode 12.5 bug on Intel
-            # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100340
-            args.append("--without-build-config")
 
             xcode = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
             clu = "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
