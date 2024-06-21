@@ -1,6 +1,7 @@
 from e3.anod.error import ShellError
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
+from e3.fs import mkdir, sync_tree
 import os
 
 
@@ -20,6 +21,9 @@ class GNU(spec("gh-artifact")):
         self.env.add_search_path(
             "LIBRARY_PATH", os.path.join(self["INSTALL_DIR"], "lib")
         )
+        self.env.add_search_path(
+            "LIBRARY_PATH", os.path.join(self["INSTALL_DIR"], "lib64")
+        )
 
     def artifact_build(self):
         # This spec inherit from gh-artifact and therefore has a different
@@ -36,5 +40,20 @@ class GNU(spec("gh-artifact")):
         self["make"](jobs=self.jobs)
         # Many projects fail when running `make install` with parallel jobs
         self["make"]("install", jobs=1)
+
+        lib_dir = os.path.join(self["INSTALL_DIR"], "lib")
+        lib64_dir = os.path.join(self["INSTALL_DIR"], "lib64")
+        if self.env.target.platform == "x86_64-linux":
+            # On some old x86_64-linux system gcc might changes drastically
+            # LIBRARY_PATH. For example if this var is set to /mydir/lib:/lib
+            # gcc might call ld with
+            # /mydir/lib/../lib64:/lib/../lib64:/mydir/lib:/lib
+            # The consequence is that sometimes we might pick the library from
+            # the system instead of the recently built one. So, make sure to
+            # provide lib64 as well as lib.
+
+            if os.path.isdir(lib_dir) and not os.path.isdir(lib64_dir):
+                mkdir(lib64_dir)
+                sync_tree(lib_dir, lib64_dir)
 
         self.clean()

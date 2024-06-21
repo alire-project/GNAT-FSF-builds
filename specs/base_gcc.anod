@@ -8,7 +8,7 @@ from e3.anod.spec import Anod
 class base_gcc(spec("common")):
     @property
     def version(self):
-        return "13.2.0-2"
+        return "14.1.0-3"
 
     @property
     def tarball(self):
@@ -25,7 +25,7 @@ class base_gcc(spec("common")):
         with HTTPSession() as http:
             http.download_file(self.url, self["BUILD_DIR"], self.tarball)
 
-        # Exctract the archive
+        # Extract the archive
         unpack_archive(self.tarball, self["INSTALL_DIR"], remove_root_dir=True)
 
         # Delete the archive

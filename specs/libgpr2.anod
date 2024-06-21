@@ -1,0 +1,140 @@
+from e3.os.fs import touch
+from e3.anod.helper import Make, text_replace
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+from e3.fs import cp, sync_tree
+from e3.diff import patch
+import os
+from datetime import date
+
+class LibGPR2(spec("common")):
+
+    @property
+    def is_next(self):
+        return 'next' in self.parsed_qualifier
+
+    @property
+    def version(self):
+        if self.is_next:
+            return "24.2.0-next"
+        else:
+            return "24.0.0"
+
+    @property
+    def lk_version(self):
+        return "24.0.0"
+
+    @property
+    def tarball(self):
+        return "gpr-%s.tar.gz" % self.version
+
+    @property
+    def lk_tarball(self):
+        return "langkit-py-%s.tar.gz" % self.lk_version
+
+    @property
+    def build_space_name(self):
+        if self.is_next:
+            return "%s-next" % (self.name)
+        else:
+            return self.name
+
+    @property
+    def source_pkg_build(self):
+        return [
+            self.HTTPSSourceBuilder(
+                name=self.tarball,
+                url="https://github.com/AdaCore/gpr/archive/v%s.tar.gz"
+                % ( self.version),
+            ),
+            self.HTTPSSourceBuilder(
+                name=self.lk_tarball,
+                url="https://github.com/AdaCore/langkit/archive/v%s.tar.gz"
+                % self.lk_version,
+            )
+        ]
+
+    @property
+    def build_source_list(self):
+        return [
+            Anod.Source(name=self.tarball, publish=True, dest=""),
+            Anod.Source(name=self.lk_tarball, publish=True, dest="langkit_src"),
+            Anod.Source(name=self.deps["gprconfig_kb"].tarball, publish=True,
+            dest="gprconfig_kb",
+            ),
+        ]
+
+    @property
+    def build_deps(self):
+        return [
+            Anod.Dependency("base_gcc", track=True),
+            Anod.Dependency("gprbuild", track=True),
+            Anod.Dependency("libgpr", track=True),
+            Anod.Dependency("xmlada", track=True),
+            Anod.Dependency("gnatcoll", track=True),
+            Anod.Dependency("gnatcoll-bindings", track=True),
+            Anod.Dependency("langkit_support", track=True),
+            Anod.Dependency("libadalang", track=True),
+            Anod.Dependency("gprconfig_kb", require="source_pkg", track=True),
+        ]
+
+    def update_version(self):
+        text_replace(
+            os.path.join(self["SRC_DIR"], "src", "lib", "gpr2-version.ads"),
+            [
+                (
+                    "Build_Type : constant GNAT_Build_Type.*",
+                    "Build_Type : constant GNAT_Build_Type := FSF;",
+                ),
+                (
+                    "Short_Value : constant String.*",
+                    'Short_Value : constant String := "%s";' % self.version,
+                ),
+                (
+                    "Date : constant String.*",
+                    'Date : constant String := "%s-gpr2";' % str(date.today()),
+                ),
+                (
+                    "Current_Year : constant String.*",
+                    'Current_Year : constant String := "%s";' % str(date.today().year),
+                ),
+            ],
+        )
+
+    @Anod.primitive()
+    def build(self):
+        for m in self.deps:
+            if m != "gprconfig_kb":
+                self.deps[m].setenv()
+
+        self.update_version()
+
+        # The SOURCE_DIR detection doesn't work on macOS, so we replace it with
+        # an absolute path.
+        print(os.path.join(self["SRC_DIR"], "Makefile"))
+        text_replace(os.path.join(self["SRC_DIR"], "Makefile"),
+                                  [("SOURCE_DIR := .*",
+                                   "SOURCE_DIR := " + self["SRC_DIR"])])
+
+        self.env.add_search_path("PYTHONPATH", os.path.join(self["SRC_DIR"], "langkit_src"))
+
+        make = Make(self,
+                    makefile=os.path.join(self["SRC_DIR"], "Makefile"),
+                    exec_dir=self["BUILD_DIR"],
+                    jobs=1)
+
+        make.set_var("prefix", self["INSTALL_DIR"])
+        make.set_var("GPR2_BUILD", "release")
+        make.set_var("FORCE_PARSER_GEN", "force")
+        make.set_var("GPR2KBDIR", os.path.join(self["SRC_DIR"], "gprconfig_kb", "db"))
+
+        for build_kind in ["static"]:
+            make("build-lib-%s" % build_kind)
+            make("install-lib-%s" % build_kind)
+        sync_tree(
+            os.path.join(self["SRC_DIR"], "examples"),
+            os.path.join(self["INSTALL_DIR"], "share", "examples", "gpr2"),
+            delete=True,
+            )
+
+        self.clean()

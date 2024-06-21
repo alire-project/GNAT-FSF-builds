@@ -104,3 +104,7 @@ class Common(Anod):
         if Env().main_options.enable_cleanup:
             rm(self["BUILD_DIR"], recursive=True)
             rm(self["SRC_DIR"], recursive=True)
+
+    @property
+    def host_is_macos_arm(self):
+        return self.env.host.os.name == "darwin" and self.env.host.cpu.name == "aarch64"

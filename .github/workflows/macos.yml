@@ -7,8 +7,8 @@ on:
 
 
 jobs:
-  gnat_gprbuild:
-    name: GNAT macOS and GPRbuild
+  gnat:
+    name: GNAT macOS
     runs-on: macos-12
     steps:
     - name: Checkout Project
@@ -35,14 +35,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
-    - name: Build GPRbuild
-      run: ./anod build gprbuild -v --loglevel DEBUG --enable-cleanup
-
-    - name: Package GPRbuild
-      run: ./anod build release_package --qualifier=package=gprbuild,do_gh_release -v --loglevel DEBUG
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
-
     - uses: actions/upload-artifact@v2
       with:
         name: anod-artifacts
@@ -56,19 +48,12 @@ jobs:
         retention-days: 5
 
 
-
-  gnatcov:
-    name: GNATcov
-    needs: gnat_gprbuild
+  gprbuild_gnatcov:
+    name: GPRbuild and GNATcov
     runs-on: macos-12
     steps:
     - name: Checkout Project
       uses: actions/checkout@v2
-
-    - uses: actions/download-artifact@v2
-      with:
-        name: anod-artifacts
-        path: in_artifacts/
 
     - name: Set up Python
       uses: actions/setup-python@v2
@@ -79,6 +64,15 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install e3-core==22.1.0
+
+    - name: Build GPRbuild
+      run: ./anod build gprbuild -v --loglevel DEBUG --enable-cleanup
+
+    - name: Package GPRbuild
+      run: ./anod build release_package --qualifier=package=gprbuild,do_gh_release -v --loglevel DEBUG
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
+
 
     - name: Build GNATcov
       run: ./anod build gnatcov -v --loglevel DEBUG --enable-cleanup
@@ -101,7 +95,7 @@ jobs:
       matrix:
         target: ["arm-elf", "riscv64-elf", "avr-elf"]
     name: GNAT ${{ matrix.target }}-darwin
-    needs: gnat_gprbuild
+    needs: gnat
     runs-on: macos-12
     steps:
     - name: Checkout Project
@@ -151,7 +145,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: 'adacore/why3'
-          ref: 'fsf-13'
+          ref: 'fsf-14'
 
       - name: Use Setup OCaml {{ matrix.ocaml-version }}
         uses: ocaml/setup-ocaml@v2
@@ -190,7 +184,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: 'adacore/alt-ergo'
-          ref: 'master'
+          ref: 'fsf-14'
 
       - name: Use Setup OCaml {{ matrix.ocaml-version }}
         uses: ocaml/setup-ocaml@v2

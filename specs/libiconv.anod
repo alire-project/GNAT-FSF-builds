@@ -30,7 +30,7 @@ class LibIconv(spec("common")):
 
     @property
     def build_deps(self):
-        return [Anod.Dependency("gcc")]
+        return [Anod.Dependency("base_gcc")]
 
     def setenv(self):
         self.env.add_search_path(
@@ -47,7 +47,8 @@ class LibIconv(spec("common")):
 
         configure = Configure(self)
         configure.add("--prefix=%s" % unixpath(self["INSTALL_DIR"]))
-        configure.add("--enable-static")
+        configure.add("--enable-static=yes")
+        configure.add("--enable-shared=no")
         configure.add("--enable-extra-encodings")
         configure.add("--disable-rpath")
         configure.add("--enable-silent-rules")
