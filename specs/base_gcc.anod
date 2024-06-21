@@ -8,7 +8,7 @@ from e3.anod.spec import Anod
 class base_gcc(spec("common")):
     @property
     def version(self):
-        return "14.1.0-2"
+        return "14.1.0-3"
 
     @property
     def tarball(self):
@@ -16,11 +16,8 @@ class base_gcc(spec("common")):
 
     @property
     def url(self):
-        # Use Simon's GCC 13.3 compiler on Mac OS X ARM64 for bootstrap
-        return ("https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-%s/%s" \
+        return "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-%s/%s" \
                     % (self.version, self.tarball)
-                if self.env.target.cpu.name == "x86_64" else
-                "https://github.com/simonjwright/alire-index.mac/releases/download/toolchain-13.2.1/gcc-13.3.0-aarch64.tar.gz")
 
     @Anod.primitive()
     def build(self):
