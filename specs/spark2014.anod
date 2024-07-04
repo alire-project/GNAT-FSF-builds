@@ -104,6 +104,9 @@ class SPARK2014(spec("common")):
             Anod.Dependency("why3"),
             Anod.Dependency("alt-ergo"),
             Anod.Dependency("gmp"),
+            Anod.Dependency("gmp",
+                            qualifier="shared_lib",
+                            local_name="gmp_shared"),
             Anod.Dependency("gprbuild"),
             Anod.Dependency("gnatcoll"),
             Anod.Dependency("gnatcoll-bindings"),
@@ -167,7 +170,7 @@ class SPARK2014(spec("common")):
         sync_tree(self.deps["why3"]["INSTALL_DIR"], libexec_spark, delete=False)
         sync_tree(self.deps["alt-ergo"]["INSTALL_DIR"], libexec_spark, delete=False)
         sync_tree(self.deps["gprbuild"]["INSTALL_DIR"], libexec_spark, delete=False)
-        sync_tree(self.deps["gmp"]["INSTALL_DIR"], libexec_spark, delete=False)
+        sync_tree(self.deps["gmp_shared"]["INSTALL_DIR"], libexec_spark, delete=False)
 
         sync_tree(os.path.join(self["SRC_DIR"], "z3"), libexec_spark, delete=False)
         sync_tree(os.path.join(self["SRC_DIR"], "cvc5"), libexec_spark, delete=False)
