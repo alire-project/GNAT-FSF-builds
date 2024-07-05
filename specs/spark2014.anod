@@ -114,6 +114,7 @@ class SPARK2014(spec("common")):
             Anod.Dependency("libgpr2", qualifier="next"),
             Anod.Dependency("libgpr"),
             Anod.Dependency("langkit_support"),
+            Anod.Dependency("adasat", track=True),
             Anod.Dependency("libadalang"),
         ]
 
@@ -135,7 +136,8 @@ class SPARK2014(spec("common")):
             jobs=self.jobs
         )
         for dep in self.deps:
-            self.deps[dep].setenv()
+            if dep not in ["gmp_shared"]:
+                self.deps[dep].setenv()
         make("all-nightly", jobs=1)
 
         self.install()
