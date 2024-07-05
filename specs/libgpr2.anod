@@ -74,7 +74,6 @@ class LibGPR2(spec("common")):
             Anod.Dependency("gnatcoll", track=True),
             Anod.Dependency("gnatcoll-bindings", track=True),
             Anod.Dependency("langkit_support", track=True),
-            Anod.Dependency("libadalang", track=True),
             Anod.Dependency("gprconfig_kb", require="source_pkg", track=True),
         ]
 
