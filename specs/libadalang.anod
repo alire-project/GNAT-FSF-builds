@@ -4,10 +4,10 @@ from e3.anod.loader import spec
 import os
 
 
-class Langkit(spec("common")):
+class Libadalang(spec("common")):
     @property
     def version(self):
-        return "22.0.0"
+        return "24.0.0"
 
     @property
     def tarball(self):
@@ -33,9 +33,11 @@ class Langkit(spec("common")):
             Anod.Dependency("base_gcc", track=True),
             Anod.Dependency("gprbuild", track=True),
             Anod.Dependency("libgpr", track=True),
+            Anod.Dependency("adasat", track=True),
+            Anod.Dependency("libgpr2"),
             Anod.Dependency("gnatcoll", track=True),
             Anod.Dependency("gnatcoll-bindings", track=True),
-            Anod.Dependency("langkit", track=True),
+            Anod.Dependency("langkit_support", track=True),
             Anod.Dependency("xmlada", track=True),
         ]
 
