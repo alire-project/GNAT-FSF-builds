@@ -10,7 +10,7 @@ import os
 class SPARK2014(spec("common")):
     @property
     def version(self):
-        return "14.1.0"
+        return "wavefront"
 
     @property
     def tarball(self):
@@ -25,7 +25,7 @@ class SPARK2014(spec("common")):
 
     @property
     def gcc_tarball(self):
-        return "gcc-%s.tar.gz" % self.version
+        return "master.tar.gz"
 
     @property
     def sparklib_tarball(self):
@@ -62,12 +62,12 @@ class SPARK2014(spec("common")):
         return [
             self.HTTPSSourceBuilder(
                 name=self.gcc_tarball,
-                url="https://ftp.gnu.org/gnu/gcc/gcc-%s/%s"
-                % (self.version, self.gcc_tarball),
+                url="https://github.com/gcc-mirror/gcc/archive/refs/heads/%s"
+                % (self.gcc_tarball),
             ),
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/adacore/spark2014/tarball/fsf-14",
+                url="https://github.com/adacore/spark2014/tarball/fsf",
             ),
             self.HTTPSSourceBuilder(
                 name=self.sparklib_tarball,
@@ -114,7 +114,7 @@ class SPARK2014(spec("common")):
             Anod.Dependency("libgpr2", qualifier="next"),
             Anod.Dependency("libgpr"),
             Anod.Dependency("langkit_support"),
-            Anod.Dependency("adasat", track=True),
+            Anod.Dependency("adasat"),
             Anod.Dependency("libadalang"),
         ]
 

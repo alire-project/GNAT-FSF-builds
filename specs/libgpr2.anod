@@ -16,21 +16,21 @@ class LibGPR2(spec("common")):
     @property
     def version(self):
         if self.is_next:
-            return "24.2.0-next"
+            return "next"
         else:
-            return "24.0.0"
+            return "master"
 
     @property
     def lk_version(self):
-        return "24.0.0"
+        return "master"
 
     @property
     def tarball(self):
-        return "gpr-%s.tar.gz" % self.version
+        return "gpr2-%s.tar.gz" % self.version
 
     @property
     def lk_tarball(self):
-        return "langkit-py-%s.tar.gz" % self.lk_version
+        return "langkit-%s.tar.gz" % self.lk_version
 
     @property
     def build_space_name(self):
@@ -44,13 +44,13 @@ class LibGPR2(spec("common")):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/AdaCore/gpr/archive/v%s.tar.gz"
-                % ( self.version),
+                url="https://github.com/AdaCore/gpr/tarball/%s"
+                % (self.version),
             ),
             self.HTTPSSourceBuilder(
                 name=self.lk_tarball,
-                url="https://github.com/AdaCore/langkit/archive/v%s.tar.gz"
-                % self.lk_version,
+                url="https://github.com/AdaCore/langkit/tarball/%s" %
+                (self.lk_version),
             )
         ]
 
@@ -106,7 +106,7 @@ class LibGPR2(spec("common")):
             if m != "gprconfig_kb":
                 self.deps[m].setenv()
 
-        self.update_version()
+        # self.update_version()
 
         # The SOURCE_DIR detection doesn't work on macOS, so we replace it with
         # an absolute path.

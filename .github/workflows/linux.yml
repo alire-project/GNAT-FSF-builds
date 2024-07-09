@@ -7,135 +7,6 @@ on:
 
 
 jobs:
-  gnat:
-    name: GNAT Linux
-    runs-on: ubuntu-20.04
-    steps:
-    - name: Checkout Project
-      uses: actions/checkout@v2
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install e3-core==22.1.0
-
-    - name: Install Ada dependencies
-      run: sudo apt-get install gnat bison
-
-    - name: Build GNAT native
-      run: ./anod build gcc -v --loglevel DEBUG --enable-cleanup
-
-    - name: Build GDB
-      run: ./anod build gdb -v --loglevel DEBUG --enable-cleanup
-
-    - name: Package GNAT
-      run: ./anod build release_package --qualifier=package=gnat,do_gh_release -v --loglevel DEBUG
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: anod-artifacts
-        path: out_artifacts/*
-        retention-days: 1
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: release-packages
-        path: sbx/*/release_package*/install/*
-        retention-days: 5
-
-
-
-  gprbuild_gnatcov:
-    name: GPRbuild and GNATcov
-    runs-on: ubuntu-20.04
-    steps:
-    - name: Checkout Project
-      uses: actions/checkout@v2
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install e3-core==22.1.0
-
-    - name: Build GPRbuild
-      run: ./anod build gprbuild -v --loglevel DEBUG --enable-cleanup
-
-    - name: Package GPRbuild
-      run: ./anod build release_package --qualifier=package=gprbuild,do_gh_release -v --loglevel DEBUG
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
-
-    - name: Build GNATcov
-      run: ./anod build gnatcov -v --loglevel DEBUG --enable-cleanup
-
-    - name: Package GNATcov
-      run: ./anod build release_package --qualifier=package=gnatcov,do_gh_release -v --loglevel DEBUG
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: release-packages
-        path: sbx/*/release_package*/install/*
-        retention-days: 5
-
-
-
-  gnat_cross:
-    strategy:
-      matrix:
-        target: ["arm-elf", "riscv64-elf", "avr-elf"]
-    name: GNAT ${{ matrix.target }}-linux
-    needs: gnat
-    runs-on: ubuntu-20.04
-    steps:
-    - name: Checkout Project
-      uses: actions/checkout@v2
-
-    - uses: actions/download-artifact@v2
-      with:
-        name: anod-artifacts
-        path: in_artifacts/
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install e3-core==22.1.0
-
-    - name: Build GNAT ${{ matrix.target }}
-      run: ./anod build gcc -v --loglevel DEBUG --target=${{ matrix.target }} --enable-cleanup
-
-    - name: Build GDB ${{ matrix.target }}
-      run: ./anod build gdb -v --loglevel DEBUG --target=${{ matrix.target }} --enable-cleanup
-
-    - name: Package GNAT ${{ matrix.target }}
-      run: ./anod build release_package --qualifier=package=gnat,do_gh_release --target=${{ matrix.target }} -v --loglevel DEBUG
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: release-packages
-        path: sbx/*/release_package*/install/*
-        retention-days: 5
-
 
   why3:
     strategy:
@@ -149,7 +20,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: 'adacore/why3'
-          ref: 'fsf-14'
+          ref: 'fsf'
 
       - name: Use Setup OCaml {{ matrix.ocaml-version }}
         uses: ocaml/setup-ocaml@v2
@@ -187,7 +58,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: 'adacore/alt-ergo'
-          ref: 'fsf-14'
+          ref: 'fsf'
 
       - name: Use Setup OCaml {{ matrix.ocaml-version }}
         uses: ocaml/setup-ocaml@v2

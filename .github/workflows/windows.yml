@@ -6,183 +6,6 @@ on:
   pull_request:
 
 jobs:
-  gnat:
-    name: GNAT Windows
-    runs-on: windows-2019
-    env:
-      CONFIG_SHELL: /bin/bash
-    defaults:
-      run:
-        shell: msys2 {0}
-    steps:
-    - name: Checkout Project
-      uses: actions/checkout@v2
-
-    - name: Install msys2
-      uses: msys2/setup-msys2@v2
-      with:
-        install: >-
-          base-devel
-          git
-          mingw-w64-x86_64-github-cli
-          mingw-w64-x86_64-toolchain
-          mingw-w64-x86_64-python
-          mingw-w64-x86_64-python-pip
-          mingw-w64-x86_64-python-psutil
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install e3-core==22.1.0
-
-    - name: Prepare msys2 build setup
-      # We need a path that is compatible between Windows and Unix world
-      run: df -h; mkdir /c/aaa; mount C:/aaa /aaa ; cd ..; cp -r GNAT-FSF-builds /aaa
-
-    - name: Build GNAT native
-      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gcc -v --loglevel DEBUG --enable-cleanup
-
-    - name: Build GDB
-      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gdb -v --loglevel DEBUG --enable-cleanup
-
-    - name: Package GNAT
-      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_package --qualifier=package=gnat,do_gh_release -v --loglevel DEBUG
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: anod-artifacts
-        path: C:/aaa/GNAT-FSF-builds/out_artifacts/*
-        retention-days: 1
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: release-packages
-        path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
-        retention-days: 5
-
-
-
-  gprbuild_gnatcov:
-    name: GPRbuild and GNATcov
-    runs-on: windows-2019
-    env:
-      CONFIG_SHELL: /bin/bash
-    defaults:
-      run:
-        shell: msys2 {0}
-    steps:
-    - name: Checkout Project
-      uses: actions/checkout@v2
-
-    - name: Install msys2
-      uses: msys2/setup-msys2@v2
-      with:
-        install: >-
-          base-devel
-          git
-          mingw-w64-x86_64-toolchain
-          mingw-w64-x86_64-github-cli
-          mingw-w64-x86_64-python
-          mingw-w64-x86_64-python-pip
-          mingw-w64-x86_64-python-psutil
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install e3-core==22.1.0
-
-    - name: Prepare msys2 build setup
-      # We need a path that is compatible between Windows and Unix world
-      run: df -h; mkdir /c/aaa; mount C:/aaa /aaa ; cd ..; cp -r GNAT-FSF-builds /c/aaa
-
-
-    - name: Build GPRbuild
-      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gprbuild -v --loglevel DEBUG --enable-cleanup
-
-    - name: Package GPRbuild
-      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_package --qualifier=package=gprbuild,do_gh_release -v --loglevel DEBUG
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
-
-
-    - name: Build GNATcov
-      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gnatcov -v --loglevel DEBUG --enable-cleanup
-
-    - name: Package GNATcov
-      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_package --qualifier=package=gnatcov,do_gh_release -v --loglevel DEBUG
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: release-packages
-        path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
-        retention-days: 5
-
-
-
-
-
-
-  gnat_cross:
-    strategy:
-      matrix:
-        target: ["arm-elf", "riscv64-elf", "avr-elf"]
-    name: GNAT ${{ matrix.target }}-windows
-    needs: gnat
-    runs-on: windows-2019
-    env:
-      CONFIG_SHELL: /bin/bash
-    defaults:
-      run:
-        shell: msys2 {0}
-    steps:
-    - name: Checkout Project
-      uses: actions/checkout@v2
-
-    - name: Install msys2
-      uses: msys2/setup-msys2@v2
-      with:
-        install: >-
-          base-devel
-          git
-          mingw-w64-x86_64-toolchain
-          mingw-w64-x86_64-github-cli
-          mingw-w64-x86_64-python
-          mingw-w64-x86_64-python-pip
-          mingw-w64-x86_64-python-psutil
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install e3-core==22.1.0
-
-    - name: Prepare msys2 build setup
-      # We need a path that is compatible between Windows and Unix world
-      run: df -h; mkdir /c/aaa; mount C:/aaa /aaa ; cd ..; cp -r GNAT-FSF-builds /aaa
-
-    - uses: actions/download-artifact@v2
-      with:
-        name: anod-artifacts
-        path: C:/aaa/GNAT-FSF-builds/in_artifacts/
-
-
-    - name: Build GNAT ${{ matrix.target }}
-      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gcc -v --loglevel DEBUG --target=${{ matrix.target }} --enable-cleanup
-
-    - name: Build GDB ${{ matrix.target }}
-      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gdb -v --loglevel DEBUG --target=${{ matrix.target }} --enable-cleanup
-
-    - name: Package GNAT ${{ matrix.target }}
-      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_package --qualifier=package=gnat,do_gh_release --target=${{ matrix.target }} -v --loglevel DEBUG
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: release-packages
-        path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
-        retention-days: 5
-
 
   why3:
     strategy:
@@ -195,7 +18,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: 'adacore/why3'
-          ref: 'fsf-14'
+          ref: 'fsf'
 
       - name: Use Setup OCaml v1 ${{ matrix.ocaml-version }}
         uses: ocaml/setup-ocaml@v2
@@ -233,7 +56,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: 'adacore/alt-ergo'
-          ref: 'fsf-14'
+          ref: 'fsf'
 
       - name: Use Setup OCaml {{ matrix.ocaml-version }}
         uses: ocaml/setup-ocaml@v2
