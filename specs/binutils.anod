@@ -8,9 +8,17 @@ from e3.anod.loader import spec
 
 
 class Binutils(spec("common")):
+
+    @property
+    def for_gnatcov (self):
+        return "gnatcov" in self.parsed_qualifier
+
     @property
     def version(self):
-        return "2.42"
+        if self.for_gnatcov:
+            return "2.40"
+        else:
+            return "2.42"
 
     @property
     def tarball(self):
@@ -41,32 +49,54 @@ class Binutils(spec("common")):
 
         return deps
 
+    @property
+    def build_space_name(self):
+        if self.for_gnatcov:
+            return "%s-gnatcov" % self.name
+        else:
+            return self.name
+
     def merge(self, prefix):
         sync_tree(self["INSTALL_DIR"], prefix, delete=False)
 
     @Anod.primitive()
     def build(self):
+
         for m in self.deps:
             self.deps[m].setenv()
 
         configure = Configure(self)
         configure.add("--prefix=%s" % unixpath(self["INSTALL_DIR"]))
-        configure.add(
-            "--disable-nls",
-            "--disable-shared",
-            "--disable-werror",
-            "--with-zlib",
-            "--without-zstd",
-            "--disable-compressed-debug-sections",
-            "--disable-separate-code",
-            "--disable-gdb",
-            "--disable-sim",
-            "--disable-libquadmath",
-            "--disable-readline",
-        )
 
-        # For embedded only?
-        configure.add("--enable-multilib")
+        if self.for_gnatcov:
+           configure.add("--disable-ld",
+                         "--disable-gdb",
+                         "--disable-gdbserver",
+                         "--disable-libquadmath",
+                         "--disable-nls",
+                         "--disable-readline",
+                         "--disable-sim",
+                         "--disable-werror",
+                         "--enable-gprofng=no",
+                         "--with-static-standard-libraries",
+                         "--enable-targets=all")
+           # For embedded only?
+           configure.add("--enable-multilib")
+
+        else:
+           configure.add(
+               "--disable-nls",
+               "--disable-shared",
+               "--disable-werror",
+               "--with-zlib",
+               "--without-zstd",
+               "--disable-compressed-debug-sections",
+               "--disable-separate-code",
+               "--disable-gdb",
+               "--disable-sim",
+               "--disable-libquadmath",
+               "--disable-readline",
+           )
 
         for m in ("mpfr", "gmp", "mpc", "isl"):
             configure.add("--with-%s=%s" % (m, unixpath(self.deps[m]["INSTALL_DIR"])))
@@ -74,9 +104,14 @@ class Binutils(spec("common")):
         configure()
 
         make = Make(self)
+
+        if self.for_gnatcov:
+           make.set_var("CFLAGS", " -fcommon")
+           make.set_var("CXXFLAGS", " -fcommon")
+           make.set_var("LDFLAGS", " -fcommon")
+
         make()
         make("install")
-
 
         # https://github.com/msys2/MINGW-packages/issues/7890
         if self.env.build.os.name == "windows":
