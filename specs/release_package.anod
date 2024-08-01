@@ -47,7 +47,7 @@ class ReleasePackage(spec("common")):
         package = self.package
 
         if package == "gprbuild":
-            return "1"
+            return "2"
         elif package == "gnatcov":
             return "1"
         elif package == "gnatprove":
