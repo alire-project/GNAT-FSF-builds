@@ -59,6 +59,8 @@ class ReleasePackage(spec("common")):
                 return "3"
             elif self.env.target.triplet == "avr-elf":
                 return "3"
+            elif self.env.target.triplet == "xtensa-esp32-elf":
+                return "3"
             else:
                 return "3"
 
@@ -129,6 +131,12 @@ class ReleasePackage(spec("common")):
                     Anod.Dependency("gcc", track=True),
                     Anod.Dependency("gdb", track=True),
                     Anod.Dependency("avrlibc", track=True),
+                ]
+
+            elif self.env.target.triplet == "xtensa-esp32-elf":
+                return [
+                    Anod.Dependency("gcc", track=True),
+                    Anod.Dependency("gdb", track=True),
                 ]
 
             elif self.env.host.triplet == self.env.target.triplet:

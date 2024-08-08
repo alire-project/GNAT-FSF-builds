@@ -1,0 +1,26 @@
+--- my-virtual-env/lib/python3.10/site-packages/e3/platform_db/knowledge_base.py	2024-08-16 09:12:34.234094200 +0300
++++ my-virtual-env/lib/python3.10/site-packages/e3/platform_db/knowledge_base.py	2024-08-16 09:13:03.987098168 +0300
+@@ -10,6 +10,7 @@
+     "aarch64": {"endian": "little", "bits": 64},
+     "arm": {"endian": "little", "bits": 32},
+     "avr": {"endian": "little", "bits": 16},
++    "esp32": {"endian": "little", "bits": 32},
+     "powerpc": {"endian": "big", "bits": 32},
+     "powerpc64": {"endian": "big", "bits": 64},
+     "sparc": {"endian": "big", "bits": 32},
+@@ -81,6 +82,7 @@
+     "arm-ios": {"cpu": "arm", "os": "ios", "is_hie": False},
+     "avr-elf": {"cpu": "avr", "os": "none", "is_hie": True},
+     "arm-linux": {"cpu": "arm", "os": "linux", "is_hie": False, "endian": "little"},
++    "esp32-elf": {"cpu": "esp32", "os": "none", "is_hie": True},
+     "ppc-aix": {"cpu": "powerpc", "os": "aix", "is_hie": False},
+     "ppc-linux": {"cpu": "powerpc", "os": "linux", "is_hie": False},
+     "raspberrypi-linux": {
+@@ -118,6 +120,7 @@
+     "arm-ios": {"name": "arm-apple-darwin10"},
+     "avr-elf": {"name": "avr"},
+     "arm-linux": {"name": "arm-linux-gnueabi"},
++    "esp32-elf": {"name": "xtensa-esp32-elf"},
+     "ppc-aix": {"name": "powerpc-ibm-aix%(os_version)s.0.0"},
+     "ppc-linux": {"name": "powerpc-generic-linux-gnu"},
+     "raspberrypi-linux": {"name": "arm-linux-gnueabihf"},

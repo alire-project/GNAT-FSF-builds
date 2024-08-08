@@ -53,6 +53,7 @@ class GCC(spec("gh-artifact")):
             self.env.target.triplet == "arm-eabi"
             or self.env.target.triplet == "riscv64-elf"
             or self.env.target.triplet == "avr-elf"
+            or self.env.target.triplet.endswith("esp32-elf")
         )
 
     @property
