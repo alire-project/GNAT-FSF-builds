@@ -126,6 +126,7 @@ jobs:
 
   gnat_cross:
     strategy:
+      fail-fast: false
       matrix:
         target: ["arm-elf", "esp32-elf", "riscv64-elf", "avr-elf"]
     name: GNAT ${{ matrix.target }}-windows
