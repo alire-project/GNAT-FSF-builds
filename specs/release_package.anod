@@ -54,15 +54,15 @@ class ReleasePackage(spec("common")):
             return "1"
         elif package == "gnat":
             if self.env.target.triplet == "arm-eabi":
-                return "3"
+                return "1"
             elif self.env.target.triplet == "riscv64-elf":
-                return "3"
+                return "1"
             elif self.env.target.triplet == "avr-elf":
-                return "3"
+                return "1"
             elif self.env.target.triplet == "xtensa-esp32-elf":
-                return "3"
+                return "1"
             else:
-                return "3"
+                return "1"
 
     @property
     def release_name(self):

@@ -13,7 +13,7 @@ patch_name = "ld"
 class GCC(spec("gh-artifact")):
     @property
     def version(self):
-        return "14.1.0"
+        return "14.2.0"
 
     @property
     def tarball(self):
@@ -30,7 +30,7 @@ class GCC(spec("gh-artifact")):
                     if not self.host_is_macos_arm
                     else
                     "https://github.com/iains/gcc-14-branch/archive/refs/"
-                    + "tags/gcc-14.1-darwin-r1.tar.gz"
+                    + "tags/gcc-14.2-darwin-r1.tar.gz"
                 )
             ),
             self.LocalSourceBuilder(name=patch_name)
