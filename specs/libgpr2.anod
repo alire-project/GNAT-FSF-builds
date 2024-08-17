@@ -112,7 +112,7 @@ class LibGPR2(spec("common")):
         # an absolute path.
         print(os.path.join(self["SRC_DIR"], "Makefile"))
         text_replace(os.path.join(self["SRC_DIR"], "Makefile"),
-                                  [("SOURCE_DIR := .*",
+                                  [("SOURCE_DIR *:= .*",
                                    "SOURCE_DIR := " + self["SRC_DIR"])])
 
         self.env.add_search_path("PYTHONPATH", os.path.join(self["SRC_DIR"], "langkit_src"))
