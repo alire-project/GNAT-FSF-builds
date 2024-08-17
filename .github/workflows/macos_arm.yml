@@ -64,6 +64,9 @@ jobs:
     - name: Checkout Project
       uses: actions/checkout@v2
 
+    - name: Install texinfo with Homebrew
+      run: brew install texinfo
+
     - uses: actions/download-artifact@v2
       with:
         name: anod-artifacts
@@ -103,7 +106,7 @@ jobs:
     strategy:
       matrix:
         ocaml-compiler:
-          - 4.11.2
+          - 4.12.1
     runs-on: macos-14
     steps:
       - name: Checkout code
@@ -141,7 +144,7 @@ jobs:
     strategy:
       matrix:
         ocaml-compiler:
-          - "4.11.2"
+          - "4.12.1"
 
     runs-on: macos-14
     steps:
