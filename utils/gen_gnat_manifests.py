@@ -14,6 +14,7 @@ targets = {
     "x86_64": {"crate": "gnat_native", "description": "Native"},
     "arm-elf": {"crate": "gnat_arm_elf", "description": "ARM cross-compiler"},
     "avr-elf": {"crate": "gnat_avr_elf", "description": "RISC-V cross-compiler"},
+    "xtensa-elf": {"crate": "gnat_xtensa_elf", "description": "Xtensa LX7 cross-compiler"},
     "riscv64-elf": {"crate": "gnat_riscv64_elf", "description": "AVR cross-compiler"},
 }
 

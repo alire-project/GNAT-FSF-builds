@@ -9,8 +9,6 @@ This can be done in a virtual env, e.g.:
 $ python3 -m venv my-virtual-env
 $ source my-virtual-env/bin/activate
 $ pip install e3-core==22.1.0
-# For esp32 only:
-$ patch -p1 < esp32-e3.patch
 ```
 
 To build a spec, for example `mpc`, run the `anod` script:

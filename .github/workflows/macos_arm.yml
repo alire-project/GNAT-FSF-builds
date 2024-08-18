@@ -54,7 +54,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        target: ["arm-elf", "esp32-elf", "riscv64-elf"] # , "avr-elf"]
+        target: ["arm-elf", "riscv64-elf", "xtensa-elf"] # , "avr-elf"]
         # libc-avr doesn't recognize aarch64-apple machine
         # https://github.com/avrdudes/avr-libc/issues/978
     name: GNAT ${{ matrix.target }}-darwin
@@ -84,8 +84,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install e3-core==22.1.0
-        FILE=$(python -c "import e3.platform_db.knowledge_base;print (e3.platform_db.knowledge_base.__file__)")
-        patch "$FILE" ./esp32-e3.patch
 
     - name: Build GNAT ${{ matrix.target }}
       run: ./anod build gcc -v --loglevel DEBUG --target=${{ matrix.target }} --enable-cleanup
