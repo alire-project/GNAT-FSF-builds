@@ -64,9 +64,18 @@ class ReleasePackage(spec("common")):
 
     @property
     def release_name(self):
+        platform = self.env.platform
+
+        # The target triplet for cross compilers on macOS (darwin) x86 and
+        # aarch64 is the same, to differentiate the two hosts we add host CPU
+        # name at the end of platform name. And for consistency we do this on
+        # all other hosts as well.
+        if self.env.is_cross:
+            platform += "-" + self.env.host.cpu.name
+
         return "%s-%s-%s-%s" % (
             self.package,
-            self.env.platform,
+            platform,
             self.version,
             self.package_release,
         )
