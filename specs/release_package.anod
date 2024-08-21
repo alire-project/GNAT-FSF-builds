@@ -140,6 +140,12 @@ class ReleasePackage(spec("common")):
                     Anod.Dependency("avrlibc", track=True),
                 ]
 
+            elif self.env.target.triplet == "xtensa-esp32-elf":
+                return [
+                    Anod.Dependency("gcc", track=True),
+                    Anod.Dependency("gdb", track=True),
+                ]
+
             elif self.env.host.triplet == self.env.target.triplet:
                 # Native
                 return [

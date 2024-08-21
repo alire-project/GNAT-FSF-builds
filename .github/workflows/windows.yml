@@ -127,7 +127,7 @@ jobs:
   gnat_cross:
     strategy:
       matrix:
-        target: ["arm-elf", "riscv64-elf", "avr-elf"]
+        target: ["arm-elf", "riscv64-elf", "avr-elf", "xtensa-esp32-elf"]
     name: GNAT ${{ matrix.target }}-windows
     needs: gnat
     runs-on: windows-2019
