@@ -53,7 +53,10 @@ jobs:
   gnat_cross:
     strategy:
       matrix:
-        target: ["arm-elf", "riscv64-elf", "avr-elf"]
+        target: ["arm-elf", "riscv64-elf", "xtensa-esp32-elf"]
+        # We don't enable avr on aarch64 macOS as libc-avr doesn't recognize
+        # aarch64-apple machine https://github.com/avrdudes/avr-libc/issues/978
+
     name: GNAT ${{ matrix.target }}-darwin
     needs: gnat
     runs-on: macos-14

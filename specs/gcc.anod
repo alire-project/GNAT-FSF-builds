@@ -176,6 +176,11 @@ class GCC(spec("gh-artifact")):
             args += cross_commons
             args.append("--enable-multilib")
 
+        if self.env.target.triplet == "extensa-esp32-elf":
+            args += cross_commons
+            args.append("--enable-multilib")
+
+
         return args
 
     def artifact_build(self):
