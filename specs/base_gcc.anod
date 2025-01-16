@@ -1,5 +1,5 @@
 from e3.net.http import HTTPSession
-from e3.fs import rm
+from e3.fs import rm, cp
 from e3.archive import unpack_archive
 from e3.anod.loader import spec
 from e3.anod.spec import Anod
@@ -8,7 +8,7 @@ from e3.anod.spec import Anod
 class base_gcc(spec("common")):
     @property
     def version(self):
-        return "14.1.0-3"
+        return "14.2.0-0"
 
     @property
     def tarball(self):
@@ -21,9 +21,7 @@ class base_gcc(spec("common")):
 
     @Anod.primitive()
     def build(self):
-        # Download the archive
-        with HTTPSession() as http:
-            http.download_file(self.url, self["BUILD_DIR"], self.tarball)
+        cp ("/tmp/%s" % self.tarball, self["BUILD_DIR"])
 
         # Extract the archive
         unpack_archive(self.tarball, self["INSTALL_DIR"], remove_root_dir=True)

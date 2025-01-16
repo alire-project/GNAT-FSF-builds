@@ -9,7 +9,7 @@ on:
 jobs:
   gnat:
     name: GNAT Linux
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04-arm # ubuntu-20.04
     steps:
     - name: Checkout Project
       uses: actions/checkout@v2
@@ -25,7 +25,17 @@ jobs:
         pip install e3-core==22.1.0
 
     - name: Install Ada dependencies
-      run: sudo apt-get install gnat bison
+      run: sudo apt-get install gnat bison texinfo
+
+    - name: Build fake bootstrap compiler
+      run: |
+        mkdir -p gnat-debian-stub/bin/
+        cat > gnat-debian-stub/bin/gcc <<EOF
+        #/bin/bash
+        /usr/bin/gnatgcc "\$@"
+        EOF
+        chmod +x gnat-debian-stub/bin/gcc
+        tar cavf /tmp/gnat-aarch64-linux-14.2.0-0.tar.gz gnat-debian-stub
 
     - name: Build GNAT native
       run: ./anod build gcc -v --loglevel DEBUG --enable-cleanup
