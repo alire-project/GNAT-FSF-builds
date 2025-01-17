@@ -12,10 +12,10 @@ jobs:
     runs-on: ubuntu-22.04-arm # ubuntu-20.04
     steps:
     - name: Checkout Project
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: 3.8
 
@@ -48,13 +48,13 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       with:
         name: anod-artifacts
         path: out_artifacts/*
         retention-days: 1
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       with:
         name: release-packages
         path: sbx/*/release_package*/install/*
@@ -67,10 +67,10 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - name: Checkout Project
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: 3.8
 
@@ -95,7 +95,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       with:
         name: release-packages
         path: sbx/*/release_package*/install/*
@@ -112,15 +112,15 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - name: Checkout Project
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v4
       with:
         name: anod-artifacts
         path: in_artifacts/
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: 3.8
 
@@ -140,7 +140,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       with:
         name: release-packages
         path: sbx/*/release_package*/install/*
@@ -156,7 +156,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: 'adacore/why3'
           ref: 'fsf-14'
@@ -180,7 +180,7 @@ jobs:
       - run: git log --format="%H" -n 1 > /tmp/why3install/why3-version.txt
 
       - name: Upload the build artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: why3
           path: /tmp/why3install
@@ -194,7 +194,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: 'adacore/alt-ergo'
           ref: 'fsf-14'
@@ -209,7 +209,7 @@ jobs:
       - run: git log --format="%H" -n 1 > /tmp/alt-ergo-install/alt-ergo-version.txt
 
       - name: Upload the build artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: alt-ergo
           path: /tmp/alt-ergo-install
@@ -221,14 +221,14 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - name: Checkout Project
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v4
       with:
         name: alt-ergo
         path: alt-ergo_artifact/
 
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v4
       with:
         name: why3
         path: why3_artifact/
@@ -251,7 +251,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       with:
         name: release-packages
         path: sbx/*/release_package*/install/*
