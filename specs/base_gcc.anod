@@ -8,7 +8,7 @@ from e3.anod.spec import Anod
 class base_gcc(spec("common")):
     @property
     def version(self):
-        return "14.1.0-3"
+        return "14.2.0-1"
 
     @property
     def tarball(self):
@@ -16,7 +16,10 @@ class base_gcc(spec("common")):
 
     @property
     def url(self):
-        return "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-%s/%s" \
+        if self.env.platform == "aarch64-linux":
+            return "https://github.com/Fabien-Chouteau/GNAT-FSF-builds/releases/download/tmp-14.2-3-aarch64/gnat-aarch64-linux-14.2.0-3.tar.gz"
+        else:
+            return "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-%s/%s" \
                     % (self.version, self.tarball)
 
     @Anod.primitive()

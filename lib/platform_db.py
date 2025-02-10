@@ -25,6 +25,7 @@ class PlatDB(PlatformDBPlugin):
         self.host_guess.update(
             {
                 "aarch64-darwin": {"os": "Darwin", "cpu": "arm64"},
+                "aarch64-linux": {"os": "Linux", "cpu": "aarch64"},
                 "x86_64-windows64": {
                     "os": "Windows",
                     "cpu": "AMD64",

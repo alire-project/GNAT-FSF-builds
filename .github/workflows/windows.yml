@@ -16,7 +16,7 @@ jobs:
         shell: msys2 {0}
     steps:
     - name: Checkout Project
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Install msys2
       uses: msys2/setup-msys2@v2
@@ -49,13 +49,13 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: anod-artifacts
         path: C:/aaa/GNAT-FSF-builds/out_artifacts/*
         retention-days: 1
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: release-packages
         path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
@@ -73,7 +73,7 @@ jobs:
         shell: msys2 {0}
     steps:
     - name: Checkout Project
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Install msys2
       uses: msys2/setup-msys2@v2
@@ -113,7 +113,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       with:
         name: release-packages
         path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
@@ -138,7 +138,7 @@ jobs:
         shell: msys2 {0}
     steps:
     - name: Checkout Project
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Install msys2
       uses: msys2/setup-msys2@v2
@@ -177,7 +177,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       with:
         name: release-packages
         path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
@@ -192,7 +192,7 @@ jobs:
     runs-on: windows-2019
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: 'adacore/why3'
           ref: 'fsf-14'
@@ -216,7 +216,7 @@ jobs:
       - run: git log --format="%H" -n 1 > C:/why3install/why3-version.txt
 
       - name: Upload the build artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: why3
           path: C:/why3install
@@ -230,7 +230,7 @@ jobs:
     runs-on: windows-2019
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: 'adacore/alt-ergo'
           ref: 'fsf-14'
@@ -245,7 +245,7 @@ jobs:
       - run: git log --format="%H" -n 1 > C:/alt-ergo-install/alt-ergo-version.txt
 
       - name: Upload the build artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: alt-ergo
           path: C:/alt-ergo-install
@@ -262,7 +262,7 @@ jobs:
         shell: msys2 {0}
     steps:
     - name: Checkout Project
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Install msys2
       uses: msys2/setup-msys2@v2
@@ -284,12 +284,12 @@ jobs:
       # We need a path that is compatible between Windows and Unix world
       run: df -h; mkdir /c/aaa; mount C:/aaa /aaa ; cd ..; cp -r GNAT-FSF-builds /c/aaa
 
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v4
       with:
         name: alt-ergo
         path: C:/aaa/GNAT-FSF-builds/alt-ergo_artifact/
 
-    - uses: actions/download-artifact@v2
+    - uses: actions/download-artifact@v4
       with:
         name: why3
         path: C:/aaa/GNAT-FSF-builds/why3_artifact/
@@ -302,7 +302,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v4
       with:
         name: release-packages
         path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
