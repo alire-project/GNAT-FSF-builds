@@ -45,9 +45,8 @@ class Common(Anod):
 
         if add_dll_path:
             # Update library path.
-            lib_dirs = [os.path.join(prefix, "lib")]
-            if self.env.target.platform == "x86_64-linux":
-                lib_dirs.append(os.path.join(prefix, "lib64"))
+            lib_dirs = [os.path.join(prefix, "lib"),
+	                os.path.join(prefix, "lib64")]
 
             for directory in lib_dirs:
                 if os.path.exists(directory):
