@@ -1,0 +1,11 @@
+--- llvm-interface/Makefile	2025-02-08 18:51:56.297742221 +0400
++++ llvm-interface/Makefile	2025-02-08 18:52:10.993815535 +0400
+@@ -32,7 +32,7 @@
+   CLANG_CXXFLAGS=
+ endif
+ 
+-LDFLAGS=$(shell $(LLVM_CONFIG) --libs all --ldflags --system-libs)
++LDFLAGS=$(shell $(LLVM_CONFIG) --libs all --ldflags --system-libs) $(ANOD_LDFLAGS)
+ CXXFLAGS=
+ ALL_CXXFLAGS=$(shell $(LLVM_CONFIG) --cxxflags) $(CXXFLAGS) $(CLANG_CXXFLAGS)
+ LLVM_INCLUDE_DIR=$(shell $(LLVM_CONFIG) --includedir)

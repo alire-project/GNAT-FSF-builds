@@ -1,0 +1,197 @@
+import os
+
+from e3.anod.helper import Make
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+from e3.diff import patch
+from e3.fs import cp, sync_tree
+
+
+class GNATLLVM_WASM32(spec("gnu")):
+    version = "14.0.0"
+    tarball = "%s.zip" % version
+    patch_name = "adawebpack-build.patch"
+    runtimexml_name = "adawebpack-runtime.xml"
+
+    gcc_version = "14.2.0"
+    gcc_tarball = "gcc-%s.tar.gz" % gcc_version
+    gnatllvm_tarball = "66e36d929524972353600db5d604d0189cf0308f.zip"
+    bbruntimes_tarball = "gnat-fsf-14.zip"
+
+    @property
+    def source_pkg_build(self):
+        return [
+            self.HTTPSSourceBuilder(
+                name=self.tarball,
+                url="https://github.com/godunko/adawebpack/archive/refs/tags/"
+                + self.tarball,
+            ),
+            self.HTTPSSourceBuilder(
+                name=self.gcc_tarball,
+                url="https://ftp.gnu.org/gnu/gcc/gcc-%s/%s"
+                % (self.gcc_version, self.gcc_tarball),
+            ),
+            self.HTTPSSourceBuilder(
+                name=self.gnatllvm_tarball,
+                url="https://github.com/AdaCore/gnat-llvm/archive/"
+                + self.gnatllvm_tarball,
+            ),
+            self.HTTPSSourceBuilder(
+                name=self.bbruntimes_tarball,
+                url="https://github.com/Fabien-Chouteau/bb-runtimes/archive/refs/heads/"
+                + self.bbruntimes_tarball,
+            ),
+            self.LocalSourceBuilder(name=self.patch_name),
+            self.LocalSourceBuilder(name=self.runtimexml_name),
+        ]
+
+    @property
+    def build_source_list(self):
+        return [
+            Anod.Source(name=self.tarball, publish=True, dest="adawebpack"),
+            Anod.Source(name=self.gcc_tarball, publish=True, dest="gcc"),
+            Anod.Source(name=self.gnatllvm_tarball, publish=True, dest="gnat-llvm"),
+            Anod.Source(name=self.bbruntimes_tarball, publish=True, dest="bb-runtimes"),
+            self.Source(
+                name=self.patch_name, publish=True, unpack_cmd=cp, dest="patches"
+            ),
+            self.Source(
+                name=self.runtimexml_name, publish=True, unpack_cmd=cp, dest="patches"
+            ),
+        ]
+
+    @property
+    def build_deps(self):
+        return [
+            Anod.Dependency("gprbuild", target="host", track=True),
+        ] + self.compiler_deps()
+
+    def prepare_build_tree(self):
+        """
+        Setup build tree - copy all necessary components and apply patches
+        """
+
+        # GNAT-LLVM
+
+        sync_tree(
+            os.path.join(
+                self["SRC_DIR"],
+                "gnat-llvm",
+            ),
+            os.path.join(
+                self["BUILD_DIR"],
+            ),
+        )
+
+        # GNAT sources from FSF GCC
+
+        sync_tree(
+            os.path.join(
+                self["SRC_DIR"],
+                "gcc",
+                "gcc",
+                "ada",
+            ),
+            os.path.join(self["BUILD_DIR"], "llvm-interface", "gnat_src"),
+        )
+
+        # Runtime sources from bb-runtimes
+
+        sync_tree(
+            os.path.join(
+                self["SRC_DIR"],
+                "bb-runtimes",
+                "gnat_rts_sources",
+                "include",
+                "rts-sources",
+            ),
+            os.path.join(self["BUILD_DIR"], "llvm-interface", "rts-sources"),
+        )
+
+        # AdaWebPack runtime sources
+
+        sync_tree(
+            os.path.join(
+                self["SRC_DIR"],
+                "adawebpack",
+            ),
+            os.path.join(self["BUILD_DIR"], "llvm-interface", "adawebpack_src"),
+        )
+        cp(
+            os.path.join(
+                self["SRC_DIR"],
+                "adawebpack",
+                "source",
+                "rtl",
+                "Makefile.target",
+            ),
+            os.path.join(self["BUILD_DIR"], "llvm-interface", "Makefile.target"),
+        )
+
+        # Patch components
+
+        patch(
+            os.path.join(self["SRC_DIR"], "adawebpack", "patches", "gnat-llvm.patch"),
+            os.path.join(self["BUILD_DIR"]),
+        )
+        patch(
+            os.path.join(
+                self["SRC_DIR"], "adawebpack", "patches", "llvm_wrapper2.patch"
+            ),
+            os.path.join(self["BUILD_DIR"]),
+        )
+        patch(
+            os.path.join(self["SRC_DIR"], "patches", self.patch_name),
+            os.path.join(self["BUILD_DIR"]),
+        )
+
+    def artifact_build(self):
+        # This spec inherit from gh-artifact and therefore has a different
+        # build method.
+
+        self.prepare_build_tree()
+
+        for m in self.deps:
+            self.deps[m].setenv()
+
+        make = Make(
+            self,
+            exec_dir=os.path.join(self["BUILD_DIR"], "llvm-interface"),
+            makefile=os.path.join(self["BUILD_DIR"], "llvm-interface", "Makefile"),
+            jobs=1,
+        )
+        make.set_var("ANOD_LDFLAGS", "-Wl,-rpath='$$ORIGIN/../lib'")
+        make("wasm")
+
+        sync_tree(
+            os.path.join(self["BUILD_DIR"], "llvm-interface", "bin"),
+            os.path.join(self["INSTALL_DIR"], "bin"),
+        )
+        sync_tree(
+            os.path.join(self["BUILD_DIR"], "llvm-interface", "lib"),
+            os.path.join(self["INSTALL_DIR"], "lib"),
+        )
+        cp(
+            os.path.join(
+                self["SRC_DIR"],
+                "patches",
+                "adawebpack-runtime.xml",
+            ),
+            os.path.join(self["INSTALL_DIR"], "lib", "rts-native", "runtime.xml"),
+        )
+
+        self.copy_llvm()
+
+    def copy_llvm(self):
+        # Copy minimal set of LLVM executables and libraries
+
+        source_bin_dir = os.path.join("/", "usr", "bin")
+        install_bin_dir = os.path.join(self["INSTALL_DIR"], "bin")
+        source_lib_dir = os.path.join("/", "usr", "lib", "llvm-16", "lib")
+        install_lib_dir = os.path.join(self["INSTALL_DIR"], "lib")
+
+        for exe in ["clang", "wasm-ld-16"]:
+            cp(os.path.join(source_bin_dir, exe), install_bin_dir)
+
+        for lib in ["libclang-cpp.so.16", "libLLVM-16.so.1"]:
+            cp(os.path.join(source_lib_dir, lib), install_lib_dir)

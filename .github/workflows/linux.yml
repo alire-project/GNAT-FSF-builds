@@ -137,6 +137,51 @@ jobs:
         retention-days: 5
 
 
+  gnat_wasm32:
+    name: GNAT wasm32-linux
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install e3-core==22.1.0
+
+    - name: Install LLVM
+      run: |
+        wget https://apt.llvm.org/llvm.sh
+        chmod +x llvm.sh
+        sudo ./llvm.sh 16 all
+        sudo ./utils/update-alternatives-clang.sh 16 100
+
+    - name: Build GNAT WASM32
+      run: ./anod build gnatllvm-wasm32 -v --loglevel DEBUG --enable-cleanup
+
+    - name: Package GNAT WASM32
+      run: ./anod build release_package --qualifier=package=gnat,do_gh_release --target=wasm32 -v --loglevel DEBUG
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: gnat-wasm32
+        path: sbx/*/gnatllvm-wasm32/install/*
+        retention-days: 5
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: release-packages
+        path: sbx/*/release_package*/install/*
+        retention-days: 5
+
+
   why3:
     strategy:
       matrix:
