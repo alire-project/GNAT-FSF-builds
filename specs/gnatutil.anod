@@ -8,15 +8,21 @@ import os
 class GNATUTIL(spec("common")):
     @property
     def version(self):
-        return "20.0w-20190814-1532A"
+        return "14.1.0"
 
     @property
     def tarball(self):
-        return "gnat_util-%s-src.tar.gz" % self.version
+        return "gnat_util-%s.tar.gz" % self.version
 
     @property
     def source_pkg_build(self):
-        return [self.LocalSourceBuilder(self.tarball)]
+        return [
+            self.HTTPSSourceBuilder(
+                name=self.tarball,
+                url="https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-14.1.0-3/%s"
+                % self.tarball,
+            )
+        ]
 
     @property
     def build_source_list(self):
