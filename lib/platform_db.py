@@ -7,6 +7,7 @@ class PlatDB(PlatformDBPlugin):
                 "xtensa": {"endian": "little", "bits": 32},
                 "riscv32": {"endian": "little", "bits": 32},
                 "riscv64": {"endian": "little", "bits": 64},
+                "wasm32": {"endian": "little", "bits": 32},
             }
         )
 
@@ -40,6 +41,7 @@ class PlatDB(PlatformDBPlugin):
                 "riscv64-elf": {"cpu": "riscv64", "os": "none", "is_hie": True},
                 "riscv32-unknown-elf": {"cpu": "riscv32", "os": "none", "is_hie": True},
                 "riscv64-unknown-elf": {"cpu": "riscv64", "os": "none", "is_hie": True},
+                "wasm32": {"cpu": "wasm32", "os": "none", "is_hie": True},
             }
         )
 
@@ -51,6 +53,6 @@ class PlatDB(PlatformDBPlugin):
                 "riscv64-elf": {"name": "riscv64-elf"},
                 "riscv32-unknown-elf": {"name": "riscv32-unknown-elf"},
                 "riscv64-unknown-elf": {"name": "riscv64-unknown-elf"},
-
+                "wasm32": {"name": "wasm32"},
             }
         )
