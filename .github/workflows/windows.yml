@@ -63,8 +63,8 @@ jobs:
 
 
 
-  gprbuild_gnatcov:
-    name: GPRbuild and GNATcov
+  gprbuild:
+    name: GPRbuild
     runs-on: windows-2019
     env:
       CONFIG_SHELL: /bin/bash
@@ -104,14 +104,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
-
-    - name: Build GNATcov
-      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gnatcov -v --loglevel DEBUG --enable-cleanup
-
-    - name: Package GNATcov
-      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_package --qualifier=package=gnatcov,do_gh_release -v --loglevel DEBUG
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
     - uses: actions/upload-artifact@v4
       with:

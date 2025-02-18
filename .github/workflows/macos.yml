@@ -48,8 +48,8 @@ jobs:
         retention-days: 5
 
 
-  gprbuild_gnatcov:
-    name: GPRbuild and GNATcov
+  gprbuild:
+    name: GPRbuild
     runs-on: macos-12
     steps:
     - name: Checkout Project
@@ -70,15 +70,6 @@ jobs:
 
     - name: Package GPRbuild
       run: ./anod build release_package --qualifier=package=gprbuild,do_gh_release -v --loglevel DEBUG
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
-
-
-    - name: Build GNATcov
-      run: ./anod build gnatcov -v --loglevel DEBUG --enable-cleanup
-
-    - name: Package GNATcov
-      run: ./anod build release_package --qualifier=package=gnatcov,do_gh_release -v --loglevel DEBUG
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
