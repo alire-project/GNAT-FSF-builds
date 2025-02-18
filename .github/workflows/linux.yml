@@ -55,11 +55,11 @@ jobs:
 
 
 
-  gprbuild_gnatcov:
+  gprbuild:
     strategy:
       matrix:
         host: ["ubuntu-20.04", "ubuntu-22.04-arm"]
-    name: GPRbuild and GNATcov
+    name: GPRbuild
     runs-on: ${{matrix.host}}
     steps:
     - name: Checkout Project
@@ -80,14 +80,6 @@ jobs:
 
     - name: Package GPRbuild
       run: ./anod build release_package --qualifier=package=gprbuild,do_gh_release -v --loglevel DEBUG
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
-
-    - name: Build GNATcov
-      run: ./anod build gnatcov -v --loglevel DEBUG --enable-cleanup
-
-    - name: Package GNATcov
-      run: ./anod build release_package --qualifier=package=gnatcov,do_gh_release -v --loglevel DEBUG
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
 
