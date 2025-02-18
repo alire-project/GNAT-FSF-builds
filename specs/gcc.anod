@@ -118,10 +118,11 @@ class GCC(spec("gh-artifact")):
             "--enable-lto",
         ]
 
-        # Linux64 Native
-        if self.env.target.triplet == "x86_64-pc-linux-gnu":
+        # Linux Native
+        if self.env.target.os.name == "linux":
             args.append("--disable-multilib")
             args.append("--enable-threads=posix")
+            args.append("--enable-default-pie")
 
         # Windows Native
         if self.env.target.triplet == "x86_64-w64-mingw32":
