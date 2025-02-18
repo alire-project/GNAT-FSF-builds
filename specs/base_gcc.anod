@@ -16,11 +16,8 @@ class base_gcc(spec("common")):
 
     @property
     def url(self):
-        if self.env.platform == "aarch64-linux":
-            return "https://github.com/Fabien-Chouteau/GNAT-FSF-builds/releases/download/tmp-14.2-3-aarch64/gnat-aarch64-linux-14.2.0-3.tar.gz"
-        else:
-            return "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-%s/%s" \
-                    % (self.version, self.tarball)
+        return "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-%s/%s" \
+                % (self.version, self.tarball)
 
     @Anod.primitive()
     def build(self):
