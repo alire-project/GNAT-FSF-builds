@@ -9,6 +9,7 @@ on:
 jobs:
   gnat:
     strategy:
+      fail-fast: false
       matrix:
         host: ["ubuntu-20.04", "ubuntu-22.04-arm"]
     name: GNAT Linux
@@ -93,6 +94,7 @@ jobs:
 
   gnat_cross:
     strategy:
+      fail-fast: false
       matrix:
         host: ["ubuntu-20.04", "ubuntu-22.04-arm"]
         target: ["arm-elf", "riscv64-elf", "avr-elf", "xtensa-esp32-elf"]
