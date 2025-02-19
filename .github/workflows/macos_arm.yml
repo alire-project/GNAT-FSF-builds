@@ -52,6 +52,7 @@ jobs:
 
   gnat_cross:
     strategy:
+      fail-fast: false
       matrix:
         target: ["arm-elf", "riscv64-elf", "xtensa-esp32-elf"]
         # We don't enable avr on aarch64 macOS as libc-avr doesn't recognize
