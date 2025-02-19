@@ -51,13 +51,13 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-        name: anod-artifacts
+        name: gnat-anod-artifacts
         path: C:/aaa/GNAT-FSF-builds/out_artifacts/*
         retention-days: 1
 
     - uses: actions/upload-artifact@v4
       with:
-        name: release-packages
+        name: gnat-release-packages
         path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
         retention-days: 5
 
@@ -107,7 +107,7 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-        name: release-packages
+        name: gprbuil-release-packages
         path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
         retention-days: 5
 
@@ -154,7 +154,7 @@ jobs:
 
     - uses: actions/download-artifact@v2
       with:
-        name: anod-artifacts
+        name: gnat-anod-artifacts
         path: C:/aaa/GNAT-FSF-builds/in_artifacts/
 
 
@@ -171,7 +171,7 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-        name: release-packages
+        name: gnat-release-packages-${{ matrix.target }}
         path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
         retention-days: 5
 
@@ -296,6 +296,6 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-        name: release-packages
+        name: gnatprove-release-packages
         path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
         retention-days: 5

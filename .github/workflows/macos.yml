@@ -9,10 +9,13 @@ on:
 jobs:
   gnat:
     name: GNAT macOS
-    runs-on: macos-12
+    runs-on: macos-13
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
+
+    - name: Install texinfo with Homebrew
+      run: brew install texinfo
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -37,20 +40,20 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-        name: anod-artifacts
+        name: gnat-anod-artifacts
         path: out_artifacts/*
         retention-days: 1
 
     - uses: actions/upload-artifact@v4
       with:
-        name: release-packages
+        name: gnat-release-packages
         path: sbx/*/release_package*/install/*
         retention-days: 5
 
 
   gprbuild:
     name: GPRbuild
-    runs-on: macos-12
+    runs-on: macos-13
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
@@ -75,7 +78,7 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-        name: release-packages
+        name: gprbuild-release-packages
         path: sbx/*/release_package*/install/*
         retention-days: 5
 
@@ -87,14 +90,14 @@ jobs:
         target: ["arm-elf", "riscv64-elf", "avr-elf", "xtensa-esp32-elf"]
     name: GNAT ${{ matrix.target }}-darwin
     needs: gnat
-    runs-on: macos-12
+    runs-on: macos-13
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
 
     - uses: actions/download-artifact@v4
       with:
-        name: anod-artifacts
+        name: gnat-anod-artifacts
         path: in_artifacts/
 
     - name: Set up Python
@@ -120,7 +123,7 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-        name: release-packages
+        name: gnat-release-packages-${{ matrix.target }}
         path: sbx/*/release_package*/install/*
         retention-days: 5
 
@@ -130,7 +133,7 @@ jobs:
       matrix:
         ocaml-compiler:
           - 4.12.1
-    runs-on: macos-12
+    runs-on: macos-13
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -169,7 +172,7 @@ jobs:
         ocaml-compiler:
           - 4.12.1
 
-    runs-on: macos-12
+    runs-on: macos-13
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -197,7 +200,7 @@ jobs:
   spark:
     name: SPARK
     needs: [why3, alt_ergo]
-    runs-on: macos-12
+    runs-on: macos-13
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
@@ -232,6 +235,6 @@ jobs:
 
     - uses: actions/upload-artifact@v4
       with:
-        name: release-packages
+        name: gnatprove-release-packages
         path: sbx/*/release_package*/install/*
         retention-days: 5
