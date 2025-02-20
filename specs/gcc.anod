@@ -122,7 +122,12 @@ class GCC(spec("gh-artifact")):
         if self.env.target.os.name == "linux":
             args.append("--disable-multilib")
             args.append("--enable-threads=posix")
-            args.append("--enable-default-pie")
+
+            # TODO: Enabling this option will make the cross compiler
+            # builds fail because of the discrepency between base_gcc
+            # and gcc. This option should be enabled on the next major
+            # release.
+            # args.append("--enable-default-pie")
 
         # Windows Native
         if self.env.target.triplet == "x86_64-w64-mingw32":
