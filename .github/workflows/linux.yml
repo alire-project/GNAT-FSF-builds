@@ -191,7 +191,7 @@ jobs:
           ref: 'fsf-14'
 
       - name: Use Setup OCaml {{ matrix.ocaml-version }}
-        uses: ocaml/setup-ocaml@v4
+        uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
 
