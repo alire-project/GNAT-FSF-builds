@@ -15,12 +15,7 @@ class AVRLibc(spec("common")):
 
     @property
     def source_pkg_build(self):
-        return [
-            self.HTTPSSourceBuilder(
-                name=self.tarball,
-                url="https://download.savannah.gnu.org/releases/avr-libc/" + self.tarball,
-            )
-        ]
+        return [self.LocalSourceBuilder(name=self.tarball)]
 
     @property
     def build_source_list(self):
