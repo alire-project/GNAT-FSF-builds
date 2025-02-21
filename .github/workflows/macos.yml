@@ -96,6 +96,9 @@ jobs:
     - name: Checkout Project
       uses: actions/checkout@v4
 
+    - name: Install texinfo with Homebrew
+      run: brew install texinfo
+
     - uses: actions/download-artifact@v4
       with:
         name: gnat-anod-artifacts

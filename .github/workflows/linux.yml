@@ -12,7 +12,7 @@ jobs:
       fail-fast: false
       matrix:
         host: ["ubuntu-20.04", "ubuntu-22.04-arm"]
-    name: GNAT Linux
+    name: GNAT Linux ${{matrix.host}}
     runs-on: ${{matrix.host}}
     steps:
     - name: Checkout Project
@@ -60,7 +60,7 @@ jobs:
     strategy:
       matrix:
         host: ["ubuntu-20.04", "ubuntu-22.04-arm"]
-    name: GPRbuild
+    name: GPRbuild ${{matrix.host}}
     runs-on: ${{matrix.host}}
     steps:
     - name: Checkout Project
@@ -98,7 +98,7 @@ jobs:
       matrix:
         host: ["ubuntu-20.04", "ubuntu-22.04-arm"]
         target: ["arm-elf", "riscv64-elf", "avr-elf", "xtensa-esp32-elf"]
-    name: GNAT ${{ matrix.target }}-linux
+    name: GNAT ${{ matrix.target }} ${{matrix.host}}
     needs: gnat
     runs-on: ${{matrix.host}}
     steps:
