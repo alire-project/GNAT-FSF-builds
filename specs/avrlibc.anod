@@ -7,7 +7,7 @@ from e3.anod.loader import spec
 class AVRLibc(spec("common")):
     @property
     def version(self):
-        return "2.1.0"
+        return "2.2.1"
 
     @property
     def tarball(self):
@@ -15,7 +15,12 @@ class AVRLibc(spec("common")):
 
     @property
     def source_pkg_build(self):
-        return [self.LocalSourceBuilder(name=self.tarball)]
+        return [
+            self.HTTPSSourceBuilder(
+                name=self.tarball,
+                url="https://github.com/avrdudes/avr-libc/releases/download/avr-libc-2_2_1-release/%s" % (self.tarball),
+            )
+        ]
 
     @property
     def build_source_list(self):
