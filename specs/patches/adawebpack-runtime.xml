@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+
+<gprconfig>
+  <configuration>
+    <config><![CDATA[
+   package Compiler is
+      Common_Required_Switches := ("--target=wasm32");
+
+      for Leading_Required_Switches ("Ada") use
+        Compiler'Leading_Required_Switches ("Ada") & Common_Required_Switches;
+   end Compiler;
+
+   package Linker is
+      for Required_Switches use
+        Linker'Required_Switches & Compiler.Common_Required_Switches &
+        ("-nostdlib", "-Wl,--no-entry", "-Wl,--export-all", "-Wl,--allow-undefined");
+   end Linker;
+]]>
+   </config>
+  </configuration>
+</gprconfig>

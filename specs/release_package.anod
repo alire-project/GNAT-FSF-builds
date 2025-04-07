@@ -35,7 +35,11 @@ class ReleasePackage(spec("common")):
         if package in ["gprbuild", "gnatcov"]:
             return self.deps[package].version
         elif package == "gnat":
-            return self.deps["gcc"].version
+            if self.env.target.triplet == "wasm32":
+                return self.deps["gnatllvm-wasm32"].version
+
+            else:
+                return self.deps["gcc"].version
         elif package == "gnatprove":
             return self.deps["spark2014"].version
 
@@ -58,6 +62,8 @@ class ReleasePackage(spec("common")):
             elif self.env.target.triplet == "riscv64-elf":
                 return "1"
             elif self.env.target.triplet == "avr":
+                return "1"
+            elif self.env.target.triplet == "wasm32":
                 return "1"
             else:
                 return "1"
@@ -144,6 +150,11 @@ class ReleasePackage(spec("common")):
                 return [
                     Anod.Dependency("gcc", track=True),
                     Anod.Dependency("gdb", track=True),
+                ]
+
+            elif self.env.target.triplet == "wasm32":
+                return [
+                    Anod.Dependency("gnatllvm-wasm32", track=True),
                 ]
 
             elif self.env.host.triplet == self.env.target.triplet:
