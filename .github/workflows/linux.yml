@@ -154,7 +154,7 @@ jobs:
         repository: adacore/alt-ergo
         ref: fsf-14
     - name: Install
-      run: opam install alt-ergo --destdire=${{ github.workspace }}/alt-ergo-install
+      run: opam install alt-ergo --destdir=${{ github.workspace }}/alt-ergo-install
     - name: Update version
       run: git log --format='%H' -n 1 > ${{ github.workspace }}/alt-ergo-install/alt-ergo-version.txt
     - name: Upload artifact 'alt-ergo'

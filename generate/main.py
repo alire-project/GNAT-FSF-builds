@@ -203,7 +203,7 @@ def main():
             Step(
                 "Install",
                 [
-                    "opam install alt-ergo --destdire=${{ github.workspace }}/alt-ergo-install"
+                    "opam install alt-ergo --destdir=${{ github.workspace }}/alt-ergo-install"
                 ],
             ),
             Step(
