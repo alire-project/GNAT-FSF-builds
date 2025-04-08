@@ -1,15 +1,11 @@
-name: GNAT macOS Arm
+name: GNAT Linux Arm
 'on':
 - pull_request
 jobs:
   gnat:
-    name: GNAT macOS_Arm
-    runs-on: macos-14
+    name: GNAT Linux_Arm
+    runs-on: ubuntu-22.04-arm
     steps:
-    - name: Set Xcode 15.3
-      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
-    - name: Install texinfo with Homebrew
-      run: brew install texinfo
     - name: Checkout Project
       uses: actions/checkout@v4
     - name: Set up Python 3.8
@@ -41,13 +37,9 @@ jobs:
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gprbuild:
-    name: GPRbuild macOS_Arm
-    runs-on: macos-14
+    name: GPRbuild Linux_Arm
+    runs-on: ubuntu-22.04-arm
     steps:
-    - name: Set Xcode 15.3
-      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
-    - name: Install texinfo with Homebrew
-      run: brew install texinfo
     - name: Checkout Project
       uses: actions/checkout@v4
     - name: Set up Python 3.8
@@ -77,16 +69,13 @@ jobs:
         target:
         - arm-elf
         - riscv64-elf
+        - avr-elf
         - xtensa-esp32-elf
     needs:
     - gnat
-    name: GNAT ${{ matrix.target }} macOS_Arm
-    runs-on: macos-14
+    name: GNAT ${{ matrix.target }} Linux_Arm
+    runs-on: ubuntu-22.04-arm
     steps:
-    - name: Set Xcode 15.3
-      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
-    - name: Install texinfo with Homebrew
-      run: brew install texinfo
     - name: Checkout Project
       uses: actions/checkout@v4
     - name: Set up Python 3.8
@@ -116,8 +105,8 @@ jobs:
         name: gnat-release-packages-${{matrix.target}}
         path: sbx/*/release_package*/install/*
   why3:
-    name: Why3 macOS_Arm
-    runs-on: macos-14
+    name: Why3 Linux_Arm
+    runs-on: ubuntu-22.04-arm
     steps:
     - name: Setup OCaml 4.12.1
       uses: ocaml/setup-ocaml@v2
@@ -148,8 +137,8 @@ jobs:
         name: why3
         path: ${{ github.workspace }}/why3install
   alt_ergo:
-    name: Alt-Ergo macOS_Arm
-    runs-on: macos-14
+    name: Alt-Ergo Linux_Arm
+    runs-on: ubuntu-22.04-arm
     steps:
     - name: Setup OCaml 4.12.1
       uses: ocaml/setup-ocaml@v2
@@ -173,13 +162,9 @@ jobs:
     needs:
     - why3
     - alt_ergo
-    name: SPARK macOS_Arm
-    runs-on: macos-14
+    name: SPARK Linux_Arm
+    runs-on: ubuntu-22.04-arm
     steps:
-    - name: Set Xcode 15.3
-      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
-    - name: Install texinfo with Homebrew
-      run: brew install texinfo
     - name: Checkout Project
       uses: actions/checkout@v4
     - name: Set up Python 3.8
