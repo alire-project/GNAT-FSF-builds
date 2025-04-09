@@ -19,7 +19,7 @@ class Unix(HostOs):
 
 
 class Linux(Unix):
-    runner: str = "ubuntu-20.04"
+    runner: str = "ubuntu-22.04"
 
 
 class Linux_Arm(Unix):

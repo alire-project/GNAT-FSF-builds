@@ -150,6 +150,8 @@ jobs:
       run: >-
         mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_package --qualifier=package=gnat,do_gh_release
         --target=${{ matrix.target }} -v --loglevel DEBUG
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Upload artifact 'gnat-release-packages-${{matrix.target}}'
       uses: actions/upload-artifact@v4
       with:

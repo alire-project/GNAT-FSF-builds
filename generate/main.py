@@ -148,6 +148,7 @@ def main():
                     "--qualifier=package=gnat,do_gh_release",
                     "--target=${{ matrix.target }}",
                 ],
+                secrets=["GITHUB_TOKEN"],
             ),
         ],
         needs=["gnat"],
