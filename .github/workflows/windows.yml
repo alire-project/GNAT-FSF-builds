@@ -161,15 +161,15 @@ jobs:
     name: Why3 Windows
     runs-on: windows-2019
     steps:
-    - name: Setup OCaml 4.12.1
-      uses: ocaml/setup-ocaml@v2
-      with:
-        ocaml-compiler: 4.12.1
     - name: Checkout Project
       uses: actions/checkout@v4
       with:
         repository: adacore/why3
         ref: fsf-14
+    - name: Setup OCaml 4.12.1
+      uses: ocaml/setup-ocaml@v2
+      with:
+        ocaml-compiler: 4.12.1
     - name: Setup packages
       run: |-
         opam depext zarith re seq why3
@@ -193,15 +193,15 @@ jobs:
     name: Alt-Ergo Windows
     runs-on: windows-2019
     steps:
-    - name: Setup OCaml 4.12.1
-      uses: ocaml/setup-ocaml@v2
-      with:
-        ocaml-compiler: 4.12.1
     - name: Checkout Project
       uses: actions/checkout@v4
       with:
         repository: adacore/alt-ergo
         ref: fsf-14
+    - name: Setup OCaml 4.12.1
+      uses: ocaml/setup-ocaml@v2
+      with:
+        ocaml-compiler: 4.12.1
     - name: Install
       run: opam install alt-ergo --destdir=${{ github.workspace }}/alt-ergo-install
     - name: Update version

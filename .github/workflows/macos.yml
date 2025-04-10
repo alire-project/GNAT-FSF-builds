@@ -6,10 +6,10 @@ jobs:
     name: GNAT macOS
     runs-on: macos-13
     steps:
-    - name: Install texinfo with Homebrew
-      run: brew install texinfo
     - name: Checkout Project
       uses: actions/checkout@v4
+    - name: Install texinfo with Homebrew
+      run: brew install texinfo
     - name: Set up Python 3.8
       uses: actions/setup-python@v5
       with:
@@ -42,10 +42,10 @@ jobs:
     name: GPRbuild macOS
     runs-on: macos-13
     steps:
-    - name: Install texinfo with Homebrew
-      run: brew install texinfo
     - name: Checkout Project
       uses: actions/checkout@v4
+    - name: Install texinfo with Homebrew
+      run: brew install texinfo
     - name: Set up Python 3.8
       uses: actions/setup-python@v5
       with:
@@ -80,10 +80,10 @@ jobs:
     name: GNAT ${{ matrix.target }} macOS
     runs-on: macos-13
     steps:
-    - name: Install texinfo with Homebrew
-      run: brew install texinfo
     - name: Checkout Project
       uses: actions/checkout@v4
+    - name: Install texinfo with Homebrew
+      run: brew install texinfo
     - name: Set up Python 3.8
       uses: actions/setup-python@v5
       with:
@@ -116,15 +116,15 @@ jobs:
     name: Why3 macOS
     runs-on: macos-13
     steps:
-    - name: Setup OCaml 4.12.1
-      uses: ocaml/setup-ocaml@v2
-      with:
-        ocaml-compiler: 4.12.1
     - name: Checkout Project
       uses: actions/checkout@v4
       with:
         repository: adacore/why3
         ref: fsf-14
+    - name: Setup OCaml 4.12.1
+      uses: ocaml/setup-ocaml@v2
+      with:
+        ocaml-compiler: 4.12.1
     - name: Setup packages
       run: |-
         opam depext zarith re seq why3
@@ -148,15 +148,15 @@ jobs:
     name: Alt-Ergo macOS
     runs-on: macos-13
     steps:
-    - name: Setup OCaml 4.12.1
-      uses: ocaml/setup-ocaml@v2
-      with:
-        ocaml-compiler: 4.12.1
     - name: Checkout Project
       uses: actions/checkout@v4
       with:
         repository: adacore/alt-ergo
         ref: fsf-14
+    - name: Setup OCaml 4.12.1
+      uses: ocaml/setup-ocaml@v2
+      with:
+        ocaml-compiler: 4.12.1
     - name: Install
       run: opam install alt-ergo --destdir=${{ github.workspace }}/alt-ergo-install
     - name: Update version
@@ -173,10 +173,10 @@ jobs:
     name: SPARK macOS
     runs-on: macos-13
     steps:
-    - name: Install texinfo with Homebrew
-      run: brew install texinfo
     - name: Checkout Project
       uses: actions/checkout@v4
+    - name: Install texinfo with Homebrew
+      run: brew install texinfo
     - name: Set up Python 3.8
       uses: actions/setup-python@v5
       with:

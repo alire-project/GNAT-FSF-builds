@@ -3,7 +3,6 @@ from typing import Literal
 from build import (
     AnodBuild,
     Artifact,
-    Checkout,
     Conditional,
     Job,
     JobKind,
@@ -165,7 +164,6 @@ def main():
     jobs["why3"] = Job(
         "Why3",
         [
-            Checkout(Repository("adacore/why3", "fsf-14")),
             Step(
                 "Setup packages",
                 [
@@ -192,6 +190,7 @@ def main():
             ),
         ],
         kind="ocaml",
+        repo=Repository("adacore/why3", "fsf-14"),
         outputs=[
             Artifact("why3", "${{ github.workspace }}/why3install"),
         ],
@@ -200,7 +199,6 @@ def main():
     jobs["alt_ergo"] = Job(
         "Alt-Ergo",
         [
-            Checkout(Repository("adacore/alt-ergo", "fsf-14")),
             Step(
                 "Install",
                 [
@@ -215,6 +213,7 @@ def main():
             ),
         ],
         kind="ocaml",
+        repo=Repository("adacore/alt-ergo", "fsf-14"),
         outputs=[Artifact("alt-ergo", "${{ github.workspace }}/alt-ergo-install")],
     )
 

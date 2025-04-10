@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from build import Action, Checkout, InstallPythonDeps, SetupOcaml, SetupPython, Step
+from build import Action, InstallPythonDeps, SetupOcaml, SetupPython, Step
 from interfaces import Host, HostOs, RawStep, Yaml, Yamlable
 
 
@@ -8,7 +8,6 @@ class Unix(HostOs):
     @classmethod
     def setup_python(cls) -> list[RawStep]:
         return [
-            Checkout(),
             SetupPython(cls.python_version),
             InstallPythonDeps({"e3-core": cls.e3_core_version}),
         ]
@@ -88,7 +87,6 @@ class WindowsMsys2(Windows):
                 return {"install": self.install}
 
         return [
-            Checkout(),
             Action(
                 "Install msys2",
                 "msys2/setup-msys2@v2",

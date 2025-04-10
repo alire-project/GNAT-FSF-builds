@@ -198,6 +198,7 @@ class Job(Yamlable[Host]):
     steps: list[RawStep]
 
     kind: JobKind = "python"
+    repo: Repository | None = None
     needs: list[str] = field(default_factory=list)
     matrix: dict[str, list[str]] = field(default_factory=dict)
     targets: Targets | None = None
@@ -228,11 +229,13 @@ class Job(Yamlable[Host]):
         if ctx.shell is not None:
             res["defaults"] = {"run": {"shell": ctx.shell}}
 
+        res["steps"] = [Checkout(self.repo).to_yaml(ctx)]
+
         match self.kind:
             case "python":
-                res["steps"] = [step.to_yaml(ctx) for step in ctx.setup_python()]
+                res["steps"].extend(step.to_yaml(ctx) for step in ctx.setup_python())
             case "ocaml":
-                res["steps"] = [step.to_yaml(ctx) for step in ctx.setup_ocaml()]
+                res["steps"].extend(step.to_yaml(ctx) for step in ctx.setup_ocaml())
 
         for i in self.inputs:
             res["steps"].append(DownloadArtifact(i).to_yaml(ctx))
