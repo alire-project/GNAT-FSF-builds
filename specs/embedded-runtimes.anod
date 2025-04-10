@@ -1,5 +1,6 @@
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
+from e3.anod.error import AnodError
 
 import os
 import glob
@@ -98,6 +99,14 @@ class EmbeddedRuntimes(spec("common")):
                 "rv32imafc",
                 "rv32imafdc",
             ]
+
+        elif self.env.target.platform == "aarch64-elf":
+            board = [
+                "rpi3",
+                "rpi3mc",
+                "zynqmp",
+            ]
+
         else:
             raise AnodError("Unknown platform: %s" % self.env.target.platform)
 
@@ -108,6 +117,8 @@ class EmbeddedRuntimes(spec("common")):
             return "arm-eabi"
         elif self.env.target.platform == "riscv64-elf":
             return "riscv64-elf"
+        elif self.env.target.platform == "aarch64-elf":
+            return "aarch64-elf"
         else:
             raise AnodError("Unknown platform: %s" % self.env.target.platform)
 
@@ -139,4 +150,3 @@ class EmbeddedRuntimes(spec("common")):
         self.shell(*cmd)
 
         self.clean()
-

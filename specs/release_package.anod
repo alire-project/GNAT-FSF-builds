@@ -126,6 +126,13 @@ class ReleasePackage(spec("common")):
                     Anod.Dependency("embedded-runtimes", track=True),
                 ]
 
+            elif self.env.target.triplet == "aarch64-elf":
+                return [
+                    Anod.Dependency("gcc", track=True),
+                    Anod.Dependency("gdb", track=True),
+                    Anod.Dependency("embedded-runtimes", track=True),
+                ]
+
             elif self.env.target.triplet == "riscv64-elf":
                 return [
                     Anod.Dependency("gcc", track=True),
