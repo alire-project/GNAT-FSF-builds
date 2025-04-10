@@ -77,6 +77,7 @@ jobs:
         target:
         - arm-elf
         - riscv64-elf
+        - avr-elf
         - xtensa-esp32-elf
     needs:
     - gnat

@@ -177,12 +177,7 @@ class InstallPythonDeps(RawStep):
 
 class Targets(Yamlable[Host]):
     def to_yaml(self, ctx: Host) -> Yaml:
-        if ctx.__name__ == "macOS_Arm":  # hack
-            # We don't enable avr on aarch64 macOS as libc-avr doesn't recognize
-            # aarch64-apple machine https://github.com/avrdudes/avr-libc/issues/978
-            return ["arm-elf", "riscv64-elf", "xtensa-esp32-elf"]
-        else:
-            return ["arm-elf", "riscv64-elf", "avr-elf", "xtensa-esp32-elf"]
+        return ["arm-elf", "riscv64-elf", "avr-elf", "xtensa-esp32-elf"]
 
 
 class Conditional(RawStep):
