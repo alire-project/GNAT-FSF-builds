@@ -127,7 +127,7 @@ jobs:
         repository: adacore/why3
         ref: fsf-14
     - name: Setup OCaml 4.12.1
-      uses: ocaml/setup-ocaml@v2
+      uses: ocaml/setup-ocaml@v3
       with:
         ocaml-compiler: 4.12.1
     - name: Setup packages
@@ -159,7 +159,7 @@ jobs:
         repository: adacore/alt-ergo
         ref: fsf-14
     - name: Setup OCaml 4.12.1
-      uses: ocaml/setup-ocaml@v2
+      uses: ocaml/setup-ocaml@v3
       with:
         ocaml-compiler: 4.12.1
     - name: Install

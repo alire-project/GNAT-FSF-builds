@@ -158,7 +158,7 @@ class SetupOcaml(Action):
     def __init__(self, ocaml_version: str):
         super().__init__(
             f"Setup OCaml {ocaml_version}",
-            "ocaml/setup-ocaml@v2",
+            "ocaml/setup-ocaml@v3",
             with_args=OcamlVersion(ocaml_version),
         )
 
