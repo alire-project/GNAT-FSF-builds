@@ -1,4 +1,5 @@
 from typing import Literal
+import sys
 
 from build import (
     AnodBuild,
@@ -230,8 +231,17 @@ def main():
         jobs,
     )
 
+    dest = "../.github/workflows/"
+    match sys.argv:
+        case [_, dirname]:
+            dest = dirname.rstrip("/\\") + "/"
+        case [] | [_]:
+            pass
+        case _:
+            sys.exit("error: too many arguments")
+
     for os in oses:
-        with open("../.github/workflows/" + os + ".yml", "w+") as f:
+        with open(dest + os + ".yml", "w+") as f:
             f.write(workflow.dump(os))
 
 
