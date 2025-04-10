@@ -71,6 +71,16 @@ class AnodBuild(Step):
         self.command = ["python3 ./anod build " + package + " " + " ".join(args)]
 
 
+class ReleasePackage(AnodBuild):
+    def __init__(self, name: str, package: str, args: list[str] = []):
+        super().__init__(
+            name,
+            "release_package",
+            [f"--qualifier=package={package},do_gh_release", *args],
+            secrets=["GITHUB_TOKEN"],
+        )
+
+
 @dataclass
 class Artifact(Yamlable[Host]):
     name: str

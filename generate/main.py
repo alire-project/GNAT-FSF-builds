@@ -6,6 +6,7 @@ from build import (
     Conditional,
     Job,
     JobKind,
+    ReleasePackage,
     Repository,
     Step,
     Targets,
@@ -86,12 +87,7 @@ def main():
             ),
             AnodBuild("Build GNAT native", "gcc"),
             AnodBuild("Build GDB", "gdb"),
-            AnodBuild(
-                "Package GNAT",
-                "release_package",
-                ["--qualifier=package=gnat,do_gh_release"],
-                secrets=["GITHUB_TOKEN"],
-            ),
+            ReleasePackage("Package GNAT", "gnat"),
         ],
         outputs=[
             Artifact(
@@ -111,12 +107,7 @@ def main():
         "GPRbuild",
         [
             AnodBuild("Build GPRbuild", "gprbuild"),
-            AnodBuild(
-                "Package GPRbuild",
-                "release_package",
-                ["--qualifier=package=gprbuild,do_gh_release"],
-                secrets=["GITHUB_TOKEN"],
-            ),
+            ReleasePackage("Package GPRbuild", "gprbuild"),
         ],
         outputs=[
             Artifact(
@@ -140,14 +131,10 @@ def main():
                 "gdb",
                 ["--target=${{ matrix.target}}"],
             ),
-            AnodBuild(
+            ReleasePackage(
                 "Package GNAT ${{ matrix.target }}",
-                "release_package",
-                [
-                    "--qualifier=package=gnat,do_gh_release",
-                    "--target=${{ matrix.target }}",
-                ],
-                secrets=["GITHUB_TOKEN"],
+                "gnat",
+                ["--target=${{ matrix.target }}"],
             ),
         ],
         needs=["gnat"],
@@ -221,12 +208,7 @@ def main():
         "SPARK",
         [
             AnodBuild("Build SPARK", "spark2014"),
-            AnodBuild(
-                "Package GNATprove",
-                "release_package",
-                ["--qualifier=package=gnatprove,do_gh_release"],
-                secrets=["GITHUB_TOKEN"],
-            ),
+            ReleasePackage("Package GNATprove", "gnatprove"),
         ],
         needs=["why3", "alt_ergo"],
         inputs=[
