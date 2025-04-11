@@ -24,6 +24,21 @@ For a cross compiler:
 $ ./anod build gcc --target=avr-elf -v --loglevel DEBUG
 ```
 
+To build the full aarch64-elf cross-compiler package:
+
+```console
+./anod build release_package --qualifier=package=gnat --target=aarch64-elf -v
+```
+
+Then the binary files will be at:
+
+```console
+sbx/aarch64-elf-linux64/release_package-gnat-aarch64-elf-linux64/install/gnat-aarch64-elf-linux64-x86_64-<vserion>.tar.gz
+```
+
+Which can then be attached to a github release for this project. Once released a toml describing the release can be added to
+and alire index, which can then be used to install it.
+
 
 ## On Windows
 Only builds in the msys2 mingw64 environement are supported.
