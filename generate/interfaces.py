@@ -1,20 +1,20 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Any
 
 import yaml
 
 
-def repr_str(dumper: Any, data: str):
-    if "\n" in data:
-        return dumper.represent_scalar("tag:yaml.org,2002:str", data, style="|")
-    elif len(data) > 110:
-        return dumper.represent_scalar("tag:yaml.org,2002:str", data, style=">")
-    return dumper.org_represent_str(data)
+class CustomDumper(yaml.SafeDumper):
+    def represent_str(self, data: str) -> yaml.ScalarNode:
+        if "\n" in data:
+            return self.represent_scalar("tag:yaml.org,2002:str", data, style="|")
+        elif len(data) > 110:
+            return self.represent_scalar("tag:yaml.org,2002:str", data, style=">")
+        return super().represent_str(data)
 
 
-yaml.SafeDumper.org_represent_str = yaml.SafeDumper.represent_str  # type: ignore
-yaml.add_representer(str, repr_str, Dumper=yaml.SafeDumper)
+CustomDumper.add_representer(str, CustomDumper.represent_str)
+
 
 type Yaml = bool | int | float | str | list[Yaml] | dict[str, Yaml] | None
 
@@ -25,8 +25,9 @@ class Yamlable[Context](ABC):
         pass
 
     def dump(self, ctx: Context) -> str:
-        return yaml.safe_dump(
+        return yaml.dump(
             self.to_yaml(ctx),
+            Dumper=CustomDumper,
             width=120,
             sort_keys=False,
             default_flow_style=False,
