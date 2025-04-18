@@ -92,11 +92,6 @@ def main():
         ],
         outputs=[
             Artifact(
-                "gnat-anod-artifacts",
-                "out_artifacts/*",
-                retention_days=1,
-            ),
-            Artifact(
                 "gnat-release-packages",
                 "sbx/*/release_package*/install/*",
                 retention_days=5,
@@ -139,7 +134,6 @@ def main():
             ),
         ],
         targets=Targets(),
-        inputs=[Artifact("gnat-anod-artifacts", "in_artifacts/")],
         outputs=[
             Artifact(
                 "gnat-release-packages-${{matrix.target}}",

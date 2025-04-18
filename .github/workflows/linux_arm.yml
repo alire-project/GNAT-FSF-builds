@@ -25,12 +25,6 @@ jobs:
       run: python3 ./anod build release_package --qualifier=package=gnat,do_gh_release -v --loglevel DEBUG
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Upload artifact 'gnat-anod-artifacts'
-      uses: actions/upload-artifact@v4
-      with:
-        name: gnat-anod-artifacts
-        path: out_artifacts/*
-        retention-days: 1
     - name: Upload artifact 'gnat-release-packages'
       uses: actions/upload-artifact@v4
       with:
@@ -85,11 +79,6 @@ jobs:
       run: |-
         python -m pip install --upgrade pip
         pip install --break-system-packages e3-core==22.1.0
-    - name: Download artifact 'gnat-anod-artifacts'
-      uses: actions/download-artifact@v4
-      with:
-        name: gnat-anod-artifacts
-        path: in_artifacts/
     - name: Build GNAT ${{ matrix.target }}
       run: python3 ./anod build gcc --target=${{ matrix.target }} -v --loglevel DEBUG --enable-cleanup
     - name: Build GDB ${{ matrix.target }}
