@@ -1,6 +1,7 @@
 name: GNAT Linux Arm
 'on':
 - pull_request
+- workflow_dispatch
 jobs:
   gnat:
     name: GNAT Linux_Arm
@@ -71,8 +72,6 @@ jobs:
         - riscv64-elf
         - avr-elf
         - xtensa-esp32-elf
-    needs:
-    - gnat
     name: GNAT ${{ matrix.target }} Linux_Arm
     runs-on: ubuntu-22.04-arm
     steps:

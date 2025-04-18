@@ -138,7 +138,6 @@ def main():
                 ["--target=${{ matrix.target }}"],
             ),
         ],
-        needs=["gnat"],
         targets=Targets(),
         inputs=[Artifact("gnat-anod-artifacts", "in_artifacts/")],
         outputs=[
@@ -227,7 +226,7 @@ def main():
 
     workflow = Workflow(
         "GNAT",
-        ["pull_request"],
+        ["pull_request", "workflow_dispatch"],
         jobs,
     )
 
