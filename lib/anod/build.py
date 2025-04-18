@@ -23,6 +23,7 @@ from e3.os.fs import cd
 import json
 import logging
 import os
+import time
 
 from typing import TYPE_CHECKING
 
@@ -146,19 +147,28 @@ class FSFBuildDownloadSource(FSFBuildJob):
                 if os.path.isfile(os.path.join(cache_dir, builder.filename + ".sha1")):
                     rm(os.path.join(cache_dir, builder.filename + ".sha1"))
 
-                s = HTTPSession(base_urls=[builder.base_url])
-                result = s.download_file(
-                    url=builder.filename, dest=cache_dir, filename=builder.name
-                )
-                if result is None:
-                    rm(os.path.join(cache_dir, builder.filename))
-                    self.run_status = ReturnValue.failure
-                else:
-                    self.run_status = ReturnValue.success
-                    with open(
-                        os.path.join(cache_dir, builder.filename + ".sha1"), "w"
-                    ) as f:
-                        f.write(hash.sha1(os.path.join(cache_dir, builder.filename)))
+                tries = 0
+                delay = 5
+                max_tries = 5
+                while tries < max_tries:
+                    s = HTTPSession(base_urls=[builder.base_url])
+                    result = s.download_file(
+                        url=builder.filename, dest=cache_dir, filename=builder.name
+                    )
+                    if result is None:
+                        rm(os.path.join(cache_dir, builder.filename))
+                        self.run_status = ReturnValue.failure
+                    else:
+                        self.run_status = ReturnValue.success
+                        with open(
+                            os.path.join(cache_dir, builder.filename + ".sha1"), "w"
+                        ) as f:
+                            f.write(hash.sha1(os.path.join(cache_dir, builder.filename)))
+                        break
+
+                    tries += 1
+                    time.sleep(delay if tries < max_tries else 0)
+                    delay *= 2
             else:
                 cp(
                     os.path.join(self.sandbox.specs_dir, "patches", builder.url),
