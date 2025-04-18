@@ -150,12 +150,22 @@ class FSFBuildDownloadSource(FSFBuildJob):
                 tries = 0
                 delay = 5
                 max_tries = 5
+                result = None
                 while tries < max_tries:
-                    s = HTTPSession(base_urls=[builder.base_url])
-                    result = s.download_file(
-                        url=builder.filename, dest=cache_dir, filename=builder.name
-                    )
+                    tries += 1
+                    try:
+                        s = HTTPSession(base_urls=[builder.base_url])
+                        result = s.download_file(
+                            url=builder.filename, dest=cache_dir, filename=builder.name
+                        )
+                    except BaseException:
+                        result = None
+    
                     if result is None:
+                        if tries < max_tries:
+                            logging.warning(f"failed to download sources, retrying in {delay} seconds...")
+                        else:
+                            logging.error(f"failed to download sources (retried {max_tries} times)")
                         rm(os.path.join(cache_dir, builder.filename))
                         self.run_status = ReturnValue.failure
                     else:
@@ -166,7 +176,6 @@ class FSFBuildDownloadSource(FSFBuildJob):
                             f.write(hash.sha1(os.path.join(cache_dir, builder.filename)))
                         break
 
-                    tries += 1
                     time.sleep(delay if tries < max_tries else 0)
                     delay *= 2
             else:
