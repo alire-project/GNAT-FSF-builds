@@ -148,7 +148,7 @@ def main():
             Step(
                 "Setup packages",
                 [
-                    "opam depext zarith re seq why3",
+                    "opam install zarith re seq why3 --depext-only",
                     "opam install dune dune-configurator menhir num ocamlgraph re "
                     "seq yojson zarith sexplib ppx_sexp_conv ppx_deriving",
                 ],
