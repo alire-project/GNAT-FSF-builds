@@ -32,13 +32,13 @@ jobs:
         cd ..
         cp -r GNAT-FSF-builds /aaa
     - name: Build GNAT native
-      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gcc -v --loglevel DEBUG --enable-cleanup
+      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gcc -v --loglevel INFO --enable-cleanup
     - name: Build GDB
-      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gdb -v --loglevel DEBUG --enable-cleanup
+      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gdb -v --loglevel INFO --enable-cleanup
     - name: Package GNAT
       run: >-
         mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_package --qualifier=package=gnat,do_gh_release
-        -v --loglevel DEBUG
+        -v --loglevel INFO
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Upload artifact 'gnat-release-packages'
@@ -77,11 +77,11 @@ jobs:
         cp -r GNAT-FSF-builds /aaa
     - name: Build GPRbuild
       run: >-
-        mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gprbuild -v --loglevel DEBUG --enable-cleanup
+        mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gprbuild -v --loglevel INFO --enable-cleanup
     - name: Package GPRbuild
       run: >-
         mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_package --qualifier=package=gprbuild,do_gh_release
-        -v --loglevel DEBUG
+        -v --loglevel INFO
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Upload artifact 'gprbuild-release-packages'
@@ -129,15 +129,15 @@ jobs:
     - name: Build GNAT ${{ matrix.target }}
       run: >-
         mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gcc --target=${{ matrix.target }} -v --loglevel
-        DEBUG --enable-cleanup
+        INFO --enable-cleanup
     - name: Build GDB ${{ matrix.target }}
       run: >-
         mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gdb --target=${{ matrix.target}} -v --loglevel
-        DEBUG --enable-cleanup
+        INFO --enable-cleanup
     - name: Package GNAT ${{ matrix.target }}
       run: >-
         mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_package --qualifier=package=gnat,do_gh_release
-        --target=${{ matrix.target }} -v --loglevel DEBUG
+        --target=${{ matrix.target }} -v --loglevel INFO
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Upload artifact 'gnat-release-packages-${{matrix.target}}'
@@ -242,11 +242,11 @@ jobs:
         path: C:/aaa/GNAT-FSF-builds/why3_artifact/
     - name: Build SPARK
       run: >-
-        mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build spark2014 -v --loglevel DEBUG --enable-cleanup
+        mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build spark2014 -v --loglevel INFO --enable-cleanup
     - name: Package GNATprove
       run: >-
         mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_package --qualifier=package=gnatprove,do_gh_release
-        -v --loglevel DEBUG
+        -v --loglevel INFO
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Upload artifact 'gnatprove-release-packages'

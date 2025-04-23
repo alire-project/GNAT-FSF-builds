@@ -55,6 +55,7 @@ class AnodBuild(Step):
         args: list[str] | None = None,
         secrets: list[str] | None = None,
         verbose: bool = True,
+        loglevel: str = "INFO"
     ):
         if secrets is None:
             secrets = []
@@ -64,8 +65,8 @@ class AnodBuild(Step):
         self.secrets = secrets
         if verbose:
             args.append("-v")
-            args.append("--loglevel")
-            args.append("DEBUG")
+        args.append("--loglevel")
+        args.append(loglevel)
         if package != "release_package":
             args.append("--enable-cleanup")
         self.command = ["python3 ./anod build " + package + " " + " ".join(args)]
