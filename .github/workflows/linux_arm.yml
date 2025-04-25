@@ -3,7 +3,37 @@ name: GNAT Linux Arm
 - pull_request
 - workflow_dispatch
 jobs:
+  gcc_dependencies:
+    name: GCC Dependencies Linux_Arm
+    runs-on: ubuntu-22.04-arm
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v4
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.8'
+    - name: Install Python dependencies
+      run: |-
+        python -m pip install --upgrade pip
+        pip install --break-system-packages e3-core==22.1.0
+    - name: Build GMP
+      run: python3 ./anod build gmp -v --loglevel INFO --enable-cleanup
+    - name: Build MPFR
+      run: python3 ./anod build mpfr -v --loglevel INFO --enable-cleanup
+    - name: Build MPC
+      run: python3 ./anod build mpc -v --loglevel INFO --enable-cleanup
+    - name: Build ISL
+      run: python3 ./anod build isl -v --loglevel INFO --enable-cleanup
+    - name: Upload artifact 'gcc-dependencies-artifacts'
+      uses: actions/upload-artifact@v4
+      with:
+        name: gcc-dependencies-artifacts
+        path: out_artifacts/*
+        retention-days: 1
   gnat:
+    needs:
+    - gcc_dependencies
     name: GNAT Linux_Arm
     runs-on: ubuntu-22.04-arm
     steps:
@@ -17,6 +47,11 @@ jobs:
       run: |-
         python -m pip install --upgrade pip
         pip install --break-system-packages e3-core==22.1.0
+    - name: Download artifact 'gcc-dependencies-artifacts'
+      uses: actions/download-artifact@v4
+      with:
+        name: gcc-dependencies-artifacts
+        path: in_artifacts/
     - name: Build GNAT native
       run: python3 ./anod build gcc -v --loglevel INFO --enable-cleanup
     - name: Build GDB
@@ -66,6 +101,8 @@ jobs:
         - riscv64-elf
         - avr-elf
         - xtensa-esp32-elf
+    needs:
+    - gcc_dependencies
     name: GNAT ${{ matrix.target }} Linux_Arm
     runs-on: ubuntu-22.04-arm
     steps:
@@ -79,6 +116,11 @@ jobs:
       run: |-
         python -m pip install --upgrade pip
         pip install --break-system-packages e3-core==22.1.0
+    - name: Download artifact 'gcc-dependencies-artifacts'
+      uses: actions/download-artifact@v4
+      with:
+        name: gcc-dependencies-artifacts
+        path: in_artifacts/
     - name: Build GNAT ${{ matrix.target }}
       run: python3 ./anod build gcc --target=${{ matrix.target }} -v --loglevel INFO --enable-cleanup
     - name: Build GDB ${{ matrix.target }}

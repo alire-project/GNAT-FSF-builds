@@ -73,22 +73,31 @@ class Workflow(Yamlable[Os]):
 def main():
     jobs: dict[str, Job] = {}
 
+    jobs["gcc_dependencies"] = Job(
+        "GCC Dependencies",
+        [
+            AnodBuild("Build GMP", "gmp"),
+            AnodBuild("Build MPFR", "mpfr"),
+            AnodBuild("Build MPC", "mpc"),
+            Conditional(
+                AnodBuild("Build ISL", "isl"), lambda os: not issubclass(os, host.macOS)
+            ),
+        ],
+        outputs=[
+            Artifact("gcc-dependencies-artifacts", "out_artifacts/*", retention_days=1)
+        ],
+    )
+
     jobs["gnat"] = Job(
         "GNAT",
         [
-            Conditional(
-                Step(
-                    "Install Ada dependencies",
-                    [
-                        "sudo apt-get update",
-                        "DEBIAN_FRONTEND=noninteractive sudo apt-get install -y texinfo",
-                    ],
-                ),
-                lambda os: issubclass(os, host.Linux),
-            ),
             AnodBuild("Build GNAT native", "gcc"),
             AnodBuild("Build GDB", "gdb"),
             ReleasePackage("Package GNAT", "gnat"),
+        ],
+        needs=["gcc_dependencies"],
+        inputs=[
+            Artifact("gcc-dependencies-artifacts", "in_artifacts/"),
         ],
         outputs=[
             Artifact(
@@ -134,6 +143,10 @@ def main():
             ),
         ],
         targets=Targets(),
+        needs=["gcc_dependencies"],
+        inputs=[
+            Artifact("gcc-dependencies-artifacts", "in_artifacts/"),
+        ],
         outputs=[
             Artifact(
                 "gnat-release-packages-${{matrix.target}}",

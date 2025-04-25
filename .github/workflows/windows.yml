@@ -3,7 +3,51 @@ name: GNAT Windows
 - pull_request
 - workflow_dispatch
 jobs:
+  gcc_dependencies:
+    name: GCC Dependencies WindowsMsys2
+    runs-on: windows-2019
+    env:
+      CONFIG_SHELL: /bin/bash
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v4
+    - name: Install msys2
+      uses: msys2/setup-msys2@v2
+      with:
+        install: >-
+          base-devel git mingw-w64-x86_64-github-cli mingw-w64-x86_64-toolchain mingw-w64-x86_64-python mingw-w64-x86_64-python-pip
+          mingw-w64-x86_64-python-psutil
+    - name: Install Python dependencies
+      run: |-
+        python -m pip install --upgrade pip
+        pip install --break-system-packages e3-core==22.1.0
+    - name: Prepare msys2 build setup
+      run: |-
+        df -h
+        mkdir C:/aaa
+        mount C:/aaa /aaa
+        cd ..
+        cp -r GNAT-FSF-builds /aaa
+    - name: Build GMP
+      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gmp -v --loglevel INFO --enable-cleanup
+    - name: Build MPFR
+      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build mpfr -v --loglevel INFO --enable-cleanup
+    - name: Build MPC
+      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build mpc -v --loglevel INFO --enable-cleanup
+    - name: Build ISL
+      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build isl -v --loglevel INFO --enable-cleanup
+    - name: Upload artifact 'gcc-dependencies-artifacts'
+      uses: actions/upload-artifact@v4
+      with:
+        name: gcc-dependencies-artifacts
+        path: C:/aaa/GNAT-FSF-builds/out_artifacts/*
+        retention-days: 1
   gnat:
+    needs:
+    - gcc_dependencies
     name: GNAT WindowsMsys2
     runs-on: windows-2019
     env:
@@ -31,6 +75,11 @@ jobs:
         mount C:/aaa /aaa
         cd ..
         cp -r GNAT-FSF-builds /aaa
+    - name: Download artifact 'gcc-dependencies-artifacts'
+      uses: actions/download-artifact@v4
+      with:
+        name: gcc-dependencies-artifacts
+        path: C:/aaa/GNAT-FSF-builds/in_artifacts/
     - name: Build GNAT native
       run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gcc -v --loglevel INFO --enable-cleanup
     - name: Build GDB
@@ -99,6 +148,8 @@ jobs:
         - riscv64-elf
         - avr-elf
         - xtensa-esp32-elf
+    needs:
+    - gcc_dependencies
     name: GNAT ${{ matrix.target }} WindowsMsys2
     runs-on: windows-2019
     env:
@@ -126,6 +177,11 @@ jobs:
         mount C:/aaa /aaa
         cd ..
         cp -r GNAT-FSF-builds /aaa
+    - name: Download artifact 'gcc-dependencies-artifacts'
+      uses: actions/download-artifact@v4
+      with:
+        name: gcc-dependencies-artifacts
+        path: C:/aaa/GNAT-FSF-builds/in_artifacts/
     - name: Build GNAT ${{ matrix.target }}
       run: >-
         mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gcc --target=${{ matrix.target }} -v --loglevel
