@@ -172,7 +172,7 @@ class GCC(spec("gh-artifact")):
         # build method.
 
         if self.env.is_cross and not self.deps["base_gcc"].version.startswith(
-            self.version.split(".")[0]
+            self.version.split(".")[0] + "."
         ):
             raise AssertionError(
                 "Cross compiler cannot be built with a different GCC version."
