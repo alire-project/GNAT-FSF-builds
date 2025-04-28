@@ -8,8 +8,6 @@ class CustomDumper(yaml.SafeDumper):
     def represent_str(self, data: str) -> yaml.ScalarNode:
         if "\n" in data:
             return self.represent_scalar("tag:yaml.org,2002:str", data, style="|")  # type: ignore #
-        elif len(data) > 110:
-            return self.represent_scalar("tag:yaml.org,2002:str", data, style=">")  # type: ignore #
         return super().represent_str(data)
 
 
@@ -28,7 +26,7 @@ class Yamlable[Context](ABC):
         return yaml.dump(
             self.to_yaml(ctx),
             Dumper=CustomDumper,
-            width=120,
+            width=200,
             sort_keys=False,
             default_flow_style=False,
         )
