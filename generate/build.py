@@ -67,7 +67,7 @@ class AnodBuild(Step):
             args.append("-v")
         args.append("--loglevel")
         args.append(loglevel)
-        if package != "release_package":
+        if package not in ["release_package", "gh-release"]:
             args.append("--enable-cleanup")
         self.command = ["python3 ./anod build " + package + " " + " ".join(args)]
 
@@ -77,12 +77,23 @@ class ReleasePackage(AnodBuild):
         super().__init__(
             name,
             "release_package",
-            [f"--qualifier=package={package},do_gh_release", *args],
+            [f"--qualifier=package={package}", *args],
+        )
+
+
+class GhRelease(AnodBuild):
+    def __init__(self, name: str, package: str, args: list[str] = []):
+        super().__init__(
+            name,
+            "release_github",
+            [f"--qualifier=package={package}", *args],
             secrets=["GITHUB_TOKEN"],
         )
 
-    def to_yaml(self, ctx):
-        return {"if": "inputs.do_gh_release", **super().to_yaml(ctx)}
+    def to_yaml(self, ctx: Host) -> Yaml:
+        spr = super().to_yaml(ctx)
+        assert isinstance(spr, dict)
+        return {"if": "inputs.do_gh_release", **spr}
 
 
 @dataclass

@@ -6,6 +6,7 @@ from build import (
     AnodBuild,
     Artifact,
     Conditional,
+    GhRelease,
     Job,
     JobKind,
     ReleasePackage,
@@ -95,6 +96,7 @@ def main():
             AnodBuild("Build GNAT native", "gcc"),
             AnodBuild("Build GDB", "gdb"),
             ReleasePackage("Package GNAT", "gnat"),
+            GhRelease("Release GNAT", "gnat"),
         ],
         needs=["gcc_dependencies"],
         inputs=[
@@ -114,6 +116,7 @@ def main():
         [
             AnodBuild("Build GPRbuild", "gprbuild"),
             ReleasePackage("Package GPRbuild", "gprbuild"),
+            GhRelease("Release GPRbuild", "gprbuild"),
         ],
         outputs=[
             Artifact(
@@ -139,6 +142,11 @@ def main():
             ),
             ReleasePackage(
                 "Package GNAT ${{ matrix.target }}",
+                "gnat",
+                ["--target=${{ matrix.target }}"],
+            ),
+            GhRelease(
+                "Release GNAT ${{ matrix.target }}",
                 "gnat",
                 ["--target=${{ matrix.target }}"],
             ),
@@ -217,6 +225,7 @@ def main():
         [
             AnodBuild("Build SPARK", "spark2014"),
             ReleasePackage("Package GNATprove", "gnatprove"),
+            GhRelease("Release GNATprove", "gnatprove"),
         ],
         needs=["why3", "alt_ergo"],
         inputs=[
