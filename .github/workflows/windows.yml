@@ -1,7 +1,19 @@
 name: GNAT Windows
 'on':
-- pull_request
-- workflow_dispatch
+  pull_request:
+    paths-ignore:
+    - generate/**
+    - utils/**
+    - LICENSE
+    - README.md
+    - .gitignore
+  workflow_dispatch:
+    inputs:
+      do_gh_release:
+        description: Set to true to publish results in a GitHub release
+        type: boolean
+        required: false
+        default: false
 jobs:
   gcc_dependencies:
     name: GCC Dependencies WindowsMsys2
@@ -84,7 +96,8 @@ jobs:
       run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gcc -v --loglevel DEBUG --enable-cleanup
     - name: Build GDB
       run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gdb -v --loglevel DEBUG --enable-cleanup
-    - name: Package GNAT
+    - if: inputs.do_gh_release
+      name: Package GNAT
       run: >-
         mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_package --qualifier=package=gnat,do_gh_release
         -v --loglevel DEBUG
@@ -127,7 +140,8 @@ jobs:
     - name: Build GPRbuild
       run: >-
         mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gprbuild -v --loglevel DEBUG --enable-cleanup
-    - name: Package GPRbuild
+    - if: inputs.do_gh_release
+      name: Package GPRbuild
       run: >-
         mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_package --qualifier=package=gprbuild,do_gh_release
         -v --loglevel DEBUG
@@ -190,7 +204,8 @@ jobs:
       run: >-
         mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gdb --target=${{ matrix.target}} -v --loglevel
         DEBUG --enable-cleanup
-    - name: Package GNAT ${{ matrix.target }}
+    - if: inputs.do_gh_release
+      name: Package GNAT ${{ matrix.target }}
       run: >-
         mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_package --qualifier=package=gnat,do_gh_release
         --target=${{ matrix.target }} -v --loglevel DEBUG
@@ -299,7 +314,8 @@ jobs:
     - name: Build SPARK
       run: >-
         mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build spark2014 -v --loglevel DEBUG --enable-cleanup
-    - name: Package GNATprove
+    - if: inputs.do_gh_release
+      name: Package GNATprove
       run: >-
         mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_package --qualifier=package=gnatprove,do_gh_release
         -v --loglevel DEBUG

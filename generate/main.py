@@ -234,7 +234,27 @@ def main():
 
     workflow = Workflow(
         "GNAT",
-        ["pull_request", "workflow_dispatch"],
+        {
+            "pull_request": {
+                "paths-ignore": [
+                    "generate/**",
+                    "utils/**",
+                    "LICENSE",
+                    "README.md",
+                    ".gitignore",
+                ],
+            },
+            "workflow_dispatch": {
+                "inputs": {
+                    "do_gh_release": {
+                        "description": "Set to true to publish results in a GitHub release",
+                        "type": "boolean",
+                        "required": False,
+                        "default": False,
+                    },
+                },
+            },
+        },
         jobs,
     )
 

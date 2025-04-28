@@ -81,6 +81,9 @@ class ReleasePackage(AnodBuild):
             secrets=["GITHUB_TOKEN"],
         )
 
+    def to_yaml(self, ctx):
+        return {"if": "inputs.do_gh_release", **super().to_yaml(ctx)}
+
 
 @dataclass
 class Artifact(Yamlable[Host]):
