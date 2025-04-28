@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Literal
 import sys
 
@@ -51,16 +52,16 @@ def dispatch(os: Os, job: JobKind) -> Host:
                     return host.Windows
 
 
+@dataclass
 class Workflow(Yamlable[Os]):
-    def __init__(self, name: str, on: list[str], jobs: dict[str, Job]):
-        self.name = name
-        self.on = on
-        self.jobs = jobs
+    name: str
+    on: Yaml
+    jobs: dict[str, Job]
 
     def to_yaml(self, ctx: Os) -> Yaml:
         res: dict[str, Yaml] = {
             "name": self.name + " " + pretty_name(ctx),
-            "on": list(self.on),
+            "on": self.on,
         }
 
         res["jobs"] = {

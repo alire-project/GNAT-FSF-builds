@@ -18,13 +18,13 @@ jobs:
         python -m pip install --upgrade pip
         pip install --break-system-packages e3-core==22.1.0
     - name: Build GMP
-      run: python3 ./anod build gmp -v --loglevel INFO --enable-cleanup
+      run: python3 ./anod build gmp -v --loglevel DEBUG --enable-cleanup
     - name: Build MPFR
-      run: python3 ./anod build mpfr -v --loglevel INFO --enable-cleanup
+      run: python3 ./anod build mpfr -v --loglevel DEBUG --enable-cleanup
     - name: Build MPC
-      run: python3 ./anod build mpc -v --loglevel INFO --enable-cleanup
+      run: python3 ./anod build mpc -v --loglevel DEBUG --enable-cleanup
     - name: Build ISL
-      run: python3 ./anod build isl -v --loglevel INFO --enable-cleanup
+      run: python3 ./anod build isl -v --loglevel DEBUG --enable-cleanup
     - name: Upload artifact 'gcc-dependencies-artifacts'
       uses: actions/upload-artifact@v4
       with:
@@ -53,11 +53,11 @@ jobs:
         name: gcc-dependencies-artifacts
         path: in_artifacts/
     - name: Build GNAT native
-      run: python3 ./anod build gcc -v --loglevel INFO --enable-cleanup
+      run: python3 ./anod build gcc -v --loglevel DEBUG --enable-cleanup
     - name: Build GDB
-      run: python3 ./anod build gdb -v --loglevel INFO --enable-cleanup
+      run: python3 ./anod build gdb -v --loglevel DEBUG --enable-cleanup
     - name: Package GNAT
-      run: python3 ./anod build release_package --qualifier=package=gnat,do_gh_release -v --loglevel INFO
+      run: python3 ./anod build release_package --qualifier=package=gnat,do_gh_release -v --loglevel DEBUG
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Upload artifact 'gnat-release-packages'
@@ -81,9 +81,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install --break-system-packages e3-core==22.1.0
     - name: Build GPRbuild
-      run: python3 ./anod build gprbuild -v --loglevel INFO --enable-cleanup
+      run: python3 ./anod build gprbuild -v --loglevel DEBUG --enable-cleanup
     - name: Package GPRbuild
-      run: python3 ./anod build release_package --qualifier=package=gprbuild,do_gh_release -v --loglevel INFO
+      run: python3 ./anod build release_package --qualifier=package=gprbuild,do_gh_release -v --loglevel DEBUG
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Upload artifact 'gprbuild-release-packages'
@@ -122,13 +122,13 @@ jobs:
         name: gcc-dependencies-artifacts
         path: in_artifacts/
     - name: Build GNAT ${{ matrix.target }}
-      run: python3 ./anod build gcc --target=${{ matrix.target }} -v --loglevel INFO --enable-cleanup
+      run: python3 ./anod build gcc --target=${{ matrix.target }} -v --loglevel DEBUG --enable-cleanup
     - name: Build GDB ${{ matrix.target }}
-      run: python3 ./anod build gdb --target=${{ matrix.target}} -v --loglevel INFO --enable-cleanup
+      run: python3 ./anod build gdb --target=${{ matrix.target}} -v --loglevel DEBUG --enable-cleanup
     - name: Package GNAT ${{ matrix.target }}
       run: >-
         python3 ./anod build release_package --qualifier=package=gnat,do_gh_release --target=${{ matrix.target }} -v --loglevel
-        INFO
+        DEBUG
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Upload artifact 'gnat-release-packages-${{matrix.target}}'
@@ -218,9 +218,9 @@ jobs:
         name: why3
         path: why3_artifact/
     - name: Build SPARK
-      run: python3 ./anod build spark2014 -v --loglevel INFO --enable-cleanup
+      run: python3 ./anod build spark2014 -v --loglevel DEBUG --enable-cleanup
     - name: Package GNATprove
-      run: python3 ./anod build release_package --qualifier=package=gnatprove,do_gh_release -v --loglevel INFO
+      run: python3 ./anod build release_package --qualifier=package=gnatprove,do_gh_release -v --loglevel DEBUG
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Upload artifact 'gnatprove-release-packages'

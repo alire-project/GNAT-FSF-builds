@@ -55,7 +55,7 @@ class AnodBuild(Step):
         args: list[str] | None = None,
         secrets: list[str] | None = None,
         verbose: bool = True,
-        loglevel: str = "INFO"
+        loglevel: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "DEBUG",
     ):
         if secrets is None:
             secrets = []
