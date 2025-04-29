@@ -25,7 +25,7 @@ class GCC(spec("gh-artifact")):
             self.HTTPSSourceBuilder(
                 name=self.tarball,
                 url=(
-                    "https://ftp.gnu.org/gnu/gcc/gcc-%s/%s"
+                    "https://gcc.gnu.org/pub/gcc/releases/gcc-%s/%s"
                     % (self.version, self.tarball)
                     if not self.host_is_macos_arm
                     else
@@ -46,14 +46,6 @@ class GCC(spec("gh-artifact")):
     @property
     def bootstrap(self):
         return "bootstrap" in self.parsed_qualifier
-
-    @property
-    def is_cross(self):
-        return (
-            self.env.target.triplet == "arm-eabi"
-            or self.env.target.triplet == "riscv64-elf"
-            or self.env.target.triplet == "avr-elf"
-        )
 
     @property
     def build_space_name(self):
@@ -79,20 +71,7 @@ class GCC(spec("gh-artifact")):
             Anod.Dependency("mpc", host="build", target="host"),
         ]
 
-        # Select which compiler to use:
-        # - gcc_native is a native compiler that was built with this script
-        # - base_gcc is a native compiler downloaded from a binray archive
-        #
-        # To build the native compilers we can use a native compiler of the
-        # last major version.
-        #
-        # To build the cross compilers we need to have a native compiler of the
-        # same version that we are building.
-        #
-        if self.env.is_cross and not self.bootstrap:
-            deps.append(Anod.Dependency("gcc", local_name="gcc_native", target="host"))
-        else:
-            deps.append(Anod.Dependency("base_gcc", host="build", target="host"))
+        deps.append(Anod.Dependency("base_gcc", host="build", target="host"))
 
         if self.env.build.os.name != "darwin":
             deps.append(Anod.Dependency("isl", host="build", target="host"))
@@ -123,11 +102,10 @@ class GCC(spec("gh-artifact")):
             args.append("--disable-multilib")
             args.append("--enable-threads=posix")
 
-            # TODO: Enabling this option will make the cross compiler
-            # builds fail because of the discrepency between base_gcc
-            # and gcc. This option should be enabled on the next major
-            # release.
-            # args.append("--enable-default-pie")
+            # Enabling this option will make the first cross builds of the next
+            # major release fail (cross compilers cannot be built with a different
+            # major GCC version.)
+            args.append("--enable-default-pie")
 
         # Windows Native
         if self.env.target.triplet == "x86_64-w64-mingw32":
@@ -193,7 +171,14 @@ class GCC(spec("gh-artifact")):
         # This spec inherit from gh-artifact and therefore has a different
         # build method.
 
-        for m in ("binutils", "gcc_native", "mingw", "base_gcc"):
+        if self.env.is_cross and not self.deps["base_gcc"].version.startswith(
+            self.version.split(".")[0] + "."
+        ):
+            raise AssertionError(
+                "Cross compiler cannot be built with a different GCC version."
+            )
+
+        for m in ("binutils", "mingw", "base_gcc"):
             if m in self.deps:
                 self.deps[m].setenv()
 

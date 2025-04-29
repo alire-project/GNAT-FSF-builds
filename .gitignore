@@ -1,3 +1,4 @@
+.vscode
 sbx
 *.pyc
 /my-virtual-env/

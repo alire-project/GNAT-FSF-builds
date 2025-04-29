@@ -23,7 +23,7 @@ class GDB(spec("common")):
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
-                name=self.tarball, url="https://ftp.gnu.org/gnu/gdb/%s" % self.tarball
+                name=self.tarball, url="https://gcc.gnu.org/pub/gdb/releases/%s" % self.tarball
             ),
             self.LocalSourceBuilder(name=patch_name),
         ]

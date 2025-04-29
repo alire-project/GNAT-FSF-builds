@@ -21,7 +21,7 @@ class Binutils(spec("common")):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://ftp.gnu.org/gnu/binutils/" + self.tarball,
+                url="https://gcc.gnu.org/pub/binutils/releases/" + self.tarball,
             )
         ]
 

@@ -62,7 +62,7 @@ class SPARK2014(spec("common")):
         return [
             self.HTTPSSourceBuilder(
                 name=self.gcc_tarball,
-                url="https://ftp.gnu.org/gnu/gcc/gcc-%s/%s"
+                url="https://gcc.gnu.org/pub/gcc/releases/gcc-%s/%s"
                 % (self.version, self.gcc_tarball),
             ),
             self.HTTPSSourceBuilder(
