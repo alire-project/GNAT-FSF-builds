@@ -9,78 +9,9 @@ import os
 valid_packages = ["gprbuild", "gnat", "gnatcov", "gnatprove"]
 
 
-class ReleasePackage(spec("common")):
-    @property
-    def package(self):
-        if "package" not in self.parsed_qualifier:
-            raise Exception(
-                "--qualifier=package=<%s> required" % ", ".join(valid_packages)
-            )
-
-        if self.parsed_qualifier["package"] not in valid_packages:
-            raise Exception(
-                "Invalid package: '%s' (expects: %s)"
-                % (self.parsed_qualifier["package"], " or ".join(valid_packages))
-            )
-
-        return self.parsed_qualifier["package"]
-
-    @property
-    def version(self):
-        package = self.package
-        package_deps = self.deps["release_package"].deps
-
-        if package in ["gprbuild", "gnatcov"]:
-            return package_deps[package].version
-        elif package == "gnat":
-            return package_deps["gcc"].version
-        elif package == "gnatprove":
-            return package_deps["spark2014"].version
-
-    @property
-    def package_release(self):
-        """Allows to differentiate between consecutive builds of the same set
-        of sources. For instance when the build options are changed.
-        """
-        package = self.package
-
-        if package == "gprbuild":
-            return "1"
-        elif package == "gnatcov":
-            return "1"
-        elif package == "gnatprove":
-            return "1"
-        elif package == "gnat":
-            if self.env.target.triplet == "arm-eabi":
-                return "1"
-            elif self.env.target.triplet == "riscv64-elf":
-                return "1"
-            elif self.env.target.triplet == "avr":
-                return "1"
-            else:
-                return "1"
-
-    @property
-    def release_name(self):
-        platform = self.env.platform
-
-        # The target triplet for cross compilers on macOS (darwin) x86 and
-        # aarch64 is the same, to differentiate the two hosts we add host CPU
-        # name at the end of platform name. And for consistency we do this on
-        # all other hosts as well.
-        if self.env.is_cross:
-            platform += "-" + self.env.host.cpu.name
-
-        return "%s-%s-%s-%s" % (
-            self.package,
-            platform,
-            self.version,
-            self.package_release,
-        )
-
-    @property
-    def archive_name(self):
-        return "%s.tar.gz" % self.release_name
+class ReleasePackage(spec("release_package")):
+    # inherit from release_package to deduplicate archive name,
+    # release name... not very elegant but it works
 
     @property
     def github_release_name(self):
@@ -96,14 +27,13 @@ class ReleasePackage(spec("common")):
             self.version,
             self.package_release,
         )
-    
-    @property
-    def build_space_name(self):
-        return "%s-%s-%s" % (self.name, self.package, self.env.platform)
 
     @property
     def build_deps(self):
-        return [Anod.Dependency("release_package", qualifier=f"package={self.package}")]
+        return [
+            Anod.Dependency("release_package", qualifier=f"package={self.package}"),
+            *super().build_deps,
+        ]
 
     def check_github_release(self, release_name):
         try:
