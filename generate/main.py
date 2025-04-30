@@ -193,7 +193,7 @@ def main():
             ),
         ],
         kind="ocaml",
-        repo=Repository("adacore/why3", "fsf-14"),
+        repo=Repository("adacore/why3", "fsf-15"),
         outputs=[
             Artifact("why3", "${{ github.workspace }}/why3install"),
         ],
@@ -216,7 +216,7 @@ def main():
             ),
         ],
         kind="ocaml",
-        repo=Repository("adacore/alt-ergo", "fsf-14"),
+        repo=Repository("adacore/alt-ergo", "fsf-15"),
         outputs=[Artifact("alt-ergo", "${{ github.workspace }}/alt-ergo-install")],
     )
 
