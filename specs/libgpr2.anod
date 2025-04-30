@@ -15,14 +15,11 @@ class LibGPR2(spec("common")):
 
     @property
     def version(self):
-        if self.is_next:
-            return "24.2.0-next"
-        else:
-            return "24.0.0"
+        return "25.0.0"
 
     @property
     def lk_version(self):
-        return "24.0.0"
+        return "25.0.0"
 
     @property
     def tarball(self):

@@ -12,7 +12,7 @@ patch_name = "gprbuild-no-static.patch"
 class GPRbuild(spec("gh-artifact")):
     @property
     def version(self):
-        return "24.0.0"
+        return "25.0.0"
 
     @property
     def tarball(self):
