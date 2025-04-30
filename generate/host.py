@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from build import Action, InstallPythonDeps, SetupOcaml, SetupPython, Step
 from interfaces import Host, HostOs, RawStep, Yaml, Yamlable
@@ -81,22 +81,26 @@ class WindowsMsys2(Windows):
     def setup_python(cls) -> list[RawStep]:
         @dataclass
         class Install(Yamlable[Host]):
-            install: str
+            install: list[str] = field(default_factory=list)
 
             def to_yaml(self, ctx: Host) -> Yaml:
-                return {"install": self.install}
+                return {"install": "\n".join(self.install)}
 
         return [
             Action(
                 "Install msys2",
                 "msys2/setup-msys2@v2",
                 with_args=Install(
-                    "base-devel "
-                    "git mingw-w64-x86_64-github-cli "
-                    "mingw-w64-x86_64-toolchain "
-                    "mingw-w64-x86_64-python "
-                    "mingw-w64-x86_64-python-pip "
-                    "mingw-w64-x86_64-python-psutil"
+                    [
+                        "base-devel",
+                        "git",
+                        "rsync",
+                        "mingw-w64-x86_64-github-cli",
+                        "mingw-w64-x86_64-toolchain",
+                        "mingw-w64-x86_64-python",
+                        "mingw-w64-x86_64-python-pip",
+                        "mingw-w64-x86_64-python-psutil",
+                    ]
                 ),
             ),
             InstallPythonDeps({"e3-core": cls.e3_core_version}),
