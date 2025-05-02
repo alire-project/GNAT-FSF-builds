@@ -119,6 +119,7 @@ def main():
             GhRelease("Release GPRbuild", "gprbuild"),
         ],
         outputs=[
+            Artifact("gpr-anod-artifacts", "out_artifacts/*", retention_days=1),
             Artifact(
                 "gprbuild-release-packages",
                 "sbx/*/release_package*/install/*",
@@ -227,8 +228,9 @@ def main():
             ReleasePackage("Package GNATprove", "gnatprove"),
             GhRelease("Release GNATprove", "gnatprove"),
         ],
-        needs=["why3", "alt_ergo"],
+        needs=["why3", "alt_ergo", "gprbuild"],
         inputs=[
+            Artifact("gpr-anod-artifacts", "in_artifacts/"),
             Artifact("alt-ergo", "alt-ergo_artifact/"),
             Artifact("why3", "why3_artifact/"),
         ],
