@@ -42,23 +42,7 @@ class ReleasePackage(spec("common")):
         """Allows to differentiate between consecutive builds of the same set
         of sources. For instance when the build options are changed.
         """
-        package = self.package
-
-        if package == "gprbuild":
-            return "1"
-        elif package == "gnatcov":
-            return "1"
-        elif package == "gnatprove":
-            return "1"
-        elif package == "gnat":
-            if self.env.target.triplet == "arm-eabi":
-                return "1"
-            elif self.env.target.triplet == "riscv64-elf":
-                return "1"
-            elif self.env.target.triplet == "avr":
-                return "1"
-            else:
-                return "1"
+        return "rc1"
 
     @property
     def release_name(self):

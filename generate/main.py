@@ -17,7 +17,7 @@ from build import (
 from interfaces import Host, Yaml, Yamlable
 import host
 
-type Os = Literal["linux", "linux_arm", "macos", "macos_arm", "windows"]
+type Os = Literal["linux", "linux_arm", "macos", "windows"]
 oses: list[Os] = list(Os.__value__.__args__)
 
 
@@ -124,120 +124,6 @@ def main():
                 "sbx/*/release_package*/install/*",
                 retention_days=5,
             ),
-        ],
-    )
-
-    jobs["gnat_cross"] = Job(
-        "GNAT ${{ matrix.target }}",
-        [
-            AnodBuild(
-                "Build GNAT ${{ matrix.target }}",
-                "gcc",
-                ["--target=${{ matrix.target }}"],
-            ),
-            AnodBuild(
-                "Build GDB ${{ matrix.target }}",
-                "gdb",
-                ["--target=${{ matrix.target}}"],
-            ),
-            ReleasePackage(
-                "Package GNAT ${{ matrix.target }}",
-                "gnat",
-                ["--target=${{ matrix.target }}"],
-            ),
-            GhRelease(
-                "Release GNAT ${{ matrix.target }}",
-                "gnat",
-                ["--target=${{ matrix.target }}"],
-            ),
-        ],
-        targets=Targets(),
-        needs=["gcc_dependencies"],
-        inputs=[
-            Artifact("gcc-dependencies-artifacts", "in_artifacts/"),
-        ],
-        outputs=[
-            Artifact(
-                "gnat-release-packages-${{matrix.target}}",
-                "sbx/*/release_package*/install/*",
-            )
-        ],
-    )
-
-    jobs["why3"] = Job(
-        "Why3",
-        [
-            Step(
-                "Setup packages",
-                [
-                    "opam install zarith re seq why3 --depext-only",
-                    "opam install dune dune-configurator menhir num ocamlgraph re "
-                    "seq yojson zarith sexplib ppx_sexp_conv ppx_deriving",
-                ],
-            ),
-            Step(
-                "Configure why3",
-                [
-                    "opam exec -- ./configure --prefix=${{ github.workspace }}/why3install "
-                    "--enable-relocation --disable-emacs-compilation --disable-hypothesis-selection "
-                    "--disable-js-of-ocaml --disable-zip"
-                ],
-            ),
-            Step("Make", ["opam exec -- make"]),
-            Step("Install", ["opam exec -- make install_spark2014"]),
-            Step(
-                "Update version",
-                [
-                    "git log --format='%H' -n 1 > ${{ github.workspace }}/why3install/why3-version.txt"
-                ],
-            ),
-        ],
-        kind="ocaml",
-        repo=Repository("adacore/why3", "fsf-14"),
-        outputs=[
-            Artifact("why3", "${{ github.workspace }}/why3install"),
-        ],
-    )
-
-    jobs["alt_ergo"] = Job(
-        "Alt-Ergo",
-        [
-            Step(
-                "Install",
-                [
-                    "opam install alt-ergo --destdir=${{ github.workspace }}/alt-ergo-install"
-                ],
-            ),
-            Step(
-                "Update version",
-                [
-                    "git log --format='%H' -n 1 > ${{ github.workspace }}/alt-ergo-install/alt-ergo-version.txt"
-                ],
-            ),
-        ],
-        kind="ocaml",
-        repo=Repository("adacore/alt-ergo", "fsf-14"),
-        outputs=[Artifact("alt-ergo", "${{ github.workspace }}/alt-ergo-install")],
-    )
-
-    jobs["spark"] = Job(
-        "SPARK",
-        [
-            AnodBuild("Build SPARK", "spark2014"),
-            ReleasePackage("Package GNATprove", "gnatprove"),
-            GhRelease("Release GNATprove", "gnatprove"),
-        ],
-        needs=["why3", "alt_ergo"],
-        inputs=[
-            Artifact("alt-ergo", "alt-ergo_artifact/"),
-            Artifact("why3", "why3_artifact/"),
-        ],
-        outputs=[
-            Artifact(
-                "gnatprove-release-packages",
-                "sbx/*/release_package*/install/*",
-                retention_days=5,
-            )
         ],
     )
 
