@@ -10,7 +10,7 @@ import time
 class base_gcc(spec("common")):
     @property
     def version(self):
-        return "14.2.0-1"
+        return "15.1.0-rc1"
 
     @property
     def tarball(self):
