@@ -159,6 +159,7 @@ class GCC(spec("gh-artifact")):
         if self.env.target.triplet == "riscv64-elf":
             args += cross_commons
             args.append("--enable-multilib")
+            args.append("--with-specs=%{!mcmodel=*:-mcmodel=medany}")
 
         if self.env.target.triplet == "xtensa-esp32-elf":
             args += cross_commons
