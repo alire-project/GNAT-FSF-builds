@@ -7,11 +7,12 @@ from e3.diff import patch
 import os
 from datetime import date
 
+patch_name = "gpr2-fix-fsf-14.patch"
 
 class LibGPR2(spec("common")):
     @property
     def version(self):
-        return "24.0.0"
+        return "25.0.0"
 
     @property
     def tarball(self):
@@ -28,13 +29,15 @@ class LibGPR2(spec("common")):
                 name=self.tarball,
                 url="https://github.com/AdaCore/gpr/archive/v%s.tar.gz"
                 % self.version,
-            )
+            ),
+            self.LocalSourceBuilder(name=patch_name),
         ]
 
     @property
     def build_source_list(self):
         return [
             Anod.Source(name=self.tarball, publish=True, dest=""),
+            self.Source(name=patch_name, publish=True, unpack_cmd=cp, dest="patches"),
         ]
 
     @property
@@ -99,6 +102,16 @@ class LibGPR2(spec("common")):
                 self.deps[m].setenv()
 
         self.update_version()
+
+        # Little hack to apply the patch only once, there is probably a clean
+        # way to do that.
+        patched = os.path.join(self["SRC_DIR"], "patches", ".patched")
+        if not os.path.exists(patched):
+            patch(
+                os.path.join(self["SRC_DIR"], "patches", patch_name),
+                self.build_space.src_dir,
+            )
+            touch(patched)
 
         gprconfig_kb_dir = os.path.join(self.deps["gprconfig_kb"]["SRC_DIR"],
                                         "db")

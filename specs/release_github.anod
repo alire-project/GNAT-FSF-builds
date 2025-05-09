@@ -53,7 +53,7 @@ class ReleasePackage(spec("release_package")):
     def publish_on_github(self):
         pkg_name = self.release_name
         gh_name = self.github_release_name
-        archive = os.path.join(self["INSTALL_DIR"], self.archive_name)
+        archive = os.path.join(self.deps["release_package"]["INSTALL_DIR"], self.archive_name)
         sha = archive + ".sha256"
 
         # Disable the pager to avoid being stuck interactive command

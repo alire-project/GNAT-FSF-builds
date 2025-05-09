@@ -7,18 +7,18 @@ import os
 class LangkikSupport(spec("common")):
     @property
     def version(self):
-        return "24.0.0"
+        return "25.0.0"
 
     @property
     def tarball(self):
-        return "langkit_support-%s.tar.gz" % self.version
+        return "langkit_support-%s.zip" % self.version
 
     @property
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/AdaCore/langkit/releases/download/v%s/langkit_support-%s.tar.gz"
+                url="https://github.com/adacore/langkit/archive/v%s/langkit-%s.zip"
                 % (self.version, self.version),
             )
         ]
@@ -37,6 +37,8 @@ class LangkikSupport(spec("common")):
             Anod.Dependency("gnatcoll-bindings", track=True),
             Anod.Dependency("xmlada", track=True),
             Anod.Dependency("adasat", track=True),
+            Anod.Dependency("prettier_ada", track=True),
+            Anod.Dependency("vss", track=True),
         ]
 
     @Anod.primitive()
@@ -44,7 +46,7 @@ class LangkikSupport(spec("common")):
         for m in self.deps:
             self.deps[m].setenv()
 
-        gpr_file = os.path.join(self["SRC_DIR"], "langkit_support.gpr")
+        gpr_file = os.path.join(self["SRC_DIR"], "langkit/support/langkit_support.gpr")
         build_mode = "prod"
 
         for library_type in ["static"]:

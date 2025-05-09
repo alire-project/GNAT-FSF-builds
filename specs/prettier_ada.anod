@@ -3,23 +3,22 @@ from e3.anod.loader import spec
 
 import os
 
-
-class Libadalang(spec("common")):
+class PrettierAda(spec("common")):
     @property
     def version(self):
         return "25.0.0"
 
     @property
     def tarball(self):
-        return "libadalang-%s.tar.gz" % self.version
-
+        return "prettier_ada-%s.zip" % self.version
+    
     @property
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/AdaCore/libadalang/releases/download/v%s/libadalang-%s.tar.gz"
-                % (self.version, self.version),
+                url="https://github.com/adacore/prettier-ada/archive/v%s/prettier-ada-%s.zip"
+                % (self.version, self.version)
             )
         ]
 
@@ -32,23 +31,16 @@ class Libadalang(spec("common")):
         return [
             Anod.Dependency("base_gcc", track=True),
             Anod.Dependency("gprbuild", track=True),
-            Anod.Dependency("libgpr", track=True),
-            Anod.Dependency("adasat", track=True),
-            Anod.Dependency("libgpr2"),
             Anod.Dependency("gnatcoll", track=True),
-            Anod.Dependency("gnatcoll-bindings", track=True),
-            Anod.Dependency("langkit_support", track=True),
-            Anod.Dependency("xmlada", track=True),
-            Anod.Dependency("prettier_ada", track=True),
             Anod.Dependency("vss", track=True),
         ]
-
+    
     @Anod.primitive()
     def build(self):
         for m in self.deps:
             self.deps[m].setenv()
 
-        gpr_file = os.path.join(self["SRC_DIR"], "libadalang.gpr")
+        gpr_file = os.path.join(self["SRC_DIR"], "prettier_ada.gpr")
         build_mode = "prod"
 
         for library_type in ["static"]:
@@ -78,3 +70,4 @@ class Libadalang(spec("common")):
             )
 
         self.clean()
+

@@ -9,7 +9,7 @@ import os
 class GNATcoll(spec("common")):
     @property
     def version(self):
-        return "24.0.0"
+        return "25.0.0"
 
     @property
     def tarball(self):

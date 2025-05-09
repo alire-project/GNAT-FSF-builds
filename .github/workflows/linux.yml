@@ -21,10 +21,10 @@ jobs:
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set up Python 3.8
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: '3.8'
+        python-version: '3.12'
     - name: Install Python dependencies
       run: |-
         python -m pip install --upgrade pip
@@ -51,10 +51,10 @@ jobs:
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set up Python 3.8
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: '3.8'
+        python-version: '3.12'
     - name: Install Python dependencies
       run: |-
         python -m pip install --upgrade pip
@@ -87,10 +87,10 @@ jobs:
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set up Python 3.8
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: '3.8'
+        python-version: '3.12'
     - name: Install Python dependencies
       run: |-
         python -m pip install --upgrade pip
@@ -126,10 +126,10 @@ jobs:
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set up Python 3.8
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: '3.8'
+        python-version: '3.12'
     - name: Install Python dependencies
       run: |-
         python -m pip install --upgrade pip
@@ -163,7 +163,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         repository: adacore/why3
-        ref: fsf-14
+        ref: fsf-15
     - name: Setup OCaml 4.14.2
       uses: ocaml/setup-ocaml@v3
       with:
@@ -193,7 +193,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         repository: adacore/alt-ergo
-        ref: fsf-14
+        ref: fsf-15
     - name: Setup OCaml 4.14.2
       uses: ocaml/setup-ocaml@v3
       with:
@@ -216,10 +216,10 @@ jobs:
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set up Python 3.8
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: '3.8'
+        python-version: '3.12'
     - name: Install Python dependencies
       run: |-
         python -m pip install --upgrade pip

@@ -51,7 +51,7 @@ class HostOs:
 
     workdir: str = "GNAT-FSF-builds"
     e3_core_version: str = "22.1.0"
-    python_version: str = "3.8"
+    python_version: str = "3.12"
     ocaml_version: str = "4.14.2"
 
     @classmethod
