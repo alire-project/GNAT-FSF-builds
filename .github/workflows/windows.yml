@@ -164,12 +164,6 @@ jobs:
       run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_github --qualifier=package=gprbuild -v --loglevel DEBUG --enable-cleanup
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Upload artifact 'gpr-anod-artifacts'
-      uses: actions/upload-artifact@v4
-      with:
-        name: gpr-anod-artifacts
-        path: C:/aaa/GNAT-FSF-builds/out_artifacts/*
-        retention-days: 1
     - name: Upload artifact 'gprbuild-release-packages'
       uses: actions/upload-artifact@v4
       with:
@@ -297,7 +291,6 @@ jobs:
     needs:
     - why3
     - alt_ergo
-    - gprbuild
     name: SPARK WindowsMsys2
     runs-on: windows-2019
     env:
@@ -331,11 +324,6 @@ jobs:
         mount C:/aaa /aaa
         cd ..
         cp -r GNAT-FSF-builds /aaa
-    - name: Download artifact 'gpr-anod-artifacts'
-      uses: actions/download-artifact@v4
-      with:
-        name: gpr-anod-artifacts
-        path: C:/aaa/GNAT-FSF-builds/in_artifacts/
     - name: Download artifact 'alt-ergo'
       uses: actions/download-artifact@v4
       with:

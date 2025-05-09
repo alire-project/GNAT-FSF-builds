@@ -108,12 +108,6 @@ jobs:
       run: python3 ./anod build release_github --qualifier=package=gprbuild -v --loglevel DEBUG --enable-cleanup
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Upload artifact 'gpr-anod-artifacts'
-      uses: actions/upload-artifact@v4
-      with:
-        name: gpr-anod-artifacts
-        path: out_artifacts/*
-        retention-days: 1
     - name: Upload artifact 'gprbuild-release-packages'
       uses: actions/upload-artifact@v4
       with:
@@ -223,7 +217,6 @@ jobs:
     needs:
     - why3
     - alt_ergo
-    - gprbuild
     name: SPARK macOS
     runs-on: macos-13
     steps:
@@ -239,11 +232,6 @@ jobs:
       run: |-
         python -m pip install --upgrade pip
         pip install --break-system-packages e3-core==22.1.0
-    - name: Download artifact 'gpr-anod-artifacts'
-      uses: actions/download-artifact@v4
-      with:
-        name: gpr-anod-artifacts
-        path: in_artifacts/
     - name: Download artifact 'alt-ergo'
       uses: actions/download-artifact@v4
       with:
