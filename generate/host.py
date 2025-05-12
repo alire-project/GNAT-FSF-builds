@@ -31,7 +31,14 @@ class macOS(Unix):
     @classmethod
     def setup_python(cls) -> list[RawStep]:
         return [
-            Step("Install texinfo with Homebrew", ["brew install texinfo"]),
+            Step(
+                "Install packages with Homebrew",
+                [
+                    "brew install texinfo",
+                    "brew install autoconf",
+                    "brew install automake",
+                ],
+            ),
             *super().setup_python(),
         ]
 
@@ -80,17 +87,21 @@ class WindowsMsys2(Windows):
     @classmethod
     def setup_python(cls) -> list[RawStep]:
         @dataclass
-        class Install(Yamlable[Host]):
+        class Msys2Args(Yamlable[Host]):
             install: list[str] = field(default_factory=list)
+            msystem: str | None = None
 
             def to_yaml(self, ctx: Host) -> Yaml:
-                return {"install": "\n".join(self.install)}
+                res = {"install": "\n".join(self.install)}
+                if self.msystem is not None:
+                    res["msystem"] = self.msystem
+                return res
 
         return [
             Action(
                 "Install msys2",
                 "msys2/setup-msys2@v2",
-                with_args=Install(
+                with_args=Msys2Args(
                     [
                         "base-devel",
                         "git",
@@ -100,7 +111,7 @@ class WindowsMsys2(Windows):
                         "mingw-w64-x86_64-python",
                         "mingw-w64-x86_64-python-pip",
                         "mingw-w64-x86_64-python-psutil",
-                    ]
+                    ],
                 ),
             ),
             InstallPythonDeps({"e3-core": cls.e3_core_version}),

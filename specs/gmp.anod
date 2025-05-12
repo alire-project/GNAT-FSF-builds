@@ -1,4 +1,4 @@
-from e3.os.fs import unixpath
+from e3.os.fs import cd, unixpath
 from e3.anod.helper import Configure, Make
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
@@ -7,7 +7,7 @@ from e3.anod.loader import spec
 class GMP(spec("gnu")):
     @property
     def version(self):
-        return "6.2.1"
+        return "6.3.0"
 
     @property
     def tarball(self):
@@ -18,7 +18,7 @@ class GMP(spec("gnu")):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://gcc.gnu.org/pub/gcc/infrastructure/" + self.tarball
+                url="https://ftp.gnu.org/gnu/gmp/" + self.tarball
             )
         ]
 
@@ -36,6 +36,14 @@ class GMP(spec("gnu")):
     @property
     def build_deps(self):
         return self.compiler_deps()
+    
+    def pre_build(self):
+        if self.env.host.os.name == "darwin":
+            # Regenerate configure to avoid flat namespace linking
+            # Reported by email: https://gmplib.org/list-archives/gmp-bugs/2023-July/thread.html
+            # Remove in next version
+            cd(self["SRC_DIR"])
+            self.shell("autoreconf", "-i", "-s")
 
     def setup(self):
         configure = Configure(self)
