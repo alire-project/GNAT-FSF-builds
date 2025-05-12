@@ -171,17 +171,16 @@ def main():
             Step(
                 "Setup packages",
                 [
-                    "opam install zarith re seq why3 --depext-only",
                     "opam install dune dune-configurator menhir num ocamlgraph re "
-                    "seq yojson zarith sexplib ppx_sexp_conv ppx_deriving",
+                    + "seq yojson zarith sexplib ppx_sexp_conv ppx_deriving",
                 ],
             ),
             Step(
                 "Configure why3",
                 [
-                    "opam exec -- ./configure --prefix=${{ github.workspace }}/why3install "
-                    "--enable-relocation --disable-emacs-compilation --disable-hypothesis-selection "
-                    "--disable-js-of-ocaml --disable-zip"
+                    "opam exec -- bash configure --prefix=${{ github.workspace }}/why3install "
+                    + "--enable-relocation --disable-emacs-compilation --disable-hypothesis-selection "
+                    + "--disable-js-of-ocaml --disable-zip"
                 ],
             ),
             Step("Make", ["opam exec -- make"]),
@@ -204,9 +203,14 @@ def main():
         "Alt-Ergo",
         [
             Step(
-                "Install",
+                "Install dependencies",
+                ["opam exec -- make deps"],
+            ),
+            Step(
+                "Build alt-ergo",
                 [
-                    "opam install alt-ergo --destdir=${{ github.workspace }}/alt-ergo-install"
+                    "opam exec -- make packages",
+                    "opam exec -- dune install -p alt-ergo --prefix=${{ github.workspace }}/alt-ergo-install",
                 ],
             ),
             Step(
@@ -279,7 +283,7 @@ def main():
 
     for os in oses:
         with open(dest + os + ".yml", "w+") as f:
-            f.write(workflow.dump(os))
+            _ = f.write(workflow.dump(os))
 
 
 if __name__ == "__main__":

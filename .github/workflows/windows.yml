@@ -249,11 +249,9 @@ jobs:
       with:
         ocaml-compiler: 4.14.2
     - name: Setup packages
-      run: |-
-        opam install zarith re seq why3 --depext-only
-        opam install dune dune-configurator menhir num ocamlgraph re seq yojson zarith sexplib ppx_sexp_conv ppx_deriving
+      run: opam install dune dune-configurator menhir num ocamlgraph re seq yojson zarith sexplib ppx_sexp_conv ppx_deriving
     - name: Configure why3
-      run: opam exec -- ./configure --prefix=${{ github.workspace }}/why3install --enable-relocation --disable-emacs-compilation --disable-hypothesis-selection --disable-js-of-ocaml --disable-zip
+      run: opam exec -- bash configure --prefix=${{ github.workspace }}/why3install --enable-relocation --disable-emacs-compilation --disable-hypothesis-selection --disable-js-of-ocaml --disable-zip
     - name: Make
       run: opam exec -- make
     - name: Install
@@ -278,8 +276,12 @@ jobs:
       uses: ocaml/setup-ocaml@v3
       with:
         ocaml-compiler: 4.14.2
-    - name: Install
-      run: opam install alt-ergo --destdir=${{ github.workspace }}/alt-ergo-install
+    - name: Install dependencies
+      run: opam exec -- make deps
+    - name: Build alt-ergo
+      run: |-
+        opam exec -- make packages
+        opam exec -- dune install -p alt-ergo --prefix=${{ github.workspace }}/alt-ergo-install
     - name: Update version
       run: git log --format='%H' -n 1 > ${{ github.workspace }}/alt-ergo-install/alt-ergo-version.txt
     - name: Upload artifact 'alt-ergo'
