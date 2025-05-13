@@ -42,7 +42,10 @@ class ReleasePackage(spec("common")):
         """Allows to differentiate between consecutive builds of the same set
         of sources. For instance when the build options are changed.
         """
-        return "rc1"
+        if self.package == "gnat":
+            return "rc2"
+        else:
+            return "rc1"
 
     @property
     def release_name(self):
