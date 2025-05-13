@@ -31,7 +31,14 @@ class macOS(Unix):
     @classmethod
     def setup_python(cls) -> list[RawStep]:
         return [
-            Step("Install texinfo with Homebrew", ["brew install texinfo"]),
+            Step(
+                "Install texinfo with Homebrew",
+                [
+                    "brew install texinfo",
+                    "brew install autoconf",
+                    "brew install automake",
+                ],
+            ),
             *super().setup_python(),
         ]
 

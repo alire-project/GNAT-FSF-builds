@@ -22,7 +22,10 @@ jobs:
     - name: Checkout Project
       uses: actions/checkout@v4
     - name: Install texinfo with Homebrew
-      run: brew install texinfo
+      run: |-
+        brew install texinfo
+        brew install autoconf
+        brew install automake
     - name: Set up Python 3.8
       uses: actions/setup-python@v5
       with:
@@ -52,7 +55,10 @@ jobs:
     - name: Checkout Project
       uses: actions/checkout@v4
     - name: Install texinfo with Homebrew
-      run: brew install texinfo
+      run: |-
+        brew install texinfo
+        brew install autoconf
+        brew install automake
     - name: Set up Python 3.8
       uses: actions/setup-python@v5
       with:
@@ -90,7 +96,10 @@ jobs:
     - name: Checkout Project
       uses: actions/checkout@v4
     - name: Install texinfo with Homebrew
-      run: brew install texinfo
+      run: |-
+        brew install texinfo
+        brew install autoconf
+        brew install automake
     - name: Set up Python 3.8
       uses: actions/setup-python@v5
       with:

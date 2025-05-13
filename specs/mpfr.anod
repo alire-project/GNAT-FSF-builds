@@ -7,7 +7,7 @@ from e3.anod.loader import spec
 class MPFR(spec("gnu")):
     @property
     def version(self):
-        return "4.1.0"
+        return "4.2.2"
 
     @property
     def tarball(self):
@@ -18,7 +18,7 @@ class MPFR(spec("gnu")):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://gcc.gnu.org/pub/gcc/infrastructure/" + self.tarball
+                url="https://ftp.gnu.org/gnu/mpfr/" + self.tarball
             )
         ]
 
