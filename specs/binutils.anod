@@ -77,14 +77,6 @@ class Binutils(spec("common")):
         make()
         make("install")
 
-
-        # https://github.com/msys2/MINGW-packages/issues/7890
-        if self.env.build.os.name == "windows":
-            # for some reason 'rm' doesn't seem to work, so we are moving the file to the build dir
-            mv(os.path.join(self["INSTALL_DIR"], "lib", "bfd-plugins", "libdep.a"), 
-               os.path.join(self["BUILD_DIR"], "libdep.a.disable"))
-
-
         # We do not clean the binutils builds and install on native targets as
         # they are used for gnatcov build.
         if self.env.target.os.is_bareboard:

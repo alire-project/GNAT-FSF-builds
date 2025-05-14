@@ -88,13 +88,17 @@ class WindowsMsys2(Windows):
     def setup_python(cls) -> list[RawStep]:
         @dataclass
         class Msys2Args(Yamlable[Host]):
-            install: list[str] = field(default_factory=list)
             msystem: str | None = None
+            update: bool = False
+            install: list[str] = field(default_factory=list)
 
             def to_yaml(self, ctx: Host) -> Yaml:
-                res = {"install": "\n".join(self.install)}
+                res = dict()
                 if self.msystem is not None:
                     res["msystem"] = self.msystem
+                if self.update:
+                    res["update"] = True
+                res["install"] = "\n".join(self.install)
                 return res
 
         return [
@@ -102,7 +106,7 @@ class WindowsMsys2(Windows):
                 "Install msys2",
                 "msys2/setup-msys2@v2",
                 with_args=Msys2Args(
-                    [
+                    install=[
                         "base-devel",
                         "git",
                         "rsync",

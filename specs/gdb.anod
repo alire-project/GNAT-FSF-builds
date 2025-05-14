@@ -95,6 +95,7 @@ class GDB(spec("common")):
         )
 
         if self.env.host.os.name == "windows":
+            configure.add("CFLAGS=-std=gnu17") # fix for new defaults in gcc 15.1.0
             configure.add("--disable-tui")
             configure.add(
                 "--with-libiconv-prefix=%s"
