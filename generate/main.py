@@ -165,77 +165,12 @@ def main():
         ],
     )
 
-    jobs["why3"] = Job(
-        "Why3",
-        [
-            Step(
-                "Setup packages",
-                [
-                    "opam install dune dune-configurator menhir num ocamlgraph re "
-                    + "seq yojson zarith sexplib ppx_sexp_conv ppx_deriving",
-                ],
-            ),
-            Step(
-                "Configure why3",
-                [
-                    "opam exec -- bash configure --prefix=${{ github.workspace }}/why3install "
-                    + "--enable-relocation --disable-emacs-compilation --disable-hypothesis-selection "
-                    + "--disable-js-of-ocaml --disable-zip"
-                ],
-            ),
-            Step("Make", ["opam exec -- make"]),
-            Step("Install", ["opam exec -- make install_spark2014"]),
-            Step(
-                "Update version",
-                [
-                    "git log --format='%H' -n 1 > ${{ github.workspace }}/why3install/why3-version.txt"
-                ],
-            ),
-        ],
-        kind="ocaml",
-        repo=Repository("adacore/why3", "fsf-15"),
-        outputs=[
-            Artifact("why3", "${{ github.workspace }}/why3install"),
-        ],
-    )
-
-    jobs["alt_ergo"] = Job(
-        "Alt-Ergo",
-        [
-            Step(
-                "Install dependencies",
-                ["opam exec -- make deps"],
-            ),
-            Step(
-                "Build alt-ergo",
-                [
-                    "opam exec -- make packages",
-                    "opam exec -- dune install -p alt-ergo --prefix=${{ github.workspace }}/alt-ergo-install",
-                ],
-            ),
-            Step(
-                "Update version",
-                [
-                    "git log --format='%H' -n 1 > ${{ github.workspace }}/alt-ergo-install/alt-ergo-version.txt"
-                ],
-            ),
-        ],
-        kind="ocaml",
-        repo=Repository("adacore/alt-ergo", "fsf-15"),
-        outputs=[Artifact("alt-ergo", "${{ github.workspace }}/alt-ergo-install")],
-    )
-
     jobs["spark"] = Job(
         "SPARK",
         [
             AnodBuild("Build SPARK", "spark2014"),
             ReleasePackage("Package GNATprove", "gnatprove"),
             GhRelease("Release GNATprove", "gnatprove"),
-        ],
-        needs=["why3", "alt_ergo"],
-        inputs=[
-            Artifact("alt-ergo", "alt-ergo_artifact/"),
-            Artifact("why3", "why3_artifact/"),
         ],
         outputs=[
             Artifact(

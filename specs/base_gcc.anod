@@ -7,7 +7,7 @@ from e3.anod.spec import Anod
 import logging
 import time
 
-class base_gcc(spec("common")):
+class base_gcc(spec("binary_install")):
     @property
     def version(self):
         return "15.1.0-rc2"
@@ -20,36 +20,3 @@ class base_gcc(spec("common")):
     def url(self):
         return "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-%s/%s" \
                 % (self.version, self.tarball)
-
-    @Anod.primitive()
-    def build(self):
-        tries = 0
-        max_tries = 5
-        delay = 5
-        result = None
-        while tries < max_tries:
-            tries += 1
-            try:
-                # Download the archive
-                with HTTPSession() as http:
-                    result = http.download_file(self.url, self["BUILD_DIR"], self.tarball)
-            except BaseException:
-                result = None
-
-            if result is None:
-                if tries < max_tries:
-                    logging.warning(f"failed to download tarball, retrying in {delay} seconds...")
-                else:
-                    raise Exception(f"failed to download tarball (retried {max_tries} times)")
-            else:
-                break
-
-            time.sleep(delay if tries < max_tries else 0)
-            delay *= 2
-
-
-        # Extract the archive
-        unpack_archive(self.tarball, self["INSTALL_DIR"], remove_root_dir=True)
-
-        # Delete the archive
-        rm(self.tarball)
