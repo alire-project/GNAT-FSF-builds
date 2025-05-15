@@ -159,7 +159,7 @@ class GCC(spec("gh-artifact")):
         if self.env.target.triplet == "riscv64-elf":
             args += cross_commons
             args.append("--enable-multilib")
-            if self.env.target.os.name == "windows":
+            if self.env.host.os.name == "windows":
                 args.append("--with-specs='%{!mcmodel=*:-mcmodel=medany}'")
             else:
                 args.append("--with-specs=%{!mcmodel=*:-mcmodel=medany}")
