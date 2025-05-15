@@ -10,14 +10,11 @@ from build import (
     Job,
     JobKind,
     ReleasePackage,
-    Repository,
-    Step,
-    Targets,
 )
 from interfaces import Host, Yaml, Yamlable
 import host
 
-type Os = Literal["linux", "linux_arm", "macos", "windows"]
+type Os = Literal["linux", "linux_arm", "macos", "macos_arm", "windows"]
 oses: list[Os] = list(Os.__value__.__args__)
 
 

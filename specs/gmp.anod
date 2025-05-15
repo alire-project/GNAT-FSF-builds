@@ -38,7 +38,7 @@ class GMP(spec("gnu")):
         return self.compiler_deps()
     
     def pre_build(self):
-        if self.env.host.os.name == "darwin":
+        if self.env.host.os.name == "darwin" and self.env.host.cpu.name == "x86_64":
             # Regenerate configure to avoid flat namespace linking
             # Reported by email: https://gmplib.org/list-archives/gmp-bugs/2023-July/thread.html
             # Remove in next version
