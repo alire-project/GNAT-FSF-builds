@@ -10,6 +10,7 @@ import os
 # A wrapper to call ld-classic on MacOS X
 patch_name = "ld"
 
+
 class GCC(spec("gh-artifact")):
     @property
     def version(self):
@@ -20,27 +21,27 @@ class GCC(spec("gh-artifact")):
         return "gcc-%s.tar.gz" % self.version
 
     @property
+    def url(self):
+        if self.host_is_macos_arm:
+            return "https://github.com/iains/gcc-15-branch/archive/refs/heads/gcc-15-1-darwin-rc1.tar.gz"
+        else:
+            return "https://gcc.gnu.org/pub/gcc/releases/gcc-%s/%s" % (
+                self.version,
+                self.tarball,
+            )
+
+    @property
     def source_pkg_build(self):
         return [
-            self.HTTPSSourceBuilder(
-                name=self.tarball,
-                url=(
-                    "https://gcc.gnu.org/pub/gcc/releases/gcc-%s/%s"
-                    % (self.version, self.tarball)
-                    if not self.host_is_macos_arm
-                    else
-                    "https://github.com/iains/gcc-14-branch/archive/refs/"
-                    + "tags/gcc-14.2-darwin-r1.tar.gz"
-                )
-            ),
-            self.LocalSourceBuilder(name=patch_name)
+            self.HTTPSSourceBuilder(name=self.tarball, url=self.url),
+            self.LocalSourceBuilder(name=patch_name),
         ]
 
     @property
     def build_source_list(self):
         return [
             Anod.Source(name=self.tarball, publish=True, dest=""),
-            self.Source(name=patch_name, publish=True, unpack_cmd=cp, dest="patches")
+            self.Source(name=patch_name, publish=True, unpack_cmd=cp, dest="patches"),
         ]
 
     @property
@@ -118,7 +119,6 @@ class GCC(spec("gh-artifact")):
 
         # macOS Native
         if self.env.target.os.name == "darwin":
-
             # Xcode 10 dropped 32-bit support
             args.append("--disable-multilib")
 
@@ -128,8 +128,10 @@ class GCC(spec("gh-artifact")):
             clu = "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
 
             args.append("--with-build-sysroot=%s" % xcode)
-            args.append("--with-specs=%%{!sysroot=*:--sysroot=%%:if-exists-else(%s %s)}" %
-                        (xcode, clu))
+            args.append(
+                "--with-specs=%%{!sysroot=*:--sysroot=%%:if-exists-else(%s %s)}"
+                % (xcode, clu)
+            )
 
         if self.env.host.os.name != "darwin":
             args.append("--with-gnu-ld")
@@ -167,7 +169,6 @@ class GCC(spec("gh-artifact")):
         if self.env.target.triplet == "xtensa-esp32-elf":
             args += cross_commons
             args.append("--enable-multilib")
-
 
         return args
 
@@ -261,7 +262,6 @@ class GCC(spec("gh-artifact")):
 
         make = Make(self)
         if self.bootstrap:
-
             # We don't need to keep the bootstrap compiler so the artifact is
             # disabled to save disk space.
             self.disable_out_artifact()
@@ -269,7 +269,6 @@ class GCC(spec("gh-artifact")):
             make("all-gcc", jobs=self.jobs)
             make("install-gcc", jobs=1)
         else:
-
             make("all", jobs=self.jobs)
 
             if self.env.is_cross:

@@ -10,8 +10,6 @@ from build import (
     Job,
     JobKind,
     ReleasePackage,
-    Repository,
-    Step,
     Targets,
 )
 from interfaces import Host, Yaml, Yamlable
@@ -19,7 +17,6 @@ import host
 
 type Os = Literal["linux", "linux_arm", "macos", "macos_arm", "windows"]
 oses: list[Os] = list(Os.__value__.__args__)
-oses.remove("macos_arm")
 
 
 def pretty_name(os: Os) -> str:
