@@ -29,10 +29,18 @@ jobs:
     - name: Install msys2
       uses: msys2/setup-msys2@v2
       with:
-        install: base-devel git mingw-w64-x86_64-github-cli mingw-w64-x86_64-toolchain mingw-w64-x86_64-python mingw-w64-x86_64-python-pip mingw-w64-x86_64-python-psutil
+        install: |-
+          base-devel
+          git
+          rsync
+          mingw-w64-x86_64-github-cli
+          mingw-w64-x86_64-toolchain
+          mingw-w64-x86_64-python
+          mingw-w64-x86_64-python-pip
+          mingw-w64-x86_64-python-psutil
     - name: Install Python dependencies
       run: |-
-        python -m pip install --upgrade pip
+        python3 -m pip install --upgrade pip
         pip install --break-system-packages e3-core==22.1.0
     - name: Prepare msys2 build setup
       run: |-
@@ -71,10 +79,18 @@ jobs:
     - name: Install msys2
       uses: msys2/setup-msys2@v2
       with:
-        install: base-devel git mingw-w64-x86_64-github-cli mingw-w64-x86_64-toolchain mingw-w64-x86_64-python mingw-w64-x86_64-python-pip mingw-w64-x86_64-python-psutil
+        install: |-
+          base-devel
+          git
+          rsync
+          mingw-w64-x86_64-github-cli
+          mingw-w64-x86_64-toolchain
+          mingw-w64-x86_64-python
+          mingw-w64-x86_64-python-pip
+          mingw-w64-x86_64-python-psutil
     - name: Install Python dependencies
       run: |-
-        python -m pip install --upgrade pip
+        python3 -m pip install --upgrade pip
         pip install --break-system-packages e3-core==22.1.0
     - name: Prepare msys2 build setup
       run: |-
@@ -119,10 +135,18 @@ jobs:
     - name: Install msys2
       uses: msys2/setup-msys2@v2
       with:
-        install: base-devel git mingw-w64-x86_64-github-cli mingw-w64-x86_64-toolchain mingw-w64-x86_64-python mingw-w64-x86_64-python-pip mingw-w64-x86_64-python-psutil
+        install: |-
+          base-devel
+          git
+          rsync
+          mingw-w64-x86_64-github-cli
+          mingw-w64-x86_64-toolchain
+          mingw-w64-x86_64-python
+          mingw-w64-x86_64-python-pip
+          mingw-w64-x86_64-python-psutil
     - name: Install Python dependencies
       run: |-
-        python -m pip install --upgrade pip
+        python3 -m pip install --upgrade pip
         pip install --break-system-packages e3-core==22.1.0
     - name: Prepare msys2 build setup
       run: |-
@@ -170,10 +194,18 @@ jobs:
     - name: Install msys2
       uses: msys2/setup-msys2@v2
       with:
-        install: base-devel git mingw-w64-x86_64-github-cli mingw-w64-x86_64-toolchain mingw-w64-x86_64-python mingw-w64-x86_64-python-pip mingw-w64-x86_64-python-psutil
+        install: |-
+          base-devel
+          git
+          rsync
+          mingw-w64-x86_64-github-cli
+          mingw-w64-x86_64-toolchain
+          mingw-w64-x86_64-python
+          mingw-w64-x86_64-python-pip
+          mingw-w64-x86_64-python-psutil
     - name: Install Python dependencies
       run: |-
-        python -m pip install --upgrade pip
+        python3 -m pip install --upgrade pip
         pip install --break-system-packages e3-core==22.1.0
     - name: Prepare msys2 build setup
       run: |-
@@ -203,62 +235,7 @@ jobs:
       with:
         name: gnat-release-packages-${{matrix.target}}
         path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
-  why3:
-    name: Why3 Windows
-    runs-on: windows-2019
-    steps:
-    - name: Checkout Project
-      uses: actions/checkout@v4
-      with:
-        repository: adacore/why3
-        ref: fsf-14
-    - name: Setup OCaml 4.14.2
-      uses: ocaml/setup-ocaml@v3
-      with:
-        ocaml-compiler: 4.14.2
-    - name: Setup packages
-      run: |-
-        opam install zarith re seq why3 --depext-only
-        opam install dune dune-configurator menhir num ocamlgraph re seq yojson zarith sexplib ppx_sexp_conv ppx_deriving
-    - name: Configure why3
-      run: opam exec -- ./configure --prefix=${{ github.workspace }}/why3install --enable-relocation --disable-emacs-compilation --disable-hypothesis-selection --disable-js-of-ocaml --disable-zip
-    - name: Make
-      run: opam exec -- make
-    - name: Install
-      run: opam exec -- make install_spark2014
-    - name: Update version
-      run: git log --format='%H' -n 1 > ${{ github.workspace }}/why3install/why3-version.txt
-    - name: Upload artifact 'why3'
-      uses: actions/upload-artifact@v4
-      with:
-        name: why3
-        path: ${{ github.workspace }}/why3install
-  alt_ergo:
-    name: Alt-Ergo Windows
-    runs-on: windows-2019
-    steps:
-    - name: Checkout Project
-      uses: actions/checkout@v4
-      with:
-        repository: adacore/alt-ergo
-        ref: fsf-14
-    - name: Setup OCaml 4.14.2
-      uses: ocaml/setup-ocaml@v3
-      with:
-        ocaml-compiler: 4.14.2
-    - name: Install
-      run: opam install alt-ergo --destdir=${{ github.workspace }}/alt-ergo-install
-    - name: Update version
-      run: git log --format='%H' -n 1 > ${{ github.workspace }}/alt-ergo-install/alt-ergo-version.txt
-    - name: Upload artifact 'alt-ergo'
-      uses: actions/upload-artifact@v4
-      with:
-        name: alt-ergo
-        path: ${{ github.workspace }}/alt-ergo-install
   spark:
-    needs:
-    - why3
-    - alt_ergo
     name: SPARK WindowsMsys2
     runs-on: windows-2019
     env:
@@ -272,10 +249,18 @@ jobs:
     - name: Install msys2
       uses: msys2/setup-msys2@v2
       with:
-        install: base-devel git mingw-w64-x86_64-github-cli mingw-w64-x86_64-toolchain mingw-w64-x86_64-python mingw-w64-x86_64-python-pip mingw-w64-x86_64-python-psutil
+        install: |-
+          base-devel
+          git
+          rsync
+          mingw-w64-x86_64-github-cli
+          mingw-w64-x86_64-toolchain
+          mingw-w64-x86_64-python
+          mingw-w64-x86_64-python-pip
+          mingw-w64-x86_64-python-psutil
     - name: Install Python dependencies
       run: |-
-        python -m pip install --upgrade pip
+        python3 -m pip install --upgrade pip
         pip install --break-system-packages e3-core==22.1.0
     - name: Prepare msys2 build setup
       run: |-
@@ -284,16 +269,6 @@ jobs:
         mount C:/aaa /aaa
         cd ..
         cp -r GNAT-FSF-builds /aaa
-    - name: Download artifact 'alt-ergo'
-      uses: actions/download-artifact@v4
-      with:
-        name: alt-ergo
-        path: C:/aaa/GNAT-FSF-builds/alt-ergo_artifact/
-    - name: Download artifact 'why3'
-      uses: actions/download-artifact@v4
-      with:
-        name: why3
-        path: C:/aaa/GNAT-FSF-builds/why3_artifact/
     - name: Build SPARK
       run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build spark2014 -v --loglevel DEBUG --enable-cleanup
     - name: Package GNATprove

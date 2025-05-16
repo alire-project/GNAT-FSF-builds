@@ -1,0 +1,15 @@
+diff --git a/gpr2.gpr b/gpr2.gpr
+index 99239717..b7dc35e0 100644
+--- gpr2.gpr
++++ gpr2.gpr
+@@ -54,6 +54,10 @@
+       --  generated knowledge base
+       for Switches ("gpr2-kb-embedded.adb") use
+         Compiler'Default_Switches ("Ada") & ("-gnatws", "-gnatyN");
++
++      for Switches ("gpr2-build-actions-post_bind.adb") use Compiler'Default_Switches ("Ada") & ("-O0");
++      for Switches ("gpr2-build-actions-compile-ada.adb") use Compiler'Default_Switches ("Ada") & ("-O0");
++
+    end Compiler;
+
+    --------------

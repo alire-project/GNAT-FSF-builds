@@ -44,21 +44,25 @@ class ReleasePackage(spec("common")):
         """
         package = self.package
 
-        if package == "gprbuild":
-            return "1"
-        elif package == "gnatcov":
-            return "1"
-        elif package == "gnatprove":
-            return "1"
-        elif package == "gnat":
-            if self.env.target.triplet == "arm-eabi":
-                return "1"
-            elif self.env.target.triplet == "riscv64-elf":
-                return "1"
-            elif self.env.target.triplet == "avr":
-                return "1"
+        release = {
+            "gprbuild": "1",
+            "gnatcov": "1",
+            "gnatprove": "1",
+            "gnat": {
+                "arm-eabi": "1",
+                "riscv64-elf": "1",
+                "avr": "1",
+                "_": "1",
+            }
+        }
+
+        if isinstance(r := release[package], dict):
+            if self.env.target.triplet in r:
+                return r[self.env.target.triplet]
             else:
-                return "1"
+                return r["_"]
+        else:
+            return release[package]
 
     @property
     def release_name(self):

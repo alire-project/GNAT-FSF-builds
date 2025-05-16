@@ -183,7 +183,7 @@ class InstallPythonDeps(RawStep):
         super().__init__(
             "Install Python dependencies",
             [
-                "python -m pip install --upgrade pip",
+                "python3 -m pip install --upgrade pip",
                 "pip install --break-system-packages "
                 + " ".join([d if v == "*" else f"{d}=={v}" for d, v in deps.items()]),
             ],

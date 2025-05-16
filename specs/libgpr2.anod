@@ -7,22 +7,21 @@ from e3.diff import patch
 import os
 from datetime import date
 
-class LibGPR2(spec("common")):
+patch_name = "gpr2-fix-fsf-14.patch"
 
+
+class LibGPR2(spec("common")):
     @property
     def is_next(self):
-        return 'next' in self.parsed_qualifier
+        return "next" in self.parsed_qualifier
 
     @property
     def version(self):
-        if self.is_next:
-            return "24.2.0-next"
-        else:
-            return "24.0.0"
+        return "25.0.0"
 
     @property
     def lk_version(self):
-        return "24.0.0"
+        return "25.0.0"
 
     @property
     def tarball(self):
@@ -45,13 +44,14 @@ class LibGPR2(spec("common")):
             self.HTTPSSourceBuilder(
                 name=self.tarball,
                 url="https://github.com/AdaCore/gpr/archive/v%s.tar.gz"
-                % ( self.version),
+                % (self.version),
             ),
             self.HTTPSSourceBuilder(
                 name=self.lk_tarball,
                 url="https://github.com/AdaCore/langkit/archive/v%s.tar.gz"
                 % self.lk_version,
-            )
+            ),
+            self.LocalSourceBuilder(name=patch_name),
         ]
 
     @property
@@ -62,6 +62,7 @@ class LibGPR2(spec("common")):
             Anod.Source(name=self.deps["gprconfig_kb"].tarball, publish=True,
             dest="gprconfig_kb",
             ),
+            self.Source(name=patch_name, publish=True, unpack_cmd=cp, dest="patches"),
         ]
 
     @property
@@ -107,6 +108,16 @@ class LibGPR2(spec("common")):
                 self.deps[m].setenv()
 
         self.update_version()
+
+        # Little hack to apply the patch only once, there is probably a clean
+        # way to do that.
+        patched = os.path.join(self["SRC_DIR"], "patches", ".patched")
+        if not os.path.exists(patched):
+            patch(
+                os.path.join(self["SRC_DIR"], "patches", patch_name),
+                self.build_space.src_dir,
+            )
+            touch(patched)
 
         # The SOURCE_DIR detection doesn't work on macOS, so we replace it with
         # an absolute path.

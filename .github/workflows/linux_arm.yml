@@ -21,13 +21,13 @@ jobs:
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set up Python 3.8
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: '3.8'
+        python-version: '3.12'
     - name: Install Python dependencies
       run: |-
-        python -m pip install --upgrade pip
+        python3 -m pip install --upgrade pip
         pip install --break-system-packages e3-core==22.1.0
     - name: Build GMP
       run: python3 ./anod build gmp -v --loglevel DEBUG --enable-cleanup
@@ -51,13 +51,13 @@ jobs:
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set up Python 3.8
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: '3.8'
+        python-version: '3.12'
     - name: Install Python dependencies
       run: |-
-        python -m pip install --upgrade pip
+        python3 -m pip install --upgrade pip
         pip install --break-system-packages e3-core==22.1.0
     - name: Download artifact 'gcc-dependencies-artifacts'
       uses: actions/download-artifact@v4
@@ -87,13 +87,13 @@ jobs:
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set up Python 3.8
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: '3.8'
+        python-version: '3.12'
     - name: Install Python dependencies
       run: |-
-        python -m pip install --upgrade pip
+        python3 -m pip install --upgrade pip
         pip install --break-system-packages e3-core==22.1.0
     - name: Build GPRbuild
       run: python3 ./anod build gprbuild -v --loglevel DEBUG --enable-cleanup
@@ -126,13 +126,13 @@ jobs:
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set up Python 3.8
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: '3.8'
+        python-version: '3.12'
     - name: Install Python dependencies
       run: |-
-        python -m pip install --upgrade pip
+        python3 -m pip install --upgrade pip
         pip install --break-system-packages e3-core==22.1.0
     - name: Download artifact 'gcc-dependencies-artifacts'
       uses: actions/download-artifact@v4
@@ -155,85 +155,20 @@ jobs:
       with:
         name: gnat-release-packages-${{matrix.target}}
         path: sbx/*/release_package*/install/*
-  why3:
-    name: Why3 Linux_Arm
-    runs-on: ubuntu-22.04-arm
-    steps:
-    - name: Checkout Project
-      uses: actions/checkout@v4
-      with:
-        repository: adacore/why3
-        ref: fsf-14
-    - name: Setup OCaml 4.14.2
-      uses: ocaml/setup-ocaml@v3
-      with:
-        ocaml-compiler: 4.14.2
-    - name: Setup packages
-      run: |-
-        opam install zarith re seq why3 --depext-only
-        opam install dune dune-configurator menhir num ocamlgraph re seq yojson zarith sexplib ppx_sexp_conv ppx_deriving
-    - name: Configure why3
-      run: opam exec -- ./configure --prefix=${{ github.workspace }}/why3install --enable-relocation --disable-emacs-compilation --disable-hypothesis-selection --disable-js-of-ocaml --disable-zip
-    - name: Make
-      run: opam exec -- make
-    - name: Install
-      run: opam exec -- make install_spark2014
-    - name: Update version
-      run: git log --format='%H' -n 1 > ${{ github.workspace }}/why3install/why3-version.txt
-    - name: Upload artifact 'why3'
-      uses: actions/upload-artifact@v4
-      with:
-        name: why3
-        path: ${{ github.workspace }}/why3install
-  alt_ergo:
-    name: Alt-Ergo Linux_Arm
-    runs-on: ubuntu-22.04-arm
-    steps:
-    - name: Checkout Project
-      uses: actions/checkout@v4
-      with:
-        repository: adacore/alt-ergo
-        ref: fsf-14
-    - name: Setup OCaml 4.14.2
-      uses: ocaml/setup-ocaml@v3
-      with:
-        ocaml-compiler: 4.14.2
-    - name: Install
-      run: opam install alt-ergo --destdir=${{ github.workspace }}/alt-ergo-install
-    - name: Update version
-      run: git log --format='%H' -n 1 > ${{ github.workspace }}/alt-ergo-install/alt-ergo-version.txt
-    - name: Upload artifact 'alt-ergo'
-      uses: actions/upload-artifact@v4
-      with:
-        name: alt-ergo
-        path: ${{ github.workspace }}/alt-ergo-install
   spark:
-    needs:
-    - why3
-    - alt_ergo
     name: SPARK Linux_Arm
     runs-on: ubuntu-22.04-arm
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set up Python 3.8
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: '3.8'
+        python-version: '3.12'
     - name: Install Python dependencies
       run: |-
-        python -m pip install --upgrade pip
+        python3 -m pip install --upgrade pip
         pip install --break-system-packages e3-core==22.1.0
-    - name: Download artifact 'alt-ergo'
-      uses: actions/download-artifact@v4
-      with:
-        name: alt-ergo
-        path: alt-ergo_artifact/
-    - name: Download artifact 'why3'
-      uses: actions/download-artifact@v4
-      with:
-        name: why3
-        path: why3_artifact/
     - name: Build SPARK
       run: python3 ./anod build spark2014 -v --loglevel DEBUG --enable-cleanup
     - name: Package GNATprove

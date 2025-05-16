@@ -1,0 +1,85 @@
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+
+import os
+
+
+class VSS(spec("common")):
+    @property
+    def version(self):
+        return "25.0.0"
+
+    @property
+    def tarball(self):
+        return "vss-%s.zip" % self.version
+
+    @property
+    def source_pkg_build(self):
+        return [
+            self.HTTPSSourceBuilder(
+                name=self.tarball,
+                url="https://github.com/adacore/VSS/archive/v%s/VSS-%s.zip"
+                % (self.version, self.version),
+            )
+        ]
+
+    @property
+    def build_source_list(self):
+        return [Anod.Source(name=self.tarball, publish=True, dest="")]
+
+    @property
+    def build_deps(self):
+        return [
+            Anod.Dependency("base_gcc", track=True),
+            Anod.Dependency("gprbuild", track=True),
+        ]
+
+    @Anod.primitive()
+    def build(self):
+        for m in self.deps:
+            self.deps[m].setenv()
+
+        build_profile = "release"
+        build_mode = "prod"
+        gpr_files = [
+            os.path.join(self["SRC_DIR"], gpr)
+            for gpr in (
+                "gnat/vss_gnat.gpr",
+                "gnat/vss_text.gpr",
+                "gnat/vss_json.gpr",
+                "gnat/vss_regexp.gpr",
+                "gnat/vss_xml.gpr",
+                "gnat/vss_xml_templates.gpr",
+            )
+        ]
+
+        for library_type in ["static"]:
+            for gpr in gpr_files:
+                self.shell(
+                    "gprbuild",
+                    "-p",
+                    "-P",
+                    gpr,
+                    "-j" + str(self.jobs),
+                    "--relocate-build-tree=" + library_type,
+                    "-XLIBRARY_TYPE=" + library_type,
+                    "-XBUILD_PROFILE=" + build_profile,
+                )
+
+            for gpr in gpr_files:
+                self.shell(
+                    "gprinstall",
+                    "-f",
+                    "-p",
+                    "-P",
+                    gpr,
+                    "--relocate-build-tree=" + library_type,
+                    "--prefix=" + self["INSTALL_DIR"],
+                    "-XBUILD_MODE=" + build_mode,
+                    "-XBUILD_PROFILE=" + build_profile,
+                    "-XLIBRARY_TYPE=" + library_type,
+                    "--build-var=LIBRARY_TYPE",
+                    "--build-name=" + library_type,
+                )
+
+        self.clean()
