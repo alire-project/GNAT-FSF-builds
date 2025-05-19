@@ -6,7 +6,7 @@ import os
 class AltErgo(spec("binary_install")):
     @property
     def version(self):
-        return "15.1.0"
+        return "15.1.1"
 
     @property
     def platform(self):
@@ -29,7 +29,7 @@ class AltErgo(spec("binary_install")):
 
     @property
     def url(self):
-        return f"https://github.com/AdaCore/alt-ergo/releases/download/fsf-15.1.0/{self.tarball}"
+        return f"https://github.com/AdaCore/alt-ergo/releases/download/fsf-15-1.1/{self.tarball}"
 
     @property
     def remove_root_dir(self):

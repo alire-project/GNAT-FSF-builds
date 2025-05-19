@@ -30,7 +30,7 @@ class Why3(spec("binary_install")):
 
     @property
     def url(self):
-        return f"https://github.com/AdaCore/why3/releases/download/fsf-15.1.0/{self.tarball}"
+        return f"https://github.com/AdaCore/why3/releases/download/fsf-{self.version}/{self.tarball}"
 
     @property
     def remove_root_dir(self):
