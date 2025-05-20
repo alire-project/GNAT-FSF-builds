@@ -124,8 +124,9 @@ class GCC(spec("gh-artifact")):
 
             args.append("--disable-libcilkrts")
 
-            xcode = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
-            clu = "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
+            # HACK: use a fixed version of the macOS SDK because of fixed-include breakages
+            xcode = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.sdk"
+            clu = "/Library/Developer/CommandLineTools/SDKs/MacOSX14.sdk"
 
             args.append("--with-build-sysroot=%s" % xcode)
             args.append(
