@@ -10,7 +10,6 @@ valid_packages = ["gprbuild", "gnat", "gnatcov", "gnatprove"]
 
 
 class ReleasePackage(spec("common")):
-
     @property
     def package(self):
         if "package" not in self.parsed_qualifier:
@@ -48,12 +47,7 @@ class ReleasePackage(spec("common")):
             "gprbuild": "1",
             "gnatcov": "1",
             "gnatprove": "1",
-            "gnat": {
-                "arm-eabi": "1",
-                "riscv64-elf": "1",
-                "avr": "1",
-                "_": "1",
-            }
+            "gnat": "2",
         }
 
         if isinstance(r := release[package], dict):
@@ -94,8 +88,10 @@ class ReleasePackage(spec("common")):
     def build_deps(self):
         pck = self.package
         if pck == "gprbuild":
-            return [Anod.Dependency("gprbuild"),
-                    Anod.Dependency("gpr2", qualifier="tools_only")]
+            return [
+                Anod.Dependency("gprbuild"),
+                Anod.Dependency("gpr2", qualifier="tools_only"),
+            ]
 
         if pck == "gnatcov":
             return [Anod.Dependency("gnatcov", track=True)]
@@ -140,16 +136,39 @@ class ReleasePackage(spec("common")):
                     Anod.Dependency("gdb", track=True),
                 ]
             else:
-                raise Exception("Unknown target for gcc package: '%s'" % self.env.target.triplet)
+                raise Exception(
+                    "Unknown target for gcc package: '%s'" % self.env.target.triplet
+                )
 
     @Anod.primitive()
     def build(self):
-
         for dep in self.deps.keys():
             self.deps[dep].merge(self["PKG_DIR"])
 
         name = self.release_name
         archive = self.archive_name
+
+        # fix for unwanted pthread.h header in include-fixed
+        extra_header = None
+        if self.package == "gnat":
+            extra_header = os.path.join(
+                self["PKG_DIR"],
+                "lib/gcc",
+                self.env.target.triplet,
+                self.version,
+                "include-fixed/pthread.h"
+            )
+        elif self.package == "gnatprove":
+            extra_header = os.path.join(
+                self["PKG_DIR"],
+                "libexec/spark/lib/gcc",
+                self.env.target.triplet,
+                self.version,
+                "include-fixed/pthread.h"
+            )
+
+        if extra_header is not None and os.path.exists(extra_header):
+            os.remove(extra_header)
 
         create_archive(
             filename=archive,
