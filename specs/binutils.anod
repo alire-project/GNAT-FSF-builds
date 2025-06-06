@@ -63,6 +63,7 @@ class Binutils(spec("common")):
             "--disable-sim",
             "--disable-libquadmath",
             "--disable-readline",
+            "--enable-lto"
         )
 
         # For embedded only?
