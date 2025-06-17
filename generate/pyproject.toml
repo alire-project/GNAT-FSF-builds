@@ -1,0 +1,8 @@
+[project]
+name = "generate"
+version = "0.1.0"
+description = "Generate GitHub actions files for GNAT FSF builds"
+requires-python = ">=3.12"
+dependencies = [
+    "pyyaml==6.0.2",
+]

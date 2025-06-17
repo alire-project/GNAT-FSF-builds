@@ -13,7 +13,7 @@ patch_name = "gdb-0002-Fix-using-gnu-print.patch"
 class GDB(spec("common")):
     @property
     def version(self):
-        return "14.2"
+        return "16.3"
 
     @property
     def tarball(self):
@@ -23,7 +23,7 @@ class GDB(spec("common")):
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
-                name=self.tarball, url="https://ftp.gnu.org/gnu/gdb/%s" % self.tarball
+                name=self.tarball, url="https://gcc.gnu.org/pub/gdb/releases/%s" % self.tarball
             ),
             self.LocalSourceBuilder(name=patch_name),
         ]
@@ -95,6 +95,7 @@ class GDB(spec("common")):
         )
 
         if self.env.host.os.name == "windows":
+            configure.add("CFLAGS=-std=gnu17") # fix for new defaults in gcc 15.1.0
             configure.add("--disable-tui")
             configure.add(
                 "--with-libiconv-prefix=%s"

@@ -10,50 +10,43 @@ import os
 # A wrapper to call ld-classic on MacOS X
 patch_name = "ld"
 
+
 class GCC(spec("gh-artifact")):
     @property
     def version(self):
-        return "14.2.0"
+        return "15.1.0"
 
     @property
     def tarball(self):
         return "gcc-%s.tar.gz" % self.version
 
     @property
+    def url(self):
+        if self.host_is_macos_arm:
+            return "https://github.com/iains/gcc-15-branch/archive/refs/heads/gcc-15-1-darwin-rc1.tar.gz"
+        else:
+            return "https://gcc.gnu.org/pub/gcc/releases/gcc-%s/%s" % (
+                self.version,
+                self.tarball,
+            )
+
+    @property
     def source_pkg_build(self):
         return [
-            self.HTTPSSourceBuilder(
-                name=self.tarball,
-                url=(
-                    "https://ftp.gnu.org/gnu/gcc/gcc-%s/%s"
-                    % (self.version, self.tarball)
-                    if not self.host_is_macos_arm
-                    else
-                    "https://github.com/iains/gcc-14-branch/archive/refs/"
-                    + "tags/gcc-14.2-darwin-r1.tar.gz"
-                )
-            ),
-            self.LocalSourceBuilder(name=patch_name)
+            self.HTTPSSourceBuilder(name=self.tarball, url=self.url),
+            self.LocalSourceBuilder(name=patch_name),
         ]
 
     @property
     def build_source_list(self):
         return [
             Anod.Source(name=self.tarball, publish=True, dest=""),
-            self.Source(name=patch_name, publish=True, unpack_cmd=cp, dest="patches")
+            self.Source(name=patch_name, publish=True, unpack_cmd=cp, dest="patches"),
         ]
 
     @property
     def bootstrap(self):
         return "bootstrap" in self.parsed_qualifier
-
-    @property
-    def is_cross(self):
-        return (
-            self.env.target.triplet == "arm-eabi"
-            or self.env.target.triplet == "riscv64-elf"
-            or self.env.target.triplet == "avr-elf"
-        )
 
     @property
     def build_space_name(self):
@@ -79,20 +72,7 @@ class GCC(spec("gh-artifact")):
             Anod.Dependency("mpc", host="build", target="host"),
         ]
 
-        # Select which compiler to use:
-        # - gcc_native is a native compiler that was built with this script
-        # - base_gcc is a native compiler downloaded from a binray archive
-        #
-        # To build the native compilers we can use a native compiler of the
-        # last major version.
-        #
-        # To build the cross compilers we need to have a native compiler of the
-        # same version that we are building.
-        #
-        if self.env.is_cross and not self.bootstrap:
-            deps.append(Anod.Dependency("gcc", local_name="gcc_native", target="host"))
-        else:
-            deps.append(Anod.Dependency("base_gcc", host="build", target="host"))
+        deps.append(Anod.Dependency("base_gcc", host="build", target="host"))
 
         if self.env.build.os.name != "darwin":
             deps.append(Anod.Dependency("isl", host="build", target="host"))
@@ -123,11 +103,10 @@ class GCC(spec("gh-artifact")):
             args.append("--disable-multilib")
             args.append("--enable-threads=posix")
 
-            # TODO: Enabling this option will make the cross compiler
-            # builds fail because of the discrepency between base_gcc
-            # and gcc. This option should be enabled on the next major
-            # release.
-            # args.append("--enable-default-pie")
+            # Enabling this option will make the first cross builds of the next
+            # major release fail (cross compilers cannot be built with a different
+            # major GCC version.)
+            args.append("--enable-default-pie")
 
         # Windows Native
         if self.env.target.triplet == "x86_64-w64-mingw32":
@@ -140,18 +119,20 @@ class GCC(spec("gh-artifact")):
 
         # macOS Native
         if self.env.target.os.name == "darwin":
-
             # Xcode 10 dropped 32-bit support
             args.append("--disable-multilib")
 
             args.append("--disable-libcilkrts")
 
-            xcode = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
-            clu = "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
+            # HACK: use a fixed version of the macOS SDK because of fixed-include breakages
+            xcode = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.sdk"
+            clu = "/Library/Developer/CommandLineTools/SDKs/MacOSX14.sdk"
 
             args.append("--with-build-sysroot=%s" % xcode)
-            args.append("--with-specs=%%{!sysroot=*:--sysroot=%%:if-exists-else(%s %s)}" %
-                        (xcode, clu))
+            args.append(
+                "--with-specs=%%{!sysroot=*:--sysroot=%%:if-exists-else(%s %s)}"
+                % (xcode, clu)
+            )
 
         if self.env.host.os.name != "darwin":
             args.append("--with-gnu-ld")
@@ -181,11 +162,14 @@ class GCC(spec("gh-artifact")):
         if self.env.target.triplet == "riscv64-elf":
             args += cross_commons
             args.append("--enable-multilib")
+            if self.env.host.os.name == "windows":
+                args.append("--with-specs='%{!mcmodel=*:-mcmodel=medany}'")
+            else:
+                args.append("--with-specs=%{!mcmodel=*:-mcmodel=medany}")
 
         if self.env.target.triplet == "xtensa-esp32-elf":
             args += cross_commons
             args.append("--enable-multilib")
-
 
         return args
 
@@ -193,7 +177,14 @@ class GCC(spec("gh-artifact")):
         # This spec inherit from gh-artifact and therefore has a different
         # build method.
 
-        for m in ("binutils", "gcc_native", "mingw", "base_gcc"):
+        if self.env.is_cross and not self.deps["base_gcc"].version.startswith(
+            self.version.split(".")[0] + "."
+        ):
+            raise AssertionError(
+                "Cross compiler cannot be built with a different GCC version."
+            )
+
+        for m in ("binutils", "mingw", "base_gcc"):
             if m in self.deps:
                 self.deps[m].setenv()
 
@@ -272,7 +263,6 @@ class GCC(spec("gh-artifact")):
 
         make = Make(self)
         if self.bootstrap:
-
             # We don't need to keep the bootstrap compiler so the artifact is
             # disabled to save disk space.
             self.disable_out_artifact()
@@ -280,7 +270,6 @@ class GCC(spec("gh-artifact")):
             make("all-gcc", jobs=self.jobs)
             make("install-gcc", jobs=1)
         else:
-
             make("all", jobs=self.jobs)
 
             if self.env.is_cross:

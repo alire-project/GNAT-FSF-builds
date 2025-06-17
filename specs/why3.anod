@@ -3,14 +3,35 @@ from e3.fs import sync_tree
 from e3.anod.spec import Anod
 import os
 
-class Why3(spec("gh-artifact")):
 
+class Why3(spec("binary_install")):
     @property
     def version(self):
-        return "xx.x.x"
+        return "15.1.0"
 
-    @Anod.primitive()
-    def build(self):
-        sync_tree(os.path.join(self.spec_dir, "..", "why3_artifact"),
-                  self["INSTALL_DIR"],
-                  delete=True)
+    @property
+    def platform(self):
+        if self.env.host.os.name == "windows":
+            return "windows"
+        if self.env.host.os.name == "darwin":
+            if self.env.host.cpu.name == "x86_64":
+                return "macos-x86_64"
+            else:
+                return "macos-arm"
+        else:
+            if self.env.host.cpu.name == "x86_64":
+                return "linux-x86_64"
+            else:
+                return "linux-arm"
+
+    @property
+    def tarball(self):
+        return f"why3-{self.version}-{self.platform}.zip"
+
+    @property
+    def url(self):
+        return f"https://github.com/AdaCore/why3/releases/download/fsf-{self.version}/{self.tarball}"
+
+    @property
+    def remove_root_dir(self):
+        return False

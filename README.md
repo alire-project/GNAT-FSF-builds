@@ -3,12 +3,19 @@ Builds of the GNAT Ada compiler from FSF GCC releases
 
 # How to build
 
-To start the builds you will need `python3` and the `e3-core` package.
+To start the builds you will need `python3` (up to version 3.12) and the `e3-core` package.
 This can be done in a virtual env, e.g.:
+
 ```console
 $ python3 -m venv my-virtual-env
 $ source my-virtual-env/bin/activate
 $ pip install e3-core==22.1.0
+```
+
+A Python 3.12 specific environment can be created with [`uv`](https://docs.astral.sh/uv/) instead:
+
+```console
+$ uv venv --python=3.12
 ```
 
 To build a spec, for example `mpc`, run the `anod` script:
@@ -36,9 +43,13 @@ Then the binary files will be at:
 sbx/aarch64-elf-linux64/release_package-gnat-aarch64-elf-linux64/install/gnat-aarch64-elf-linux64-x86_64-<vserion>.tar.gz
 ```
 
-Which can then be attached to a github release for this project. Once released a toml describing the release can be added to
-and alire index, which can then be used to install it.
+Building release packages can be done using the `release_package` spec:
 
+```console
+$ ./anod build release_package --qualifier=package=<package name>
+```
+
+Currently supported package names are `gnat`, `gprbuild` and `gnatprove`.
 
 ## On Windows
 Only builds in the msys2 mingw64 environement are supported.

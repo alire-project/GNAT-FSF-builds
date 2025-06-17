@@ -10,7 +10,7 @@ from e3.anod.loader import spec
 class Binutils(spec("common")):
     @property
     def version(self):
-        return "2.42"
+        return "2.44"
 
     @property
     def tarball(self):
@@ -21,7 +21,7 @@ class Binutils(spec("common")):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://ftp.gnu.org/gnu/binutils/" + self.tarball,
+                url="https://gcc.gnu.org/pub/binutils/releases/" + self.tarball,
             )
         ]
 
@@ -76,14 +76,6 @@ class Binutils(spec("common")):
         make = Make(self)
         make()
         make("install")
-
-
-        # https://github.com/msys2/MINGW-packages/issues/7890
-        if self.env.build.os.name == "windows":
-            # for some reason 'rm' doesn't seem to work, so we are moving the file to the build dir
-            mv(os.path.join(self["INSTALL_DIR"], "lib", "bfd-plugins", "libdep.a"), 
-               os.path.join(self["BUILD_DIR"], "libdep.a.disable"))
-
 
         # We do not clean the binutils builds and install on native targets as
         # they are used for gnatcov build.

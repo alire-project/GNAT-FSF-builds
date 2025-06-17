@@ -10,7 +10,11 @@ import os
 class SPARK2014(spec("common")):
     @property
     def version(self):
-        return "14.1.0"
+        return "15.1.0"
+    
+    @property
+    def spark_branch(self):
+        return "fsf-15"
 
     @property
     def tarball(self):
@@ -30,31 +34,45 @@ class SPARK2014(spec("common")):
     @property
     def sparklib_tarball(self):
         return "sparkib-%s.tar.gz" % self.version
+    
+    @property
+    def cvc5_version(self):
+        return "1.2.1"
 
     @property
     def cvc5_zip(self):
         if self.env.host.os.name == "windows":
-            fn = "cvc5-Win64-static.zip"
-        elif self.env.host.os.name == "darwin" and \
-             self.env.target.cpu.name == "x86_64":
-            fn = "cvc5-macOS-static.zip"
+            fn = "cvc5-Win64-x86_64-static.zip"
         elif self.env.host.os.name == "darwin":
-            fn = "cvc5-macOS-arm64-static.zip"
-        else:
-            fn = "cvc5-linux-static.zip"
+            if self.env.target.cpu.name == "x86_64":
+                fn = "cvc5-macOS-x86_64-static.zip"
+            else:
+                fn = "cvc5-macOS-arm64-static.zip"
+        else: # self.env.host.os.name == "linux":
+            if self.env.target.cpu.name == "x86_64":
+                fn = "cvc5-Linux-x86_64-static.zip"
+            else:
+                fn = "cvc5-Linux-arm64-static.zip"
         return fn
+
+    @property
+    def z3_version(self):
+        return "4.13.4"
 
     @property
     def z3_zip(self):
         if self.env.host.os.name == "windows":
-            fn = "z3-4.13.0-x64-win.zip"
-        elif self.env.host.os.name == "darwin" and \
-             self.env.target.cpu.name == "x86_64":
-            fn = "z3-4.13.0-x64-osx-11.7.10.zip"
+            fn = "z3-%s-x64-win.zip" % self.z3_version
         elif self.env.host.os.name == "darwin":
-            fn = "z3-4.13.0-arm64-osx-11.0.zip"
-        else:
-            fn = "z3-4.13.0-x64-glibc-2.31.zip"
+            if self.env.target.cpu.name == "x86_64":
+                fn = "z3-%s-x64-osx-13.7.1.zip" % self.z3_version
+            else:
+                fn = "z3-%s-arm64-osx-13.7.1.zip" % self.z3_version
+        else: # self.env.host.os.name == "linux"
+            if self.env.target.cpu.name == "x86_64":
+                fn = "z3-%s-x64-glibc-2.35.zip" % self.z3_version
+            else:
+                fn = "z3-%s-arm64-glibc-2.34.zip" % self.z3_version
         return fn
 
     @property
@@ -62,26 +80,28 @@ class SPARK2014(spec("common")):
         return [
             self.HTTPSSourceBuilder(
                 name=self.gcc_tarball,
-                url="https://ftp.gnu.org/gnu/gcc/gcc-%s/%s"
+                url="https://gcc.gnu.org/pub/gcc/releases/gcc-%s/%s"
                 % (self.version, self.gcc_tarball),
             ),
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/adacore/spark2014/tarball/fsf-14",
+                url="https://github.com/adacore/spark2014/tarball/%s"
+                % self.spark_branch,
             ),
             self.HTTPSSourceBuilder(
                 name=self.sparklib_tarball,
-                url="https://github.com/adacore/sparklib/tarball/d4f3dc1c6c8ce441472b1bd5df00777eec799eb2",
+                url="https://github.com/adacore/sparklib/tarball/%s"
+                % self.spark_branch,
             ),
             self.HTTPSSourceBuilder(
                 name=self.cvc5_zip,
-                url="https://github.com/cvc5/cvc5/releases/download/cvc5-1.1.2/%s"
-                % self.cvc5_zip,
+                url="https://github.com/cvc5/cvc5/releases/download/cvc5-%s/%s"
+                % (self.cvc5_version, self.cvc5_zip),
             ),
             self.HTTPSSourceBuilder(
                 name=self.z3_zip,
-                url="https://github.com/Z3Prover/z3/releases/download/z3-4.13.0/%s"
-                % self.z3_zip,
+                url="https://github.com/Z3Prover/z3/releases/download/z3-%s/%s"
+                % (self.z3_version, self.z3_zip),
             ),
         ]
 

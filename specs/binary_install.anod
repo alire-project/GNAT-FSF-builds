@@ -1,0 +1,54 @@
+from e3.net.http import HTTPSession
+from e3.fs import rm
+from e3.archive import unpack_archive
+from e3.anod.loader import spec
+from e3.anod.spec import Anod
+
+import logging
+import time
+
+class binary_install(spec("common")):
+    @property
+    def tarball(self):
+        raise NotImplementedError
+    
+    @property
+    def url(self):
+        raise NotImplementedError
+    
+    @property
+    def remove_root_dir(self):
+        return True
+
+    @Anod.primitive()
+    def build(self):
+        tries = 0
+        max_tries = 5
+        delay = 5
+        result = None
+        while tries < max_tries:
+            tries += 1
+            try:
+                # Download the archive
+                with HTTPSession() as http:
+                    result = http.download_file(self.url, self["BUILD_DIR"], self.tarball)
+            except BaseException:
+                result = None
+
+            if result is None:
+                if tries < max_tries:
+                    logging.warning(f"failed to download {self.tarball}, retrying in {delay} seconds...")
+                else:
+                    raise Exception(f"failed to download {self.tarball} (retried {max_tries} times)")
+            else:
+                break
+
+            time.sleep(delay if tries < max_tries else 0)
+            delay *= 2
+
+
+        # Extract the archive
+        unpack_archive(self.tarball, self["INSTALL_DIR"], remove_root_dir=self.remove_root_dir)
+
+        # Delete the archive
+        rm(self.tarball)

@@ -1,10 +1,8 @@
 from e3.anod.helper import log
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
-from e3.anod.error import ShellError
 from e3.archive import create_archive
 from e3.hash import sha256
-from e3.os.process import Run
 
 import os
 
@@ -12,7 +10,6 @@ valid_packages = ["gprbuild", "gnat", "gnatcov", "gnatprove"]
 
 
 class ReleasePackage(spec("common")):
-
     @property
     def package(self):
         if "package" not in self.parsed_qualifier:
@@ -46,21 +43,20 @@ class ReleasePackage(spec("common")):
         """
         package = self.package
 
-        if package == "gprbuild":
-            return "1"
-        elif package == "gnatcov":
-            return "1"
-        elif package == "gnatprove":
-            return "1"
-        elif package == "gnat":
-            if self.env.target.triplet == "arm-eabi":
-                return "1"
-            elif self.env.target.triplet == "riscv64-elf":
-                return "1"
-            elif self.env.target.triplet == "avr":
-                return "1"
+        release = {
+            "gprbuild": "1",
+            "gnatcov": "1",
+            "gnatprove": "1",
+            "gnat": "2",
+        }
+
+        if isinstance(r := release[package], dict):
+            if self.env.target.triplet in r:
+                return r[self.env.target.triplet]
             else:
-                return "1"
+                return r["_"]
+        else:
+            return release[package]
 
     @property
     def release_name(self):
@@ -85,21 +81,6 @@ class ReleasePackage(spec("common")):
         return "%s.tar.gz" % self.release_name
 
     @property
-    def github_release_name(self):
-        # Packges for different architectures are all gathered in the same GH
-        # release. So we will have for example:
-        #   GitHub release: gnat-10.3.0-1
-        #           assets: gnat-x86_64-linux-10.3.0-1
-        #                   gnat-x86_64-windows64-10.3.0-1
-        #                   gnat-riscv64-elf-windows64-10.3.0-1
-        #                   etc.
-        return "%s-%s-%s" % (
-            self.package,
-            self.version,
-            self.package_release,
-        )
-
-    @property
     def build_space_name(self):
         return "%s-%s-%s" % (self.name, self.package, self.env.platform)
 
@@ -107,8 +88,10 @@ class ReleasePackage(spec("common")):
     def build_deps(self):
         pck = self.package
         if pck == "gprbuild":
-            return [Anod.Dependency("gprbuild"),
-                    Anod.Dependency("gpr2", qualifier="tools_only")]
+            return [
+                Anod.Dependency("gprbuild"),
+                Anod.Dependency("gpr2", qualifier="tools_only"),
+            ]
 
         if pck == "gnatcov":
             return [Anod.Dependency("gnatcov", track=True)]
@@ -160,64 +143,39 @@ class ReleasePackage(spec("common")):
                     Anod.Dependency("gdb", track=True),
                 ]
             else:
-                raise Exception("Unknown target for gcc package: '%s'" % self.env.target.triplet)
-
-    def check_github_release(self, release_name):
-        try:
-            # If the gh command does not fail, the release exists
-            self.shell("gh", "release", "view", release_name)
-            return True
-        except ShellError:
-            return False
-
-    def check_github_release_asset(self, release_name, asset):
-        try:
-            p = Run(["gh", "release", "view", release_name])
-            return asset in p.out
-        except ShellError:
-            return False
-
-    def publish_on_github(self):
-        pkg_name = self.release_name
-        gh_name = self.github_release_name
-        archive = os.path.join(self["INSTALL_DIR"], self.archive_name)
-        sha = archive + ".sha256"
-
-        # Disable the pager to avoid being stuck interactive command
-        self.shell("gh", "config", "set", "pager", "cat")
-
-        if not self.check_github_release(gh_name):
-            log.info("Create GitHub release '%s' for '%s'." % (gh_name, pkg_name))
-            self.shell(
-                "gh",
-                "release",
-                "create",
-                gh_name,
-                "--title",
-                gh_name,
-                "--notes",
-                gh_name,
-                "--draft",
-            )
-        else:
-            log.info("There is already a GitHub release for' %s'." % (pkg_name))
-
-        if self.check_github_release_asset(gh_name, self.archive_name):
-            log.info("Assets for '%s' already in GitHub release." % (pkg_name))
-        else:
-            log.info(
-                "Upload assets for '%s' in GitHub release '%s'..." % (pkg_name, gh_name)
-            )
-            self.shell("gh", "release", "upload", gh_name, archive, sha)
+                raise Exception(
+                    "Unknown target for gcc package: '%s'" % self.env.target.triplet
+                )
 
     @Anod.primitive()
     def build(self):
-
         for dep in self.deps.keys():
             self.deps[dep].merge(self["PKG_DIR"])
 
         name = self.release_name
         archive = self.archive_name
+
+        # fix for unwanted pthread.h header in include-fixed
+        extra_header = None
+        if self.package == "gnat":
+            extra_header = os.path.join(
+                self["PKG_DIR"],
+                "lib/gcc",
+                self.env.target.triplet,
+                self.version,
+                "include-fixed/pthread.h"
+            )
+        elif self.package == "gnatprove":
+            extra_header = os.path.join(
+                self["PKG_DIR"],
+                "libexec/spark/lib/gcc",
+                self.env.target.triplet,
+                self.version,
+                "include-fixed/pthread.h"
+            )
+
+        if extra_header is not None and os.path.exists(extra_header):
+            os.remove(extra_header)
 
         create_archive(
             filename=archive,
@@ -230,6 +188,3 @@ class ReleasePackage(spec("common")):
         log.info("archive: %s sha256: %s" % (archive, sha))
         with open(os.path.join(self["INSTALL_DIR"], archive + ".sha256"), "w") as f:
             f.write(sha)
-
-        if "do_gh_release" in self.parsed_qualifier:
-            self.publish_on_github()

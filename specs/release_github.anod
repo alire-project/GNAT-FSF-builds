@@ -1,0 +1,88 @@
+from e3.anod.helper import log
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+from e3.anod.error import ShellError
+from e3.os.process import Run
+
+import os
+
+valid_packages = ["gprbuild", "gnat", "gnatcov", "gnatprove"]
+
+
+class ReleasePackage(spec("release_package")):
+    # inherit from release_package to deduplicate archive name,
+    # release name... not very elegant but it works
+
+    @property
+    def github_release_name(self):
+        # Packges for different architectures are all gathered in the same GH
+        # release. So we will have for example:
+        #   GitHub release: gnat-10.3.0-1
+        #           assets: gnat-x86_64-linux-10.3.0-1
+        #                   gnat-x86_64-windows64-10.3.0-1
+        #                   gnat-riscv64-elf-windows64-10.3.0-1
+        #                   etc.
+        return "%s-%s-%s" % (
+            self.package,
+            self.version,
+            self.package_release,
+        )
+
+    @property
+    def build_deps(self):
+        return [
+            Anod.Dependency("release_package", qualifier=f"package={self.package}"),
+            *super().build_deps,
+        ]
+
+    def check_github_release(self, release_name):
+        try:
+            # If the gh command does not fail, the release exists
+            self.shell("gh", "release", "view", release_name)
+            return True
+        except ShellError:
+            return False
+
+    def check_github_release_asset(self, release_name, asset):
+        try:
+            p = Run(["gh", "release", "view", release_name])
+            return asset in p.out
+        except ShellError:
+            return False
+
+    def publish_on_github(self):
+        pkg_name = self.release_name
+        gh_name = self.github_release_name
+        archive = os.path.join(self.deps["release_package"]["INSTALL_DIR"], self.archive_name)
+        sha = archive + ".sha256"
+
+        # Disable the pager to avoid being stuck interactive command
+        self.shell("gh", "config", "set", "pager", "cat")
+
+        if not self.check_github_release(gh_name):
+            log.info("Create GitHub release '%s' for '%s'." % (gh_name, pkg_name))
+            self.shell(
+                "gh",
+                "release",
+                "create",
+                gh_name,
+                "--title",
+                gh_name,
+                "--notes",
+                gh_name,
+                "--draft",
+            )
+        else:
+            log.info("There is already a GitHub release for' %s'." % (pkg_name))
+
+        if self.check_github_release_asset(gh_name, self.archive_name):
+            log.info("Assets for '%s' already in GitHub release." % (pkg_name))
+        else:
+            log.info(
+                "Upload assets for '%s' in GitHub release '%s'..." % (pkg_name, gh_name)
+            )
+            self.shell("gh", "release", "upload", gh_name, archive, sha)
+
+    @Anod.primitive()
+    def build(self):
+        self.publish_on_github()

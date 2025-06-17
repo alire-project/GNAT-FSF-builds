@@ -9,23 +9,19 @@ import sys
 class EmbeddedRuntimes(spec("common")):
     @property
     def version(self):
-        return "14.1"
-
-    @property
-    def commit_id(self):
-        return "e59080e0c4b49d12e00538595052dea2dceb5a6e"
+        return "15.1.0-1"
 
     @property
     def tarball(self):
-        return "embedded-runtimes-%s.zip" % self.commit_id
+        return "embedded-runtimes-%s.zip" % self.version
 
     @property
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/Fabien-Chouteau/bb-runtimes/archive/%s.zip"
-                % self.commit_id,
+                url="https://github.com/alire-project/bb-runtimes/archive/v%s.zip"
+                % self.version,
             )
         ]
 

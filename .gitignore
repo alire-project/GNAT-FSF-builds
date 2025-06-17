@@ -1,4 +1,6 @@
+.vscode
 sbx
+uv.lock
 *.pyc
 /my-virtual-env/
 /in_artifacts/

@@ -1,248 +1,185 @@
 name: GNAT Linux
-on:
-  #schedule:
-  #  - cron:  '0 0 * * *'
-  #push:
+'on':
   pull_request:
-
-
+    paths-ignore:
+    - generate/**
+    - utils/**
+    - LICENSE
+    - README.md
+    - .gitignore
+  workflow_dispatch:
+    inputs:
+      do_gh_release:
+        description: Set to true to publish results in a GitHub release
+        type: boolean
+        required: false
+        default: false
 jobs:
-  gnat:
-    strategy:
-      fail-fast: false
-      matrix:
-        host: ["ubuntu-20.04", "ubuntu-22.04-arm"]
-    name: GNAT Linux ${{matrix.host}}
-    runs-on: ${{matrix.host}}
+  gcc_dependencies:
+    name: GCC Dependencies Linux
+    runs-on: ubuntu-22.04
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-
-    - name: Set up Python
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: 3.8
-
+        python-version: '3.12'
     - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install e3-core==22.1.0
-
-    - name: Install Ada dependencies
-      run: sudo apt-get install gnat bison
-
-    - name: Build GNAT native
-      run: ./anod build gcc -v --loglevel DEBUG --enable-cleanup
-
-    - name: Build GDB
-      run: ./anod build gdb -v --loglevel DEBUG --enable-cleanup
-
-    - name: Package GNAT
-      run: ./anod build release_package --qualifier=package=gnat,do_gh_release -v --loglevel DEBUG
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
-
-    - uses: actions/upload-artifact@v4
+      run: |-
+        python3 -m pip install --upgrade pip
+        pip install --break-system-packages e3-core==22.1.0
+    - name: Build GMP
+      run: python3 ./anod build gmp -v --loglevel DEBUG --enable-cleanup
+    - name: Build MPFR
+      run: python3 ./anod build mpfr -v --loglevel DEBUG --enable-cleanup
+    - name: Build MPC
+      run: python3 ./anod build mpc -v --loglevel DEBUG --enable-cleanup
+    - name: Build ISL
+      run: python3 ./anod build isl -v --loglevel DEBUG --enable-cleanup
+    - name: Upload artifact 'gcc-dependencies-artifacts'
+      uses: actions/upload-artifact@v4
       with:
-        name: gnat-anod-artifacts-${{matrix.host}}
+        name: gcc-dependencies-artifacts
         path: out_artifacts/*
         retention-days: 1
-
-    - uses: actions/upload-artifact@v4
-      with:
-        name: gnat-release-packages-${{matrix.host}}
-        path: sbx/*/release_package*/install/*
-        retention-days: 5
-
-
-
-  gprbuild:
-    strategy:
-      matrix:
-        host: ["ubuntu-20.04", "ubuntu-22.04-arm"]
-    name: GPRbuild ${{matrix.host}}
-    runs-on: ${{matrix.host}}
+  gnat:
+    needs:
+    - gcc_dependencies
+    name: GNAT Linux
+    runs-on: ubuntu-22.04
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-
-    - name: Set up Python
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: 3.8
-
+        python-version: '3.12'
     - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install e3-core==22.1.0
-
-    - name: Build GPRbuild
-      run: ./anod build gprbuild -v --loglevel DEBUG --enable-cleanup
-
-    - name: Package GPRbuild
-      run: ./anod build release_package --qualifier=package=gprbuild,do_gh_release -v --loglevel DEBUG
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
-
-    - uses: actions/upload-artifact@v4
+      run: |-
+        python3 -m pip install --upgrade pip
+        pip install --break-system-packages e3-core==22.1.0
+    - name: Download artifact 'gcc-dependencies-artifacts'
+      uses: actions/download-artifact@v4
       with:
-        name: gprbuild-release-packages-${{matrix.host}}
+        name: gcc-dependencies-artifacts
+        path: in_artifacts/
+    - name: Build GNAT native
+      run: python3 ./anod build gcc -v --loglevel DEBUG --enable-cleanup
+    - name: Build GDB
+      run: python3 ./anod build gdb -v --loglevel DEBUG --enable-cleanup
+    - name: Package GNAT
+      run: python3 ./anod build release_package --qualifier=package=gnat -v --loglevel DEBUG
+    - if: inputs.do_gh_release
+      name: Release GNAT
+      run: python3 ./anod build release_github --qualifier=package=gnat -v --loglevel DEBUG --enable-cleanup
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact 'gnat-release-packages'
+      uses: actions/upload-artifact@v4
+      with:
+        name: gnat-release-packages
         path: sbx/*/release_package*/install/*
         retention-days: 5
-
-
-
+  gprbuild:
+    name: GPRbuild Linux
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v4
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install Python dependencies
+      run: |-
+        python3 -m pip install --upgrade pip
+        pip install --break-system-packages e3-core==22.1.0
+    - name: Build GPRbuild
+      run: python3 ./anod build gprbuild -v --loglevel DEBUG --enable-cleanup
+    - name: Package GPRbuild
+      run: python3 ./anod build release_package --qualifier=package=gprbuild -v --loglevel DEBUG
+    - if: inputs.do_gh_release
+      name: Release GPRbuild
+      run: python3 ./anod build release_github --qualifier=package=gprbuild -v --loglevel DEBUG --enable-cleanup
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact 'gprbuild-release-packages'
+      uses: actions/upload-artifact@v4
+      with:
+        name: gprbuild-release-packages
+        path: sbx/*/release_package*/install/*
+        retention-days: 5
   gnat_cross:
     strategy:
       fail-fast: false
       matrix:
-        host: ["ubuntu-20.04", "ubuntu-22.04-arm"]
-        target: ["arm-elf", "riscv64-elf", "avr-elf", "xtensa-esp32-elf"]
-    name: GNAT ${{ matrix.target }} ${{matrix.host}}
-    needs: gnat
-    runs-on: ${{matrix.host}}
+        target:
+        - arm-elf
+        - riscv64-elf
+        - avr-elf
+        - xtensa-esp32-elf
+    needs:
+    - gcc_dependencies
+    name: GNAT ${{ matrix.target }} Linux
+    runs-on: ubuntu-22.04
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-
-    - uses: actions/download-artifact@v4
-      with:
-        name: gnat-anod-artifacts-${{matrix.host}}
-        path: in_artifacts/
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8
-
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install e3-core==22.1.0
-
-    - name: Build GNAT ${{ matrix.target }}
-      run: ./anod build gcc -v --loglevel DEBUG --target=${{ matrix.target }} --enable-cleanup
-
-    - name: Build GDB ${{ matrix.target }}
-      run: ./anod build gdb -v --loglevel DEBUG --target=${{ matrix.target }} --enable-cleanup
-
-    - name: Package GNAT ${{ matrix.target }}
-      run: ./anod build release_package --qualifier=package=gnat,do_gh_release --target=${{ matrix.target }} -v --loglevel DEBUG
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
-
-    - uses: actions/upload-artifact@v4
-      with:
-        name: gnat-release-packages-${{matrix.host}}-${{matrix.target}}
-        path: sbx/*/release_package*/install/*
-        retention-days: 5
-
-
-  why3:
-    strategy:
-      matrix:
-        ocaml-compiler:
-          - 4.12.1
-
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          repository: 'adacore/why3'
-          ref: 'fsf-14'
-
-      - name: Use Setup OCaml {{ matrix.ocaml-version }}
-        uses: ocaml/setup-ocaml@v2
-        with:
-          ocaml-compiler: ${{ matrix.ocaml-compiler }}
-
-      - name: Setup Packages
-        run: |
-          opam depext zarith re seq why3
-          opam install dune dune-configurator menhir num ocamlgraph re seq yojson zarith sexplib ppx_sexp_conv ppx_deriving
-
-      - run: opam exec -- ./configure --prefix=/tmp/why3install --enable-relocation --disable-emacs-compilation --disable-hypothesis-selection --disable-js-of-ocaml --disable-zip
-
-      - run: opam exec -- make
-
-      - run: opam exec -- make install_spark2014
-
-      - run: git log --format="%H" -n 1 > /tmp/why3install/why3-version.txt
-
-      - name: Upload the build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: why3
-          path: /tmp/why3install
-
-
-  alt_ergo:
-    strategy:
-      matrix:
-        ocaml-compiler:
-          - 4.12.1
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          repository: 'adacore/alt-ergo'
-          ref: 'fsf-14'
-
-      - name: Use Setup OCaml {{ matrix.ocaml-version }}
-        uses: ocaml/setup-ocaml@v2
-        with:
-          ocaml-compiler: ${{ matrix.ocaml-compiler }}
-
-      - run: opam install alt-ergo --destdir=/tmp/alt-ergo-install
-
-      - run: git log --format="%H" -n 1 > /tmp/alt-ergo-install/alt-ergo-version.txt
-
-      - name: Upload the build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: alt-ergo
-          path: /tmp/alt-ergo-install
-
-
-  spark:
-    name: spark
-    needs: [why3, alt_ergo]
-    runs-on: ubuntu-20.04
-    steps:
-    - name: Checkout Project
-      uses: actions/checkout@v4
-
-    - uses: actions/download-artifact@v4
-      with:
-        name: alt-ergo
-        path: alt-ergo_artifact/
-
-    - uses: actions/download-artifact@v4
-      with:
-        name: why3
-        path: why3_artifact/
-
-    - name: Set up Python
+    - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
-        python-version: 3.8
-
+        python-version: '3.12'
     - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install e3-core==22.1.0
-
-    - name: Build SPARK
-      run: ./anod build spark2014 -v --loglevel DEBUG --enable-cleanup
-
-    - name: Package GNATprove
-      run: ./anod build release_package --qualifier=package=gnatprove,do_gh_release -v --loglevel DEBUG
+      run: |-
+        python3 -m pip install --upgrade pip
+        pip install --break-system-packages e3-core==22.1.0
+    - name: Download artifact 'gcc-dependencies-artifacts'
+      uses: actions/download-artifact@v4
+      with:
+        name: gcc-dependencies-artifacts
+        path: in_artifacts/
+    - name: Build GNAT ${{ matrix.target }}
+      run: python3 ./anod build gcc --target=${{ matrix.target }} -v --loglevel DEBUG --enable-cleanup
+    - name: Build GDB ${{ matrix.target }}
+      run: python3 ./anod build gdb --target=${{ matrix.target}} -v --loglevel DEBUG --enable-cleanup
+    - name: Package GNAT ${{ matrix.target }}
+      run: python3 ./anod build release_package --qualifier=package=gnat --target=${{ matrix.target }} -v --loglevel DEBUG
+    - if: inputs.do_gh_release
+      name: Release GNAT ${{ matrix.target }}
+      run: python3 ./anod build release_github --qualifier=package=gnat --target=${{ matrix.target }} -v --loglevel DEBUG --enable-cleanup
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for GitHub CLI tool
-
-    - uses: actions/upload-artifact@v4
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact 'gnat-release-packages-${{matrix.target}}'
+      uses: actions/upload-artifact@v4
+      with:
+        name: gnat-release-packages-${{matrix.target}}
+        path: sbx/*/release_package*/install/*
+  spark:
+    name: SPARK Linux
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v4
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install Python dependencies
+      run: |-
+        python3 -m pip install --upgrade pip
+        pip install --break-system-packages e3-core==22.1.0
+    - name: Build SPARK
+      run: python3 ./anod build spark2014 -v --loglevel DEBUG --enable-cleanup
+    - name: Package GNATprove
+      run: python3 ./anod build release_package --qualifier=package=gnatprove -v --loglevel DEBUG
+    - if: inputs.do_gh_release
+      name: Release GNATprove
+      run: python3 ./anod build release_github --qualifier=package=gnatprove -v --loglevel DEBUG --enable-cleanup
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact 'gnatprove-release-packages'
+      uses: actions/upload-artifact@v4
       with:
         name: gnatprove-release-packages
         path: sbx/*/release_package*/install/*

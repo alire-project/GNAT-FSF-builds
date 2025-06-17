@@ -3,14 +3,34 @@ from e3.fs import sync_tree
 from e3.anod.spec import Anod
 import os
 
-class AltErgo(spec("gh-artifact")):
-
+class AltErgo(spec("binary_install")):
     @property
     def version(self):
-        return "xx.x.x"
+        return "15.1.1"
 
-    @Anod.primitive()
-    def build(self):
-        sync_tree(os.path.join(self.spec_dir, "..", "alt-ergo_artifact"),
-                  self["INSTALL_DIR"],
-                  delete=True)
+    @property
+    def platform(self):
+        if self.env.host.os.name == "windows":
+            return "windows"
+        if self.env.host.os.name == "darwin":
+            if self.env.host.cpu.name == "x86_64":
+                return "macos-x86_64"
+            else:
+                return "macos-arm"
+        else:
+            if self.env.host.cpu.name == "x86_64":
+                return "linux-x86_64"
+            else:
+                return "linux-arm"
+
+    @property
+    def tarball(self):
+        return f"altergo-{self.version}-{self.platform}.zip"
+
+    @property
+    def url(self):
+        return f"https://github.com/AdaCore/alt-ergo/releases/download/fsf-15-1.1/{self.tarball}"
+
+    @property
+    def remove_root_dir(self):
+        return False

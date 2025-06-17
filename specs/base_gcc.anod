@@ -4,11 +4,13 @@ from e3.archive import unpack_archive
 from e3.anod.loader import spec
 from e3.anod.spec import Anod
 
+import logging
+import time
 
-class base_gcc(spec("common")):
+class base_gcc(spec("binary_install")):
     @property
     def version(self):
-        return "14.2.0-1"
+        return "15.1.0-rc2"
 
     @property
     def tarball(self):
@@ -18,15 +20,3 @@ class base_gcc(spec("common")):
     def url(self):
         return "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-%s/%s" \
                 % (self.version, self.tarball)
-
-    @Anod.primitive()
-    def build(self):
-        # Download the archive
-        with HTTPSession() as http:
-            http.download_file(self.url, self["BUILD_DIR"], self.tarball)
-
-        # Extract the archive
-        unpack_archive(self.tarball, self["INSTALL_DIR"], remove_root_dir=True)
-
-        # Delete the archive
-        rm(self.tarball)

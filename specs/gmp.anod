@@ -1,4 +1,4 @@
-from e3.os.fs import unixpath
+from e3.os.fs import cd, unixpath
 from e3.anod.helper import Configure, Make
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
@@ -7,7 +7,7 @@ from e3.anod.loader import spec
 class GMP(spec("gnu")):
     @property
     def version(self):
-        return "6.2.1"
+        return "6.3.0"
 
     @property
     def tarball(self):
@@ -17,8 +17,7 @@ class GMP(spec("gnu")):
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
-                name=self.tarball,
-                url="https://gcc.gnu.org/pub/gcc/infrastructure/" + self.tarball
+                name=self.tarball, url="https://ftp.gnu.org/gnu/gmp/" + self.tarball
             )
         ]
 
@@ -37,6 +36,14 @@ class GMP(spec("gnu")):
     def build_deps(self):
         return self.compiler_deps()
 
+    def pre_build(self):
+        if self.env.host.os.name == "darwin" and self.env.host.cpu.name == "x86_64":
+            # Regenerate configure to avoid flat namespace linking
+            # Reported by email: https://gmplib.org/list-archives/gmp-bugs/2023-July/thread.html
+            # Remove in next version
+            cd(self["SRC_DIR"])
+            self.shell("autoreconf", "-i", "-s")
+
     def setup(self):
         configure = Configure(self)
         configure.add("--prefix=%s" % unixpath(self["INSTALL_DIR"]))
@@ -52,6 +59,9 @@ class GMP(spec("gnu")):
             # Enable --with-pic to avoid linking issues with the static library
             # https://github.com/Homebrew/homebrew-core/blob/98064198c7e5464124f53bbdb47bec3e03f1a0cd/Formula/gmp.rb#L28
             configure.add("--with-pic")
+
+        if self.env.host.os.name == "windows":
+            configure.add("CFLAGS=-std=gnu17")  # fix for new defaults in gcc 15.1.0
 
         make = Make(self)
 

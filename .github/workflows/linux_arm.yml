@@ -1,4 +1,4 @@
-name: GNAT macOS Arm
+name: GNAT Linux Arm
 'on':
   pull_request:
     paths-ignore:
@@ -16,18 +16,11 @@ name: GNAT macOS Arm
         default: false
 jobs:
   gcc_dependencies:
-    name: GCC Dependencies macOS_Arm
-    runs-on: macos-14
+    name: GCC Dependencies Linux_Arm
+    runs-on: ubuntu-22.04-arm
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set Xcode 15.3
-      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
-    - name: Install packages with Homebrew
-      run: |-
-        brew install texinfo
-        brew install autoconf
-        brew install automake
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
@@ -42,6 +35,8 @@ jobs:
       run: python3 ./anod build mpfr -v --loglevel DEBUG --enable-cleanup
     - name: Build MPC
       run: python3 ./anod build mpc -v --loglevel DEBUG --enable-cleanup
+    - name: Build ISL
+      run: python3 ./anod build isl -v --loglevel DEBUG --enable-cleanup
     - name: Upload artifact 'gcc-dependencies-artifacts'
       uses: actions/upload-artifact@v4
       with:
@@ -51,18 +46,11 @@ jobs:
   gnat:
     needs:
     - gcc_dependencies
-    name: GNAT macOS_Arm
-    runs-on: macos-14
+    name: GNAT Linux_Arm
+    runs-on: ubuntu-22.04-arm
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set Xcode 15.3
-      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
-    - name: Install packages with Homebrew
-      run: |-
-        brew install texinfo
-        brew install autoconf
-        brew install automake
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
@@ -94,18 +82,11 @@ jobs:
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gprbuild:
-    name: GPRbuild macOS_Arm
-    runs-on: macos-14
+    name: GPRbuild Linux_Arm
+    runs-on: ubuntu-22.04-arm
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set Xcode 15.3
-      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
-    - name: Install packages with Homebrew
-      run: |-
-        brew install texinfo
-        brew install autoconf
-        brew install automake
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
@@ -140,18 +121,11 @@ jobs:
         - xtensa-esp32-elf
     needs:
     - gcc_dependencies
-    name: GNAT ${{ matrix.target }} macOS_Arm
-    runs-on: macos-14
+    name: GNAT ${{ matrix.target }} Linux_Arm
+    runs-on: ubuntu-22.04-arm
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set Xcode 15.3
-      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
-    - name: Install packages with Homebrew
-      run: |-
-        brew install texinfo
-        brew install autoconf
-        brew install automake
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
@@ -182,18 +156,11 @@ jobs:
         name: gnat-release-packages-${{matrix.target}}
         path: sbx/*/release_package*/install/*
   spark:
-    name: SPARK macOS_Arm
-    runs-on: macos-14
+    name: SPARK Linux_Arm
+    runs-on: ubuntu-22.04-arm
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set Xcode 15.3
-      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
-    - name: Install packages with Homebrew
-      run: |-
-        brew install texinfo
-        brew install autoconf
-        brew install automake
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:

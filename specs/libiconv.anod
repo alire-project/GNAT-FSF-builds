@@ -9,7 +9,7 @@ import os
 class LibIconv(spec("common")):
     @property
     def version(self):
-        return "1.16"
+        return "1.18"
 
     @property
     def tarball(self):
@@ -20,7 +20,7 @@ class LibIconv(spec("common")):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://ftp.gnu.org/pub/gnu/libiconv/%s" % self.tarball,
+                url="https://ftp.gnu.org/gnu/libiconv/%s" % self.tarball,
             )
         ]
 
