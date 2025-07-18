@@ -1,16 +1,9 @@
-from e3.net.http import HTTPSession
-from e3.fs import rm
-from e3.archive import unpack_archive
 from e3.anod.loader import spec
-from e3.anod.spec import Anod
-
-import logging
-import time
 
 class base_gcc(spec("binary_install")):
     @property
     def version(self):
-        return "15.1.0-rc2"
+        return "15.1.0-2"
 
     @property
     def tarball(self):
