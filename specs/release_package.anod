@@ -69,6 +69,11 @@ class ReleasePackage(spec("common")):
         if self.env.is_cross:
             platform += "-" + self.env.host.cpu.name
 
+        if self.package == "gnat":
+            return (
+                f"gnat-{platform}-{self.deps['gcc'].branch}.0.0-{self.deps['gcc'].version}"
+            )
+
         return "%s-%s-%s-%s" % (
             self.package,
             platform,
@@ -156,7 +161,7 @@ class ReleasePackage(spec("common")):
                 "lib/gcc",
                 self.env.target.triplet,
                 self.version,
-                "include-fixed/pthread.h"
+                "include-fixed/pthread.h",
             )
         elif self.package == "gnatprove":
             extra_header = os.path.join(
@@ -164,7 +169,7 @@ class ReleasePackage(spec("common")):
                 "libexec/spark/lib/gcc",
                 self.env.target.triplet,
                 self.version,
-                "include-fixed/pthread.h"
+                "include-fixed/pthread.h",
             )
 
         if extra_header is not None and os.path.exists(extra_header):

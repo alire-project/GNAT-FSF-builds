@@ -3,30 +3,65 @@ from e3.fs import cp, mkdir, sync_tree
 from e3.anod.helper import Configure, Make
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
-from e3.env import Env
 from e3.os.process import Run
+
 import os
+import requests as req
+from functools import cached_property
+import html.parser
 
 # A wrapper to call ld-classic on MacOS X
 patch_name = "ld"
 
 
+class SnapshotTarballFinder(html.parser.HTMLParser):
+    outer = []
+    curr = None
+    tarball = None
+
+    def handle_starttag(self, tag, attrs):
+        if self.curr:
+            self.outer.append(self.curr)
+        self.curr = tag
+        if tag == "a" and self.outer == ["html", "body", "table", "tr", "td"]:
+            for key, val in attrs:
+                if key == "href" and (
+                    val.endswith(".tar.xz") or val.endswith(".tar.gz")
+                ):
+                    self.tarball = val
+
+    def handle_endtag(self, tag):
+        if self.curr == tag:
+            self.curr = self.outer.pop() if self.outer else None
+
+
 class GCC(spec("gh-artifact")):
     @property
-    def version(self):
-        return "15.2.0"
+    def branch(self):
+        return "16"
 
     @property
+    def version(self):
+        return self.tarball.split(".")[0].removeprefix("gcc-%s-" % self.branch)
+
+    @cached_property
     def tarball(self):
-        return "gcc-%s.tar.gz" % self.version
+        page = req.get("https://gcc.gnu.org/pub/gcc/snapshots/LATEST-%s/" % self.branch)
+        parser = SnapshotTarballFinder()
+        parser.feed(page.text)
+        if parser.tarball:
+            self.tarball_name = parser.tarball
+            return parser.tarball
+        else:
+            raise Exception("could not find tarball in snapshot page")
 
     @property
     def url(self):
         if self.host_is_macos_arm:
-            return "https://github.com/iains/gcc-15-branch/archive/refs/heads/gcc-15-1-darwin-rc1.tar.gz"
+            return "https://github.com/iains/gcc-darwin-arm64/archive/refs/heads/master-wip-apple-si.zip"
         else:
-            return "https://gcc.gnu.org/pub/gcc/releases/gcc-%s/%s" % (
-                self.version,
+            return "https://gcc.gnu.org/pub/gcc/snapshots/LATEST-%s/%s" % (
+                self.branch,
                 self.tarball,
             )
 
