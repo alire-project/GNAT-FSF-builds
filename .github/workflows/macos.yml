@@ -26,6 +26,7 @@ jobs:
         brew install texinfo
         brew install autoconf
         brew install automake
+        brew install flex
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
@@ -59,6 +60,7 @@ jobs:
         brew install texinfo
         brew install autoconf
         brew install automake
+        brew install flex
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
@@ -100,6 +102,7 @@ jobs:
         brew install texinfo
         brew install autoconf
         brew install automake
+        brew install flex
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
@@ -144,6 +147,7 @@ jobs:
         brew install texinfo
         brew install autoconf
         brew install automake
+        brew install flex
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
@@ -184,6 +188,7 @@ jobs:
         brew install texinfo
         brew install autoconf
         brew install automake
+        brew install flex
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:

@@ -20,8 +20,21 @@ class Unix(HostOs):
 class Linux(Unix):
     runner: str = "ubuntu-22.04"
 
+    @classmethod
+    def setup_python(cls) -> list[RawStep]:
+        return [
+            Step(
+                "Install packages with apt",
+                [
+                    "sudo apt update",
+                    "sudo apt install flex",
+                ],
+            ),
+            *super().setup_python(),
+        ]
 
-class Linux_Arm(Unix):
+
+class Linux_Arm(Linux):
     runner: str = "ubuntu-22.04-arm"
 
 
@@ -37,6 +50,7 @@ class macOS(Unix):
                     "brew install texinfo",
                     "brew install autoconf",
                     "brew install automake",
+                    "brew install flex",
                 ],
             ),
             *super().setup_python(),
@@ -90,10 +104,10 @@ class WindowsMsys2(Windows):
         class Msys2Args(Yamlable[Host]):
             msystem: str | None = None
             update: bool = False
-            install: list[str] = field(default_factory=list)
+            install: list[str] = field(default_factory=list[str])
 
             def to_yaml(self, ctx: Host) -> Yaml:
-                res = dict()
+                res: dict[str, Yaml] = dict()
                 if self.msystem is not None:
                     res["msystem"] = self.msystem
                 if self.update:
@@ -110,6 +124,7 @@ class WindowsMsys2(Windows):
                         "base-devel",
                         "git",
                         "rsync",
+                        "flex",
                         "mingw-w64-x86_64-github-cli",
                         "mingw-w64-x86_64-toolchain",
                         "mingw-w64-x86_64-python",

@@ -21,6 +21,10 @@ jobs:
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
+    - name: Install packages with apt
+      run: |-
+        sudo apt update
+        sudo apt install flex
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
@@ -51,6 +55,10 @@ jobs:
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
+    - name: Install packages with apt
+      run: |-
+        sudo apt update
+        sudo apt install flex
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
@@ -87,6 +95,10 @@ jobs:
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
+    - name: Install packages with apt
+      run: |-
+        sudo apt update
+        sudo apt install flex
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
@@ -126,6 +138,10 @@ jobs:
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
+    - name: Install packages with apt
+      run: |-
+        sudo apt update
+        sudo apt install flex
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:
@@ -161,6 +177,10 @@ jobs:
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
+    - name: Install packages with apt
+      run: |-
+        sudo apt update
+        sudo apt install flex
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
       with:

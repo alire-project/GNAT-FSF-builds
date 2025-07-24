@@ -33,6 +33,7 @@ jobs:
           base-devel
           git
           rsync
+          flex
           mingw-w64-x86_64-github-cli
           mingw-w64-x86_64-toolchain
           mingw-w64-x86_64-python
@@ -83,6 +84,7 @@ jobs:
           base-devel
           git
           rsync
+          flex
           mingw-w64-x86_64-github-cli
           mingw-w64-x86_64-toolchain
           mingw-w64-x86_64-python
@@ -139,6 +141,7 @@ jobs:
           base-devel
           git
           rsync
+          flex
           mingw-w64-x86_64-github-cli
           mingw-w64-x86_64-toolchain
           mingw-w64-x86_64-python
@@ -198,6 +201,7 @@ jobs:
           base-devel
           git
           rsync
+          flex
           mingw-w64-x86_64-github-cli
           mingw-w64-x86_64-toolchain
           mingw-w64-x86_64-python
@@ -253,6 +257,7 @@ jobs:
           base-devel
           git
           rsync
+          flex
           mingw-w64-x86_64-github-cli
           mingw-w64-x86_64-toolchain
           mingw-w64-x86_64-python
