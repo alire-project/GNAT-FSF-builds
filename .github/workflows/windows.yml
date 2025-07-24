@@ -41,7 +41,7 @@ jobs:
     - name: Install Python dependencies
       run: |-
         python3 -m pip install --upgrade pip
-        pip install --break-system-packages e3-core==22.1.0
+        pip install --break-system-packages e3-core==22.10.0
     - name: Prepare msys2 build setup
       run: |-
         df -h
@@ -91,7 +91,7 @@ jobs:
     - name: Install Python dependencies
       run: |-
         python3 -m pip install --upgrade pip
-        pip install --break-system-packages e3-core==22.1.0
+        pip install --break-system-packages e3-core==22.10.0
     - name: Prepare msys2 build setup
       run: |-
         df -h
@@ -147,7 +147,7 @@ jobs:
     - name: Install Python dependencies
       run: |-
         python3 -m pip install --upgrade pip
-        pip install --break-system-packages e3-core==22.1.0
+        pip install --break-system-packages e3-core==22.10.0
     - name: Prepare msys2 build setup
       run: |-
         df -h
@@ -206,7 +206,7 @@ jobs:
     - name: Install Python dependencies
       run: |-
         python3 -m pip install --upgrade pip
-        pip install --break-system-packages e3-core==22.1.0
+        pip install --break-system-packages e3-core==22.10.0
     - name: Prepare msys2 build setup
       run: |-
         df -h
@@ -261,7 +261,7 @@ jobs:
     - name: Install Python dependencies
       run: |-
         python3 -m pip install --upgrade pip
-        pip install --break-system-packages e3-core==22.1.0
+        pip install --break-system-packages e3-core==22.10.0
     - name: Prepare msys2 build setup
       run: |-
         df -h

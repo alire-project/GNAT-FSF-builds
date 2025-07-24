@@ -61,7 +61,7 @@ def add_anod_files_to_fingerprint(
 
 class FSFBuildEmptyJob(EmptyJob):
     def __init__(self, uid, data, notify_end, sandbox):
-        super(FSFBuildEmptyJob, self).__init__(uid, data, notify_end)
+        super(FSFBuildEmptyJob, self).__init__(uid, data, notify_end, ReturnValue.success)
 
 
 class FSFBuildJob(Job):

@@ -33,7 +33,7 @@ jobs:
     - name: Install Python dependencies
       run: |-
         python3 -m pip install --upgrade pip
-        pip install --break-system-packages e3-core==22.1.0
+        pip install --break-system-packages e3-core==22.10.0
     - name: Build GMP
       run: python3 ./anod build gmp -v --loglevel DEBUG --enable-cleanup
     - name: Build MPFR
@@ -66,7 +66,7 @@ jobs:
     - name: Install Python dependencies
       run: |-
         python3 -m pip install --upgrade pip
-        pip install --break-system-packages e3-core==22.1.0
+        pip install --break-system-packages e3-core==22.10.0
     - name: Download artifact 'gcc-dependencies-artifacts'
       uses: actions/download-artifact@v4
       with:
@@ -107,7 +107,7 @@ jobs:
     - name: Install Python dependencies
       run: |-
         python3 -m pip install --upgrade pip
-        pip install --break-system-packages e3-core==22.1.0
+        pip install --break-system-packages e3-core==22.10.0
     - name: Build GPRbuild
       run: python3 ./anod build gprbuild -v --loglevel DEBUG --enable-cleanup
     - name: Package GPRbuild
@@ -151,7 +151,7 @@ jobs:
     - name: Install Python dependencies
       run: |-
         python3 -m pip install --upgrade pip
-        pip install --break-system-packages e3-core==22.1.0
+        pip install --break-system-packages e3-core==22.10.0
     - name: Download artifact 'gcc-dependencies-artifacts'
       uses: actions/download-artifact@v4
       with:
@@ -191,7 +191,7 @@ jobs:
     - name: Install Python dependencies
       run: |-
         python3 -m pip install --upgrade pip
-        pip install --break-system-packages e3-core==22.1.0
+        pip install --break-system-packages e3-core==22.10.0
     - name: Build SPARK
       run: python3 ./anod build spark2014 -v --loglevel DEBUG --enable-cleanup
     - name: Package GNATprove
