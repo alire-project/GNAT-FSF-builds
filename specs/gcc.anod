@@ -14,7 +14,7 @@ patch_name = "ld"
 class GCC(spec("gh-artifact")):
     @property
     def version(self):
-        return "15.1.0"
+        return "15.2.0"
 
     @property
     def tarball(self):

@@ -17,7 +17,7 @@ class GMP(spec("gnu")):
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
-                name=self.tarball, url="https://ftp.gnu.org/gnu/gmp/" + self.tarball
+                name=self.tarball, url="https://gcc.gnu.org/pub/gcc/infrastructure/" + self.tarball
             )
         ]
 

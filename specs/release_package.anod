@@ -47,7 +47,7 @@ class ReleasePackage(spec("common")):
             "gprbuild": "1",
             "gnatcov": "1",
             "gnatprove": "1",
-            "gnat": "2",
+            "gnat": "1",
         }
 
         if isinstance(r := release[package], dict):
