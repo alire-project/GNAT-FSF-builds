@@ -58,7 +58,7 @@ class macOS_Arm(macOS):
 
 
 class Windows(HostOs):
-    runner = "windows-2019"
+    runner = "windows-2022"
 
     @classmethod
     def setup_ocaml(cls) -> list[RawStep]:

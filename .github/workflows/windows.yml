@@ -17,7 +17,7 @@ name: GNAT Windows
 jobs:
   gcc_dependencies:
     name: GCC Dependencies WindowsMsys2
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
       CONFIG_SHELL: /bin/bash
     defaults:
@@ -67,7 +67,7 @@ jobs:
     needs:
     - gcc_dependencies
     name: GNAT WindowsMsys2
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
       CONFIG_SHELL: /bin/bash
     defaults:
@@ -123,7 +123,7 @@ jobs:
         retention-days: 5
   gprbuild:
     name: GPRbuild WindowsMsys2
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
       CONFIG_SHELL: /bin/bash
     defaults:
@@ -182,7 +182,7 @@ jobs:
     needs:
     - gcc_dependencies
     name: GNAT ${{ matrix.target }} WindowsMsys2
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
       CONFIG_SHELL: /bin/bash
     defaults:
@@ -237,7 +237,7 @@ jobs:
         path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
   spark:
     name: SPARK WindowsMsys2
-    runs-on: windows-2019
+    runs-on: windows-2022
     env:
       CONFIG_SHELL: /bin/bash
     defaults:
