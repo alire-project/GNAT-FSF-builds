@@ -20,7 +20,7 @@ class LibIconv(spec("common")):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://ftp.gnu.org/gnu/libiconv/%s" % self.tarball,
+                url="https://mirrors.ocf.berkeley.edu/gnu/libiconv/%s" % self.tarball,
             )
         ]
 
