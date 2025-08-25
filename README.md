@@ -9,7 +9,7 @@ This can be done in a virtual env, e.g.:
 ```console
 $ python3 -m venv my-virtual-env
 $ source my-virtual-env/bin/activate
-$ pip install e3-core==22.1.0
+$ pip install e3-core==22.10.0
 ```
 
 A Python 3.12 specific environment can be created with [`uv`](https://docs.astral.sh/uv/) instead:
