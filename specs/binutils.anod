@@ -79,12 +79,10 @@ class Binutils(spec("common")):
 
         # https://github.com/msys2/MINGW-packages/issues/7890
         # https://forum.ada-lang.io/t/win32ada-fails-to-compile-with-gcc-15-1-0/2196/5
-        if self.env.build.os.name == "windows":
+        plugin = os.path.join(self["INSTALL_DIR"], "lib", "bfd-plugins", "libdep.a")
+        if self.env.build.os.name == "windows" and os.path.exists(plugin):
             # for some reason 'rm' doesn't seem to work, so we are moving the file to the build dir
-            mv(
-                os.path.join(self["INSTALL_DIR"], "lib", "bfd-plugins", "libdep.a"),
-                os.path.join(self["BUILD_DIR"], "libdep.a.disable"),
-            )
+            mv(plugin, os.path.join(self["BUILD_DIR"], "libdep.a.disable"))
 
         # We do not clean the binutils builds and install on native targets as
         # they are used for gnatcov build.
