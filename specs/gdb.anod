@@ -96,6 +96,7 @@ class GDB(spec("common")):
 
         if self.env.host.os.name == "windows":
             configure.add("CFLAGS=-std=gnu17") # fix for new defaults in gcc 15.1.0
+            configure.add("CXXFLAGS=-D_WIN32_WINNT=0x0600") # set min windows version
             configure.add("--disable-tui")
             configure.add(
                 "--with-libiconv-prefix=%s"

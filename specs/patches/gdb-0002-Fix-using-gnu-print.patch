@@ -83,8 +83,7 @@ index 72c1c5144f3..ccf440baf0c 100644
 -#  define _WIN32_WINNT 0x0501
 +#  define _WIN32_WINNT 0x0600
  # endif
- #endif /* __MINGW32__ || __CYGWIN__ */
-
+ #endif	/* __MINGW32__ || __CYGWIN__ */
 diff --git a/gdbsupport/common.m4 b/gdbsupport/common.m4
 index 3909ec81ccb..118dba78815 100644
 --- gdbsupport/common.m4
@@ -103,7 +102,7 @@ index 3909ec81ccb..118dba78815 100644
 -    #  define _WIN32_WINNT 0x0501
 +    #  define _WIN32_WINNT 0x0600
      # endif
-     #endif     /* __MINGW32__ || __CYGWIN__ */
+     #endif	/* __MINGW32__ || __CYGWIN__ */
      #include <thread>
 
 
