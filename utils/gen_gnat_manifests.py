@@ -13,8 +13,10 @@ CRATE_VERSION = "14.1.3"
 targets = {
     "x86_64": {"crate": "gnat_native", "description": "Native"},
     "arm-elf": {"crate": "gnat_arm_elf", "description": "ARM cross-compiler"},
-    "avr-elf": {"crate": "gnat_avr_elf", "description": "RISC-V cross-compiler"},
-    "riscv64-elf": {"crate": "gnat_riscv64_elf", "description": "AVR cross-compiler"},
+    "aarch64-elf": {"crate": "gnat_aarch64_elf", "description": "AArch64 cross-compiler"},
+    "riscv64-elf": {"crate": "gnat_riscv64_elf", "description": "RISC-V cross-compiler"},
+    "x86_64-elf": {"crate": "gnat_x86_64_elf", "description": "x86-64 cross-compiler"},
+    "avr-elf": {"crate": "gnat_avr_elf", "description": "AVR cross-compiler"},
 }
 
 

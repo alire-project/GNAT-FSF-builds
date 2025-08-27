@@ -135,7 +135,9 @@ jobs:
       matrix:
         target:
         - arm-elf
+        - aarch64-elf
         - riscv64-elf
+        - x86_64-elf
         - avr-elf
         - xtensa-esp32-elf
     needs:

@@ -192,7 +192,7 @@ class InstallPythonDeps(RawStep):
 
 class Targets(Yamlable[Host]):
     def to_yaml(self, ctx: Host) -> Yaml:
-        return ["arm-elf", "riscv64-elf", "avr-elf", "xtensa-esp32-elf"]
+        return ["arm-elf", "aarch64-elf", "riscv64-elf", "x86_64-elf", "avr-elf", "xtensa-esp32-elf"]
 
 
 class Conditional(RawStep):
