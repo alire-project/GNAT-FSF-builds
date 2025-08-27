@@ -1,0 +1,40 @@
+from e3.anod.loader import spec
+from e3.fs import sync_tree
+from e3.anod.spec import Anod
+import os
+
+class LLVM(spec("binary_install")):
+    @property
+    def version(self):
+        return "20.1.8"
+
+    @property
+    def platform(self):
+        if self.env.host.os.name == "windows":
+            return "x86_64-pc-windows-msvc"
+        if self.env.host.os.name == "darwin":
+            if self.env.host.cpu.name == "arm":
+                return "macos-arm64"
+            else:
+                # Unsupported
+                raise NotImplementedError
+        else:
+            if self.env.host.cpu.name == "x86_64":
+                return "linux-x64"
+            else:
+                return "linux-arm64"
+
+    @property
+    def tool(self):
+        if self.env.host.os.name == "windows":
+            return "clang+llvm"
+        else:
+            return "LLVM"
+
+    @property
+    def tarball(self):
+        return f"{self.tool}-{self.version}-{self.platform}.tar.xz"
+
+    @property
+    def url(self):
+        return f"https://github.com/llvm/llvm-project/releases/download/llvmorg-{self.version}/{self.tarball}"
