@@ -1,0 +1,25 @@
+name: GNAT FSF snapshot builds
+'on':
+  schedule:
+    - cron: "0 4 * * TUE" # run every Tuesday at 04:00
+
+jobs:
+  dispatch_builds:
+    strategy:
+      fail-fast: false
+      matrix:
+        host:
+        - linux
+        - linux_arm
+        - macos # soon to be retired :(
+        - macos_arm
+        - windows
+    name: "Start build on ${{ matrix.host }}"
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        ref: snapshots
+    - run: gh workflow run ${{ matrix.host }}.yml --ref snapshots -f do_gh_release=true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
