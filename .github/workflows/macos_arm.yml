@@ -132,59 +132,6 @@ jobs:
         name: gprbuild-release-packages
         path: sbx/*/release_package*/install/*
         retention-days: 5
-  gnat_cross:
-    strategy:
-      fail-fast: false
-      matrix:
-        target:
-        - arm-elf
-        - riscv64-elf
-        - avr-elf
-        - xtensa-esp32-elf
-    needs:
-    - gcc_dependencies
-    name: GNAT ${{ matrix.target }} macOS_Arm
-    runs-on: macos-14
-    steps:
-    - name: Checkout Project
-      uses: actions/checkout@v4
-    - name: Set Xcode 15.3
-      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
-    - name: Install packages with Homebrew
-      run: |-
-        brew install texinfo
-        brew install autoconf
-        brew install automake
-        brew install flex
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
-    - name: Install Python dependencies
-      run: |-
-        python3 -m pip install --upgrade pip
-        pip install --break-system-packages e3-core==22.10.0
-    - name: Download artifact 'gcc-dependencies-artifacts'
-      uses: actions/download-artifact@v4
-      with:
-        name: gcc-dependencies-artifacts
-        path: in_artifacts/
-    - name: Build GNAT ${{ matrix.target }}
-      run: python3 ./anod build gcc --target=${{ matrix.target }} -v --loglevel DEBUG --enable-cleanup
-    - name: Build GDB ${{ matrix.target }}
-      run: python3 ./anod build gdb --target=${{ matrix.target}} -v --loglevel DEBUG --enable-cleanup
-    - name: Package GNAT ${{ matrix.target }}
-      run: python3 ./anod build release_package --qualifier=package=gnat --target=${{ matrix.target }} -v --loglevel DEBUG
-    - if: inputs.do_gh_release
-      name: Release GNAT ${{ matrix.target }}
-      run: python3 ./anod build release_github --qualifier=package=gnat --target=${{ matrix.target }} -v --loglevel DEBUG --enable-cleanup
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Upload artifact 'gnat-release-packages-${{matrix.target}}'
-      uses: actions/upload-artifact@v4
-      with:
-        name: gnat-release-packages-${{matrix.target}}
-        path: sbx/*/release_package*/install/*
   spark:
     name: SPARK macOS_Arm
     runs-on: macos-14

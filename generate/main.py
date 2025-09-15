@@ -125,43 +125,6 @@ def main():
         ],
     )
 
-    jobs["gnat_cross"] = Job(
-        "GNAT ${{ matrix.target }}",
-        [
-            AnodBuild(
-                "Build GNAT ${{ matrix.target }}",
-                "gcc",
-                ["--target=${{ matrix.target }}"],
-            ),
-            AnodBuild(
-                "Build GDB ${{ matrix.target }}",
-                "gdb",
-                ["--target=${{ matrix.target}}"],
-            ),
-            ReleasePackage(
-                "Package GNAT ${{ matrix.target }}",
-                "gnat",
-                ["--target=${{ matrix.target }}"],
-            ),
-            GhRelease(
-                "Release GNAT ${{ matrix.target }}",
-                "gnat",
-                ["--target=${{ matrix.target }}"],
-            ),
-        ],
-        targets=Targets(),
-        needs=["gcc_dependencies"],
-        inputs=[
-            Artifact("gcc-dependencies-artifacts", "in_artifacts/"),
-        ],
-        outputs=[
-            Artifact(
-                "gnat-release-packages-${{matrix.target}}",
-                "sbx/*/release_package*/install/*",
-            )
-        ],
-    )
-
     jobs["spark"] = Job(
         "SPARK",
         [
