@@ -15,7 +15,7 @@ patch_name = "ld"
 
 
 class GCC(spec("gh-artifact")):
-    snap : util.Snapshot | None = None
+    snap: util.Snapshot | None = None
 
     @property
     def branch(self):
@@ -23,13 +23,20 @@ class GCC(spec("gh-artifact")):
 
     @cached_property
     def version(self):
-        return self.tarball.split(".")[0].removeprefix("gcc-%s-" % self.branch)
+        return f"{self.branch}.0.0"
+
+    @cached_property
+    def prerelease(self):
+        # YYYYMMDD
+        return self.tarball.rsplit(".", maxsplit=1)[0].removeprefix(
+            f"gnat-{self.branch}-"
+        )
 
     @cached_property
     def tarball(self):
         return util.GCCSnapshotTarballFinder.get(self.branch).tarball
 
-    @property
+    @cached_property
     def url(self):
         if self.host_is_macos_arm:
             return "https://github.com/iains/gcc-darwin-arm64/archive/refs/heads/master-wip-apple-si.zip"
