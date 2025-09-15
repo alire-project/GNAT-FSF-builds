@@ -123,56 +123,6 @@ jobs:
         name: gnat-release-packages
         path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
         retention-days: 5
-  gprbuild:
-    name: GPRbuild WindowsMsys2
-    runs-on: windows-2022
-    env:
-      CONFIG_SHELL: /bin/bash
-    defaults:
-      run:
-        shell: msys2 {0}
-    steps:
-    - name: Checkout Project
-      uses: actions/checkout@v4
-    - name: Install msys2
-      uses: msys2/setup-msys2@v2
-      with:
-        install: |-
-          base-devel
-          git
-          rsync
-          flex
-          mingw-w64-x86_64-github-cli
-          mingw-w64-x86_64-toolchain
-          mingw-w64-x86_64-python
-          mingw-w64-x86_64-python-pip
-          mingw-w64-x86_64-python-psutil
-    - name: Install Python dependencies
-      run: |-
-        python3 -m pip install --upgrade pip
-        pip install --break-system-packages e3-core==22.10.0
-    - name: Prepare msys2 build setup
-      run: |-
-        df -h
-        mkdir C:/aaa
-        mount C:/aaa /aaa
-        cd ..
-        cp -r GNAT-FSF-builds /aaa
-    - name: Build GPRbuild
-      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gprbuild -v --loglevel DEBUG --enable-cleanup
-    - name: Package GPRbuild
-      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_package --qualifier=package=gprbuild -v --loglevel DEBUG
-    - if: inputs.do_gh_release
-      name: Release GPRbuild
-      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_github --qualifier=package=gprbuild -v --loglevel DEBUG --enable-cleanup
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Upload artifact 'gprbuild-release-packages'
-      uses: actions/upload-artifact@v4
-      with:
-        name: gprbuild-release-packages
-        path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
-        retention-days: 5
   spark:
     name: SPARK WindowsMsys2
     runs-on: windows-2022

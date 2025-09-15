@@ -10,7 +10,6 @@ from build import (
     Job,
     JobKind,
     ReleasePackage,
-    Targets,
 )
 from interfaces import Host, Yaml, Yamlable
 import host
@@ -103,22 +102,6 @@ def main():
         outputs=[
             Artifact(
                 "gnat-release-packages",
-                "sbx/*/release_package*/install/*",
-                retention_days=5,
-            ),
-        ],
-    )
-
-    jobs["gprbuild"] = Job(
-        "GPRbuild",
-        [
-            AnodBuild("Build GPRbuild", "gprbuild"),
-            ReleasePackage("Package GPRbuild", "gprbuild"),
-            GhRelease("Release GPRbuild", "gprbuild"),
-        ],
-        outputs=[
-            Artifact(
-                "gprbuild-release-packages",
                 "sbx/*/release_package*/install/*",
                 retention_days=5,
             ),
