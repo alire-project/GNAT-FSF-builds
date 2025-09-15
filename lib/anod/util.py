@@ -5,8 +5,10 @@ from e3.anod.context import AnodContext
 from e3.anod.sandbox import SandBox
 from e3.os.process import Run
 
+from dataclasses import dataclass
+import html.parser
 import logging
-import os
+import requests as req
 import sys
 
 
@@ -39,3 +41,51 @@ def create_anod_sandbox(sbx_dir: str, spec_dir: str) -> SandBox:
     sbx.specs_dir = spec_dir
 
     return sbx
+
+@dataclass
+class Snapshot:
+    tarball: str
+    url: str
+
+class GCCSnapshotTarballFinder(html.parser.HTMLParser):
+    outer = []
+    curr = None
+    tarball = None
+    branch = ""
+
+    # cache the result at the class level to avoid doing unecessary requests
+    __snap: Snapshot | None = None
+
+    def __init__(self, branch: str):
+        super().__init__()
+        self.branch = branch
+
+    def handle_starttag(self, tag, attrs):
+        if self.curr:
+            self.outer.append(self.curr)
+        self.curr = tag
+        if tag == "a" and self.outer == ["html", "body", "table", "tr", "td"]:
+            for key, val in attrs:
+                if key == "href" and (
+                    val.endswith(".tar.xz") or val.endswith(".tar.gz")
+                ):
+                    self.tarball = val.rstrip('/').rsplit('/', 1)[-1]
+
+    def handle_endtag(self, tag):
+        if self.curr == tag:
+            self.curr = self.outer.pop() if self.outer else None
+    
+    @classmethod
+    def get(cls, branch: str) -> Snapshot:
+        if cls.__snap:
+            return cls.__snap
+        base_url = "https://gcc.gnu.org/pub/gcc/snapshots/LATEST-%s/" % branch
+        page = req.get(base_url)
+        parser = cls(branch)
+        parser.feed(page.text)
+        if parser.tarball:
+            cls.__snap = Snapshot(parser.tarball, base_url + parser.tarball)
+            return cls.__snap
+        else:
+            raise Exception("could not find tarball in snapshot page")
+
