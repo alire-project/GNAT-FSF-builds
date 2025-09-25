@@ -91,38 +91,3 @@ jobs:
         name: gnat-release-packages
         path: sbx/*/release_package*/install/*
         retention-days: 5
-  spark:
-    name: SPARK macOS
-    runs-on: macos-13
-    steps:
-    - name: Checkout Project
-      uses: actions/checkout@v4
-    - name: Install packages with Homebrew
-      run: |-
-        brew install texinfo
-        brew install autoconf
-        brew install automake
-        brew install flex
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
-    - name: Install Python dependencies
-      run: |-
-        python3 -m pip install --upgrade pip
-        pip install --break-system-packages e3-core==22.10.0
-    - name: Build SPARK
-      run: python3 ./anod build spark2014 -v --loglevel DEBUG --enable-cleanup
-    - name: Package GNATprove
-      run: python3 ./anod build release_package --qualifier=package=gnatprove -v --loglevel DEBUG
-    - if: inputs.do_gh_release
-      name: Release GNATprove
-      run: python3 ./anod build release_github --qualifier=package=gnatprove -v --loglevel DEBUG --enable-cleanup
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Upload artifact 'gnatprove-release-packages'
-      uses: actions/upload-artifact@v4
-      with:
-        name: gnatprove-release-packages
-        path: sbx/*/release_package*/install/*
-        retention-days: 5

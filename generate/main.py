@@ -108,21 +108,21 @@ def main():
         ],
     )
 
-    jobs["spark"] = Job(
-        "SPARK",
-        [
-            AnodBuild("Build SPARK", "spark2014"),
-            ReleasePackage("Package GNATprove", "gnatprove"),
-            GhRelease("Release GNATprove", "gnatprove"),
-        ],
-        outputs=[
-            Artifact(
-                "gnatprove-release-packages",
-                "sbx/*/release_package*/install/*",
-                retention_days=5,
-            )
-        ],
-    )
+    # jobs["spark"] = Job(
+    #     "SPARK",
+    #     [
+    #         AnodBuild("Build SPARK", "spark2014"),
+    #         ReleasePackage("Package GNATprove", "gnatprove"),
+    #         GhRelease("Release GNATprove", "gnatprove"),
+    #     ],
+    #     outputs=[
+    #         Artifact(
+    #             "gnatprove-release-packages",
+    #             "sbx/*/release_package*/install/*",
+    #             retention_days=5,
+    #         )
+    #     ],
+    # )
 
     workflow = Workflow(
         "GNAT",
