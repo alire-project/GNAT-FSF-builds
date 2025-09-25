@@ -16,7 +16,7 @@ class ReleaseGitHub(spec("release_package")):
     @property
     def github_release_name(self):
         # gnat-16.0.0-snapshot
-        return "%s-%s-snapshot" % (
+        return "%s-%s-snapshot-draft" % (
             self.package,
             self.version,
         )
@@ -62,28 +62,23 @@ class ReleaseGitHub(spec("release_package")):
         # Disable the pager to avoid being stuck interactive command
         self.shell("gh", "config", "set", "pager", "cat")
 
-        if self.check_github_release(gh_name):
-            p = self.shell("gh", "release", "view", "--json", "body")
-            if gh_body not in p.out:
-                log.info("Deleting previous release...")
-                self.shell("gh", "release", "delete", gh_name, "--cleanup-tag", "-y")
-                log.info(
-                    "Create GitHub release for '%s' for '%s'." % (gh_body, pkg_name)
-                )
-                self.shell(
-                    "gh",
-                    "release",
-                    "create",
-                    gh_name,
-                    "--target",
-                    "snapshots",
-                    "--title",
-                    gh_name,
-                    "--notes",
-                    gh_body,  # gnat-16.0.0-YYYYMMDD
-                    "--prerelease",
-                    "--latest=false",
-                )
+        if not self.check_github_release(gh_name):
+            log.info(
+                "Create draft GitHub release for '%s' for '%s'." % (gh_body, pkg_name)
+            )
+            self.shell(
+                "gh",
+                "release",
+                "create",
+                gh_name,
+                "--target",
+                "snapshots",
+                "--title",
+                gh_name,
+                "--notes",
+                gh_body,  # gnat-16.0.0-YYYYMMDD
+                "--draft",  # DRAFT: release when all is ready
+            )
 
         if self.check_github_release_asset(gh_name, self.archive_name):
             log.info("Assets for '%s' already in GitHub release." % (pkg_name))
