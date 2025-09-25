@@ -28,13 +28,16 @@ class GCC(spec("gh-artifact")):
     @cached_property
     def prerelease(self):
         # YYYYMMDD
-        return self.tarball.rsplit(".", maxsplit=1)[0].removeprefix(
-            f"gnat-{self.branch}-"
-        )
+        t = util.GCCSnapshotTarballFinder.get(self.branch).tarball
+        return t.split(".")[0].removeprefix(f"gcc-{self.branch}-")
 
     @cached_property
     def tarball(self):
-        return util.GCCSnapshotTarballFinder.get(self.branch).tarball
+        t = util.GCCSnapshotTarballFinder.get(self.branch).tarball
+        if self.host_is_macos_arm:
+            return t.replace(".tar.xz", ".zip")
+        else:
+            return t
 
     @cached_property
     def url(self):

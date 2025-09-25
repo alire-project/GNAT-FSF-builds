@@ -24,7 +24,7 @@ class ReleaseGitHub(spec("release_package")):
     @property
     def github_release_body(self):
         # gnat-16.0.0-YYYYMMDD
-        return f"{self.package}-{self.version}-{self.prerelease}"
+        return f"{self.package}-{self.version}-{self.package_release}"
 
     @property
     def build_deps(self):
