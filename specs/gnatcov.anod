@@ -3,7 +3,6 @@ from e3.fs import cp
 from e3.anod.helper import Make
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
-from e3.diff import patch
 
 import os
 
@@ -13,7 +12,7 @@ patch_name = "gnatcov.patch"
 class GNATcov(spec("common")):
     @property
     def version(self):
-        return "22.0"
+        return "26.0"
 
     @property
     def tarball(self):
@@ -34,7 +33,6 @@ class GNATcov(spec("common")):
     def build_source_list(self):
         return [
             Anod.Source(name=self.tarball, publish=True, dest=""),
-            self.Source(name=patch_name, publish=True, unpack_cmd=cp, dest="patches"),
         ]
 
     @property
@@ -45,13 +43,14 @@ class GNATcov(spec("common")):
             Anod.Dependency("libgpr", track=True),
             Anod.Dependency("gnatcoll", track=True),
             Anod.Dependency("gnatcoll-bindings", track=True),
-            Anod.Dependency("langkit", track=True),
+            Anod.Dependency("langkit_support", track=True),
             Anod.Dependency("libadalang", track=True),
             Anod.Dependency("binutils", track=True),
             Anod.Dependency("gnatutil", track=True),
             Anod.Dependency("xmlada", track=True),
             Anod.Dependency("zlib", track=True),
-            Anod.Dependency("gmp", track=True)
+            Anod.Dependency("gmp", track=True),
+            Anod.Dependency("llvm", track=True),
         ]
         if self.env.target.os.name == "windows":
             deps.append(Anod.Dependency("libiconv"))
@@ -63,16 +62,6 @@ class GNATcov(spec("common")):
         for m in [d for d in self.deps if d != "binutils"]:
             self.deps[m].setenv()
 
-        # Little hack to apply the patch only once, there is probably a clean
-        # way to do that.
-        patched = os.path.join(self["SRC_DIR"], "patches", ".patched")
-        if not os.path.exists(patched):
-            patch(
-                os.path.join(self["SRC_DIR"], "patches", patch_name),
-                self.build_space.src_dir,
-            )
-            touch(patched)
-
         build_mode = "prod"
         exec_dir = os.path.join(self["SRC_DIR"], "tools", "gnatcov")
 
@@ -80,6 +69,7 @@ class GNATcov(spec("common")):
         make_all.set_default_target("all")
         make_all.set_var("BINUTILS_SRC_DIR", self.deps["binutils"]["SRC_DIR"])
         make_all.set_var("BINUTILS_BUILD_DIR", self.deps["binutils"]["BUILD_DIR"])
+        make_all.set_var("C_SUPPORT", "False")
 
         make_distrib = Make(self, exec_dir=exec_dir)
         make_distrib.set_var("PREFIX", unixpath(self["INSTALL_DIR"]))
@@ -89,8 +79,21 @@ class GNATcov(spec("common")):
             m.set_var("BITS_ARCH", str(self.env.target.cpu.bits))
             m.set_var("DISTRIB_ARCH", self.env.build.cpu.name)
             m.set_var("BUILD_MODE", build_mode)
-            m.set_var("ADAPTERS_LIST", "")
+            m.set_var("ADAPTERS_LIST", "llvm_json")
 
         make_all()
         make_distrib()
+
+        cp(
+            source=os.path.join(
+                self.deps["llvm"]["INSTALL_DIR"],
+                "bin",
+                "llvm-profdata" + self.env.build.os.exeext,
+            ),
+            target=os.path.join(
+                self["PKG_DIR"],
+                "libexec",
+                "gnatcoverage",
+            ),
+        )
         self.clean()
