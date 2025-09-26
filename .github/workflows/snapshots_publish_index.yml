@@ -2,6 +2,7 @@ name: GNAT FSF snapshot publish
 'on':
   schedule:
     - cron: "0 10 * * TUE" # run every Tuesday at 10:00
+  workflow_dispatch: {}
 
 jobs:
   dispatch_builds:
