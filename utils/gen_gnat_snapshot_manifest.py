@@ -35,7 +35,7 @@ subprocess.run(
 )
 
 p = subprocess.run(
-    args=["gh", "release", "view", f"{release_name}", "--json", "body,assets"],
+    args=["gh", "release", "view", release_name, "--json", "body,assets"],
     capture_output=True,
     check=True,
 )
@@ -46,8 +46,7 @@ assets = dict()
 for a in release["assets"]:
     assets[a["name"]] = a
 
-manifest = """
-name = "gnat_native"
+manifest = """name = "gnat_native"
 version = "%s"
 provides = ["gnat=%s"]
 description = "The GNAT Ada compiler - Native"
@@ -97,7 +96,7 @@ for os_name, arch, asset_identifier in [
 ]:
     key = f"gnat-{asset_identifier}-{version}.tar.gz"
     if key not in assets:
-        pass
+        continue
     asset = assets[key]
     t = os_template.replace("{OS}", os_name)
     t = t.replace("{ARCH}", arch)
@@ -106,20 +105,25 @@ for os_name, arch, asset_identifier in [
     manifest += t
 
 
-os.makedirs("../index/gn/gnat_native", exist_ok=True)
+index_path = "../index/gn/gnat_native"
+if lst := os.listdir(index_path):
+    # delete previous file (we don't keep artifacts around)
+    for f in lst:
+        os.remove(f"{index_path}/{f}")
+os.makedirs(index_path, exist_ok=True)
 
-with open(f"../index/gn/gnat_native/gnat_native-{version}.toml") as f:
+with open(f"{index_path}/gnat_native-{version}.toml", "w+") as f:
     f.write(manifest)
 
 subprocess.run(args=["git", "add", "../index"], check=True)
 subprocess.run(
     args=[
         "git",
-        "commit",
         "-c",
         "user.name=github-actions",
         "-c",
         "user.email=noreply@github.com",
+        "commit",
         "-m",
         f"gnat {version} snapshot",
     ],
