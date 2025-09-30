@@ -1,5 +1,7 @@
 # GNAT-FSF-builds
-Builds of the GNAT Ada compiler from FSF GCC releases
+Builds of the GNAT Ada compiler from FSF GCC releases.
+
+The snapshots built from this branch are published in an Alire index at the `snapshot-index` branch.
 
 # How to build
 
