@@ -8,7 +8,7 @@ import os
 class GNATUTIL(spec("common")):
     @property
     def version(self):
-        return "20.0w-20190814-1532A"
+        return "26.0w-20250825"
 
     @property
     def tarball(self):
