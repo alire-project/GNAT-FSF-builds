@@ -1,0 +1,10 @@
+.vscode
+.zed
+sbx
+uv.lock
+*.pyc
+/my-virtual-env/
+/in_artifacts/
+/out_artifacts/
+/why3_artifact/
+/alt-ergo_artifact/
