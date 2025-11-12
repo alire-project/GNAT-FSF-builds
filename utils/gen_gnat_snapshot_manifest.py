@@ -157,6 +157,7 @@ for package in ("gnat", "gnatprove"):
 
 
     index_path = f"../index/gn/{alire_crate}"
+    os.makedirs(index_path, exist_ok=True)
     if lst := os.listdir(index_path):
         # delete previous file (we don't keep artifacts around)
         for f in lst:
