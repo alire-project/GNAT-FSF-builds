@@ -3,7 +3,10 @@ from e3.anod.loader import spec
 class base_gcc(spec("binary_install")):
     @property
     def version(self):
-        return "15.1.0-2"
+        if self.host_is_macos_arm:
+            return "15.1.0-2"
+        else:
+            return "15.2.0-1"
 
     @property
     def tarball(self):

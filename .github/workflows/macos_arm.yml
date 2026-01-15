@@ -17,12 +17,10 @@ name: GNAT macOS Arm
 jobs:
   gcc_dependencies:
     name: GCC Dependencies macOS_Arm
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set Xcode 15.3
-      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
     - name: Install packages with Homebrew
       run: |-
         brew install texinfo
@@ -52,12 +50,10 @@ jobs:
     needs:
     - gcc_dependencies
     name: GNAT macOS_Arm
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set Xcode 15.3
-      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
     - name: Install packages with Homebrew
       run: |-
         brew install texinfo
@@ -95,12 +91,10 @@ jobs:
         retention-days: 5
   gprbuild:
     name: GPRbuild macOS_Arm
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set Xcode 15.3
-      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
     - name: Install packages with Homebrew
       run: |-
         brew install texinfo
@@ -143,12 +137,10 @@ jobs:
     needs:
     - gcc_dependencies
     name: GNAT ${{ matrix.target }} macOS_Arm
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set Xcode 15.3
-      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
     - name: Install packages with Homebrew
       run: |-
         brew install texinfo
@@ -185,12 +177,10 @@ jobs:
         path: sbx/*/release_package*/install/*
   spark:
     name: SPARK macOS_Arm
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set Xcode 15.3
-      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
     - name: Install packages with Homebrew
       run: |-
         brew install texinfo

@@ -26,7 +26,7 @@ class Linux_Arm(Unix):
 
 
 class macOS(Unix):
-    runner = "macos-13"
+    runner = "macos-15-intel"
 
     @classmethod
     def setup_python(cls) -> list[RawStep]:
@@ -44,15 +44,15 @@ class macOS(Unix):
 
 
 class macOS_Arm(macOS):
-    runner = "macos-14"
+    runner = "macos-15"
 
     @classmethod
     def setup_python(cls) -> list[RawStep]:
         return [
-            Step(
-                "Set Xcode 15.3",
-                ["sudo xcode-select --switch /Applications/Xcode_15.3.app"],
-            ),
+            # Step(
+            #     "Set Xcode 15.3",
+            #     ["sudo xcode-select --switch /Applications/Xcode_15.3.app"],
+            # ),
             *super().setup_python(),
         ]
 
@@ -90,10 +90,10 @@ class WindowsMsys2(Windows):
         class Msys2Args(Yamlable[Host]):
             msystem: str | None = None
             update: bool = False
-            install: list[str] = field(default_factory=list)
+            install: list[str] = field(default_factory=list[str])
 
             def to_yaml(self, ctx: Host) -> Yaml:
-                res = dict()
+                res: Yaml = dict()
                 if self.msystem is not None:
                     res["msystem"] = self.msystem
                 if self.update:

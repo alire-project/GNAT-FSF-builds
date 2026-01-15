@@ -11,7 +11,7 @@ class Step(RawStep):
     command: list[str] | None
     uses: str | None = None
     with_args: Yamlable[Host] | None = None
-    secrets: list[str] = field(default_factory=list)
+    secrets: list[str] = field(default_factory=list[str])
 
     def to_yaml(self, ctx: Host) -> Yaml:
         res: Yaml = {
@@ -219,12 +219,12 @@ class Job(Yamlable[Host]):
 
     kind: JobKind = "python"
     repo: Repository | None = None
-    needs: list[str] = field(default_factory=list)
-    matrix: dict[str, list[str]] = field(default_factory=dict)
+    needs: list[str] = field(default_factory=list[str])
+    matrix: dict[str, list[str]] = field(default_factory=dict[str, list[str]])
     targets: Targets | None = None
 
-    inputs: list[Artifact] = field(default_factory=list)
-    outputs: list[Artifact] = field(default_factory=list)
+    inputs: list[Artifact] = field(default_factory=list[Artifact])
+    outputs: list[Artifact] = field(default_factory=list[Artifact])
 
     def to_yaml(self, ctx: Host) -> Yaml:
         res: Yaml = {}

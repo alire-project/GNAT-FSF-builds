@@ -17,7 +17,7 @@ name: GNAT macOS
 jobs:
   gcc_dependencies:
     name: GCC Dependencies macOS
-    runs-on: macos-13
+    runs-on: macos-15-intel
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
@@ -50,7 +50,7 @@ jobs:
     needs:
     - gcc_dependencies
     name: GNAT macOS
-    runs-on: macos-13
+    runs-on: macos-15-intel
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
@@ -91,7 +91,7 @@ jobs:
         retention-days: 5
   gprbuild:
     name: GPRbuild macOS
-    runs-on: macos-13
+    runs-on: macos-15-intel
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
@@ -137,7 +137,7 @@ jobs:
     needs:
     - gcc_dependencies
     name: GNAT ${{ matrix.target }} macOS
-    runs-on: macos-13
+    runs-on: macos-15-intel
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
@@ -177,7 +177,7 @@ jobs:
         path: sbx/*/release_package*/install/*
   spark:
     name: SPARK macOS
-    runs-on: macos-13
+    runs-on: macos-15-intel
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
