@@ -1,5 +1,5 @@
 name = "gnatprove"
-version = "16.0.0-20260210"
+version = "16.0.0-20260217"
 authors = ["AdaCore"]
 description = "Automatic formal verification of SPARK code"
 maintainers = ["Fabien Chouteau <chouteau@adacore.com>", "César Sagaert <sagaert@adacore.com>"]
@@ -41,29 +41,29 @@ GPR_PROJECT_PATH.prepend = "${CRATE_ROOT}/lib/gnat"
 
 [origin."case(os)".linux."case(host-arch)".x86-64]
 binary = true
-url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnatprove-16.0.0-snapshot/gnatprove-x86_64-linux-16.0.0-20260210.tar.gz"
-hashes = ["sha256:1fb7d1ba168b3c37f5b40ea9c1340777cba948ebcf98d065eb9c9abbf5d72157"]
+url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnatprove-16.0.0-snapshot/gnatprove-x86_64-linux-16.0.0-20260217.tar.gz"
+hashes = ["sha256:f0d9772ddacac14f6438f3b99d2eb9331905343fcb00e2d68d4517254483da4b"]
 
 
 [origin."case(os)".linux."case(host-arch)".aarch64]
 binary = true
-url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnatprove-16.0.0-snapshot/gnatprove-aarch64-linux-16.0.0-20260210.tar.gz"
-hashes = ["sha256:a92a86d393c3516793f7d5c69e3c1a3c994b4773b568b66f9974900d5192aa19"]
+url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnatprove-16.0.0-snapshot/gnatprove-aarch64-linux-16.0.0-20260217.tar.gz"
+hashes = ["sha256:30f676f2c7c80694e537c44ac1738e0cd9f3f93c9d363220e61a438ad4afe209"]
 
 
 [origin."case(os)".macos."case(host-arch)".x86-64]
 binary = true
-url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnatprove-16.0.0-snapshot/gnatprove-x86_64-darwin-16.0.0-20260210.tar.gz"
-hashes = ["sha256:70b0764ae9885c9cce0e356bf821a24ec6725568c1e16fdea63f0b122754c6dc"]
+url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnatprove-16.0.0-snapshot/gnatprove-x86_64-darwin-16.0.0-20260217.tar.gz"
+hashes = ["sha256:3e1ad8ff5f65f00d530fdbbbd276ac2e2add1732ae1aad0500df7a13a9a50299"]
 
 
 [origin."case(os)".macos."case(host-arch)".aarch64]
 binary = true
-url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnatprove-16.0.0-snapshot/gnatprove-aarch64-darwin-16.0.0-20260210.tar.gz"
-hashes = ["sha256:f9908b13a7e7ed80e21af928f22068e6fc99c7bbf74cfaa8273fef1674b42e15"]
+url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnatprove-16.0.0-snapshot/gnatprove-aarch64-darwin-16.0.0-20260217.tar.gz"
+hashes = ["sha256:23ee9c8e852842997a876913be61a8e415e9e4c525d184bb0bc044efa32a3717"]
 
 
 [origin."case(os)".windows."case(host-arch)".x86-64]
 binary = true
-url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnatprove-16.0.0-snapshot/gnatprove-x86_64-windows64-16.0.0-20260210.tar.gz"
-hashes = ["sha256:3e6f08af5eef3b4ee9b56cac017b1890306a7fd08c021f0393cc968f448a8aa0"]
+url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnatprove-16.0.0-snapshot/gnatprove-x86_64-windows64-16.0.0-20260217.tar.gz"
+hashes = ["sha256:d6adda87ab11814ec3d86efe4b98fc663c3e2d6f34cd02fff642b7ef5e5c33c6"]
