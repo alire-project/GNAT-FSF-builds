@@ -192,7 +192,14 @@ class InstallPythonDeps(RawStep):
 
 class Targets(Yamlable[Host]):
     def to_yaml(self, ctx: Host) -> Yaml:
-        return ["arm-elf", "aarch64-elf", "riscv64-elf", "x86_64-elf", "avr-elf", "xtensa-esp32-elf"]
+        return [
+            "arm-elf",
+            "aarch64-elf",
+            "riscv64-elf",
+            "x86_64-elf",
+            "avr-elf",
+            "xtensa-esp32-elf",
+        ]
 
 
 class Conditional(RawStep):
@@ -219,12 +226,15 @@ class Job(Yamlable[Host]):
 
     kind: JobKind = "python"
     repo: Repository | None = None
-    needs: list[str] = field(default_factory=list)
+    needs: list["Job"] = field(default_factory=list)
     matrix: dict[str, list[str]] = field(default_factory=dict)
     targets: Targets | None = None
 
     inputs: list[Artifact] = field(default_factory=list)
     outputs: list[Artifact] = field(default_factory=list)
+
+    def key(self, ctx: Host):
+        return f"{self.name}_{ctx.runner}".replace(" ", "_").replace(".", "-").lower()
 
     def to_yaml(self, ctx: Host) -> Yaml:
         res: Yaml = {}
@@ -238,9 +248,9 @@ class Job(Yamlable[Host]):
                 res["strategy"]["matrix"]["target"] = self.targets.to_yaml(ctx)
 
         if len(self.needs) != 0:
-            res["needs"] = list(self.needs)
+            res["needs"] = [need.key(ctx) for need in self.needs]
 
-        res["name"] = self.name + " " + ctx.__name__
+        res["name"] = f"{self.name} ({ctx.runner})"
         res["runs-on"] = ctx.runner
 
         if len(ctx.env) != 0:
@@ -256,6 +266,14 @@ class Job(Yamlable[Host]):
                 res["steps"].extend(step.to_yaml(ctx) for step in ctx.setup_python())
             case "ocaml":
                 res["steps"].extend(step.to_yaml(ctx) for step in ctx.setup_ocaml())
+
+        for need in self.needs:
+            for output in need.outputs:
+                res["steps"].append(
+                    DownloadArtifact(
+                        Artifact(output.name, path="in_artifacts/")
+                    ).to_yaml(ctx)
+                )
 
         for i in self.inputs:
             res["steps"].append(DownloadArtifact(i).to_yaml(ctx))

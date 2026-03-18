@@ -55,18 +55,22 @@ def dispatch(os: Os, job: JobKind) -> Host:
 class Workflow(Yamlable[Os]):
     name: str
     on: Yaml
-    jobs: dict[str, Job]
+    jobs: list[Job]
 
     def to_yaml(self, ctx: Os) -> Yaml:
         res: dict[str, Yaml] = {
-            "name": self.name + " " + pretty_name(ctx),
+            "name": self.name,
             "on": self.on,
         }
 
-        res["jobs"] = {
-            name: job.to_yaml(dispatch(ctx, job.kind))
-            for name, job in self.jobs.items()
-        }
+        res["jobs"] = dict()
+        for os in oses:
+            res["jobs"].update(
+                {
+                    job.key(dispatch(os, job.kind)): job.to_yaml(dispatch(os, job.kind))
+                    for job in self.jobs
+                }
+            )
         return res
 
 
@@ -96,10 +100,7 @@ def main():
             ReleasePackage("Package GNAT", "gnat"),
             GhRelease("Release GNAT", "gnat"),
         ],
-        needs=["gcc_dependencies"],
-        inputs=[
-            Artifact("gcc-dependencies-artifacts", "in_artifacts/"),
-        ],
+        needs=[jobs["gcc_dependencies"]],
         outputs=[
             Artifact(
                 "gnat-release-packages",
@@ -126,7 +127,7 @@ def main():
     )
 
     jobs["gnat_cross"] = Job(
-        "GNAT ${{ matrix.target }}",
+        "GNAT Cross",
         [
             AnodBuild(
                 "Build GNAT ${{ matrix.target }}",
@@ -150,10 +151,7 @@ def main():
             ),
         ],
         targets=Targets(),
-        needs=["gcc_dependencies"],
-        inputs=[
-            Artifact("gcc-dependencies-artifacts", "in_artifacts/"),
-        ],
+        needs=[jobs["gcc_dependencies"]],
         outputs=[
             Artifact(
                 "gnat-release-packages-${{matrix.target}}",
@@ -169,6 +167,7 @@ def main():
             ReleasePackage("Package GNATprove", "gnatprove"),
             GhRelease("Release GNATprove", "gnatprove"),
         ],
+        needs=[jobs["gprbuild"]],
         outputs=[
             Artifact(
                 "gnatprove-release-packages",
@@ -177,6 +176,7 @@ def main():
             )
         ],
     )
+
 
     workflow = Workflow(
         "GNAT",
@@ -201,7 +201,7 @@ def main():
                 },
             },
         },
-        jobs,
+        list(jobs.values()),
     )
 
     dest = "../.github/workflows/"
@@ -213,9 +213,8 @@ def main():
         case _:
             sys.exit("error: too many arguments")
 
-    for os in oses:
-        with open(dest + os + ".yml", "w+") as f:
-            _ = f.write(workflow.dump(os))
+    with open(dest + "main.yml", "w+") as f:
+        _ = f.write(workflow.dump("linux"))
 
 
 if __name__ == "__main__":
