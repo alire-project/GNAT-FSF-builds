@@ -103,7 +103,10 @@ class Artifact(Yamlable[Host]):
     retention_days: int = 0
 
     def to_yaml(self, ctx: Host) -> Yaml:
-        res: Yaml = {"name": self.name, "path": ctx.native_path(self.path)}
+        res: Yaml = {
+            "name": f"{self.name}_{ctx.runner.replace('.', '-')}",
+            "path": ctx.native_path(self.path),
+        }
         if self.retention_days > 0:
             res["retention-days"] = self.retention_days
         return res

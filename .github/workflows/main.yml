@@ -40,7 +40,7 @@ jobs:
     - name: Upload artifact 'gcc-dependencies-artifacts'
       uses: actions/upload-artifact@v4
       with:
-        name: gcc-dependencies-artifacts
+        name: gcc-dependencies-artifacts_ubuntu-22-04
         path: out_artifacts/*
         retention-days: 1
   gnat_ubuntu-22-04:
@@ -62,7 +62,7 @@ jobs:
     - name: Download artifact 'gcc-dependencies-artifacts'
       uses: actions/download-artifact@v4
       with:
-        name: gcc-dependencies-artifacts
+        name: gcc-dependencies-artifacts_ubuntu-22-04
         path: in_artifacts/
     - name: Build GNAT native
       run: python3 ./anod build gcc -v --loglevel DEBUG --enable-cleanup
@@ -78,7 +78,7 @@ jobs:
     - name: Upload artifact 'gnat-release-packages'
       uses: actions/upload-artifact@v4
       with:
-        name: gnat-release-packages
+        name: gnat-release-packages_ubuntu-22-04
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gprbuild_ubuntu-22-04:
@@ -107,7 +107,7 @@ jobs:
     - name: Upload artifact 'gprbuild-release-packages'
       uses: actions/upload-artifact@v4
       with:
-        name: gprbuild-release-packages
+        name: gprbuild-release-packages_ubuntu-22-04
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gnat_cross_ubuntu-22-04:
@@ -139,7 +139,7 @@ jobs:
     - name: Download artifact 'gcc-dependencies-artifacts'
       uses: actions/download-artifact@v4
       with:
-        name: gcc-dependencies-artifacts
+        name: gcc-dependencies-artifacts_ubuntu-22-04
         path: in_artifacts/
     - name: Build GNAT ${{ matrix.target }}
       run: python3 ./anod build gcc --target=${{ matrix.target }} -v --loglevel DEBUG --enable-cleanup
@@ -155,7 +155,7 @@ jobs:
     - name: Upload artifact 'gnat-release-packages-${{matrix.target}}'
       uses: actions/upload-artifact@v4
       with:
-        name: gnat-release-packages-${{matrix.target}}
+        name: gnat-release-packages-${{matrix.target}}_ubuntu-22-04
         path: sbx/*/release_package*/install/*
   spark_ubuntu-22-04:
     needs:
@@ -176,7 +176,7 @@ jobs:
     - name: Download artifact 'gprbuild-release-packages'
       uses: actions/download-artifact@v4
       with:
-        name: gprbuild-release-packages
+        name: gprbuild-release-packages_ubuntu-22-04
         path: in_artifacts/
     - name: Build SPARK
       run: python3 ./anod build spark2014 -v --loglevel DEBUG --enable-cleanup
@@ -190,7 +190,7 @@ jobs:
     - name: Upload artifact 'gnatprove-release-packages'
       uses: actions/upload-artifact@v4
       with:
-        name: gnatprove-release-packages
+        name: gnatprove-release-packages_ubuntu-22-04
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gnatformat_ubuntu-22-04:
@@ -212,7 +212,7 @@ jobs:
     - name: Download artifact 'gprbuild-release-packages'
       uses: actions/download-artifact@v4
       with:
-        name: gprbuild-release-packages
+        name: gprbuild-release-packages_ubuntu-22-04
         path: in_artifacts/
     - name: Build GNATformat
       run: python3 ./anod build gnatformat -v --loglevel DEBUG --enable-cleanup
@@ -226,7 +226,7 @@ jobs:
     - name: Upload artifact 'gnatformat-release-packages'
       uses: actions/upload-artifact@v4
       with:
-        name: gnatformat-release-packages
+        name: gnatformat-release-packages_ubuntu-22-04
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gnatdoc_ubuntu-22-04:
@@ -248,7 +248,7 @@ jobs:
     - name: Download artifact 'gprbuild-release-packages'
       uses: actions/download-artifact@v4
       with:
-        name: gprbuild-release-packages
+        name: gprbuild-release-packages_ubuntu-22-04
         path: in_artifacts/
     - name: Build GNATdoc
       run: python3 ./anod build gnatdoc -v --loglevel DEBUG --enable-cleanup
@@ -262,7 +262,7 @@ jobs:
     - name: Upload artifact 'gnatdoc-release-packages'
       uses: actions/upload-artifact@v4
       with:
-        name: gnatdoc-release-packages
+        name: gnatdoc-release-packages_ubuntu-22-04
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gcc_dependencies_ubuntu-22-04-arm:
@@ -290,7 +290,7 @@ jobs:
     - name: Upload artifact 'gcc-dependencies-artifacts'
       uses: actions/upload-artifact@v4
       with:
-        name: gcc-dependencies-artifacts
+        name: gcc-dependencies-artifacts_ubuntu-22-04-arm
         path: out_artifacts/*
         retention-days: 1
   gnat_ubuntu-22-04-arm:
@@ -312,7 +312,7 @@ jobs:
     - name: Download artifact 'gcc-dependencies-artifacts'
       uses: actions/download-artifact@v4
       with:
-        name: gcc-dependencies-artifacts
+        name: gcc-dependencies-artifacts_ubuntu-22-04-arm
         path: in_artifacts/
     - name: Build GNAT native
       run: python3 ./anod build gcc -v --loglevel DEBUG --enable-cleanup
@@ -328,7 +328,7 @@ jobs:
     - name: Upload artifact 'gnat-release-packages'
       uses: actions/upload-artifact@v4
       with:
-        name: gnat-release-packages
+        name: gnat-release-packages_ubuntu-22-04-arm
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gprbuild_ubuntu-22-04-arm:
@@ -357,7 +357,7 @@ jobs:
     - name: Upload artifact 'gprbuild-release-packages'
       uses: actions/upload-artifact@v4
       with:
-        name: gprbuild-release-packages
+        name: gprbuild-release-packages_ubuntu-22-04-arm
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gnat_cross_ubuntu-22-04-arm:
@@ -389,7 +389,7 @@ jobs:
     - name: Download artifact 'gcc-dependencies-artifacts'
       uses: actions/download-artifact@v4
       with:
-        name: gcc-dependencies-artifacts
+        name: gcc-dependencies-artifacts_ubuntu-22-04-arm
         path: in_artifacts/
     - name: Build GNAT ${{ matrix.target }}
       run: python3 ./anod build gcc --target=${{ matrix.target }} -v --loglevel DEBUG --enable-cleanup
@@ -405,7 +405,7 @@ jobs:
     - name: Upload artifact 'gnat-release-packages-${{matrix.target}}'
       uses: actions/upload-artifact@v4
       with:
-        name: gnat-release-packages-${{matrix.target}}
+        name: gnat-release-packages-${{matrix.target}}_ubuntu-22-04-arm
         path: sbx/*/release_package*/install/*
   spark_ubuntu-22-04-arm:
     needs:
@@ -426,7 +426,7 @@ jobs:
     - name: Download artifact 'gprbuild-release-packages'
       uses: actions/download-artifact@v4
       with:
-        name: gprbuild-release-packages
+        name: gprbuild-release-packages_ubuntu-22-04-arm
         path: in_artifacts/
     - name: Build SPARK
       run: python3 ./anod build spark2014 -v --loglevel DEBUG --enable-cleanup
@@ -440,7 +440,7 @@ jobs:
     - name: Upload artifact 'gnatprove-release-packages'
       uses: actions/upload-artifact@v4
       with:
-        name: gnatprove-release-packages
+        name: gnatprove-release-packages_ubuntu-22-04-arm
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gnatformat_ubuntu-22-04-arm:
@@ -462,7 +462,7 @@ jobs:
     - name: Download artifact 'gprbuild-release-packages'
       uses: actions/download-artifact@v4
       with:
-        name: gprbuild-release-packages
+        name: gprbuild-release-packages_ubuntu-22-04-arm
         path: in_artifacts/
     - name: Build GNATformat
       run: python3 ./anod build gnatformat -v --loglevel DEBUG --enable-cleanup
@@ -476,7 +476,7 @@ jobs:
     - name: Upload artifact 'gnatformat-release-packages'
       uses: actions/upload-artifact@v4
       with:
-        name: gnatformat-release-packages
+        name: gnatformat-release-packages_ubuntu-22-04-arm
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gnatdoc_ubuntu-22-04-arm:
@@ -498,7 +498,7 @@ jobs:
     - name: Download artifact 'gprbuild-release-packages'
       uses: actions/download-artifact@v4
       with:
-        name: gprbuild-release-packages
+        name: gprbuild-release-packages_ubuntu-22-04-arm
         path: in_artifacts/
     - name: Build GNATdoc
       run: python3 ./anod build gnatdoc -v --loglevel DEBUG --enable-cleanup
@@ -512,7 +512,7 @@ jobs:
     - name: Upload artifact 'gnatdoc-release-packages'
       uses: actions/upload-artifact@v4
       with:
-        name: gnatdoc-release-packages
+        name: gnatdoc-release-packages_ubuntu-22-04-arm
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gcc_dependencies_macos-15-intel:
@@ -543,7 +543,7 @@ jobs:
     - name: Upload artifact 'gcc-dependencies-artifacts'
       uses: actions/upload-artifact@v4
       with:
-        name: gcc-dependencies-artifacts
+        name: gcc-dependencies-artifacts_macos-15-intel
         path: out_artifacts/*
         retention-days: 1
   gnat_macos-15-intel:
@@ -570,7 +570,7 @@ jobs:
     - name: Download artifact 'gcc-dependencies-artifacts'
       uses: actions/download-artifact@v4
       with:
-        name: gcc-dependencies-artifacts
+        name: gcc-dependencies-artifacts_macos-15-intel
         path: in_artifacts/
     - name: Build GNAT native
       run: python3 ./anod build gcc -v --loglevel DEBUG --enable-cleanup
@@ -586,7 +586,7 @@ jobs:
     - name: Upload artifact 'gnat-release-packages'
       uses: actions/upload-artifact@v4
       with:
-        name: gnat-release-packages
+        name: gnat-release-packages_macos-15-intel
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gprbuild_macos-15-intel:
@@ -620,7 +620,7 @@ jobs:
     - name: Upload artifact 'gprbuild-release-packages'
       uses: actions/upload-artifact@v4
       with:
-        name: gprbuild-release-packages
+        name: gprbuild-release-packages_macos-15-intel
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gnat_cross_macos-15-intel:
@@ -657,7 +657,7 @@ jobs:
     - name: Download artifact 'gcc-dependencies-artifacts'
       uses: actions/download-artifact@v4
       with:
-        name: gcc-dependencies-artifacts
+        name: gcc-dependencies-artifacts_macos-15-intel
         path: in_artifacts/
     - name: Build GNAT ${{ matrix.target }}
       run: python3 ./anod build gcc --target=${{ matrix.target }} -v --loglevel DEBUG --enable-cleanup
@@ -673,7 +673,7 @@ jobs:
     - name: Upload artifact 'gnat-release-packages-${{matrix.target}}'
       uses: actions/upload-artifact@v4
       with:
-        name: gnat-release-packages-${{matrix.target}}
+        name: gnat-release-packages-${{matrix.target}}_macos-15-intel
         path: sbx/*/release_package*/install/*
   spark_macos-15-intel:
     needs:
@@ -699,7 +699,7 @@ jobs:
     - name: Download artifact 'gprbuild-release-packages'
       uses: actions/download-artifact@v4
       with:
-        name: gprbuild-release-packages
+        name: gprbuild-release-packages_macos-15-intel
         path: in_artifacts/
     - name: Build SPARK
       run: python3 ./anod build spark2014 -v --loglevel DEBUG --enable-cleanup
@@ -713,7 +713,7 @@ jobs:
     - name: Upload artifact 'gnatprove-release-packages'
       uses: actions/upload-artifact@v4
       with:
-        name: gnatprove-release-packages
+        name: gnatprove-release-packages_macos-15-intel
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gnatformat_macos-15-intel:
@@ -740,7 +740,7 @@ jobs:
     - name: Download artifact 'gprbuild-release-packages'
       uses: actions/download-artifact@v4
       with:
-        name: gprbuild-release-packages
+        name: gprbuild-release-packages_macos-15-intel
         path: in_artifacts/
     - name: Build GNATformat
       run: python3 ./anod build gnatformat -v --loglevel DEBUG --enable-cleanup
@@ -754,7 +754,7 @@ jobs:
     - name: Upload artifact 'gnatformat-release-packages'
       uses: actions/upload-artifact@v4
       with:
-        name: gnatformat-release-packages
+        name: gnatformat-release-packages_macos-15-intel
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gnatdoc_macos-15-intel:
@@ -781,7 +781,7 @@ jobs:
     - name: Download artifact 'gprbuild-release-packages'
       uses: actions/download-artifact@v4
       with:
-        name: gprbuild-release-packages
+        name: gprbuild-release-packages_macos-15-intel
         path: in_artifacts/
     - name: Build GNATdoc
       run: python3 ./anod build gnatdoc -v --loglevel DEBUG --enable-cleanup
@@ -795,7 +795,7 @@ jobs:
     - name: Upload artifact 'gnatdoc-release-packages'
       uses: actions/upload-artifact@v4
       with:
-        name: gnatdoc-release-packages
+        name: gnatdoc-release-packages_macos-15-intel
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gcc_dependencies_macos-15:
@@ -804,8 +804,6 @@ jobs:
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set Xcode 15.3
-      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
     - name: Install packages with Homebrew
       run: |-
         brew install texinfo
@@ -828,7 +826,7 @@ jobs:
     - name: Upload artifact 'gcc-dependencies-artifacts'
       uses: actions/upload-artifact@v4
       with:
-        name: gcc-dependencies-artifacts
+        name: gcc-dependencies-artifacts_macos-15
         path: out_artifacts/*
         retention-days: 1
   gnat_macos-15:
@@ -839,8 +837,6 @@ jobs:
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set Xcode 15.3
-      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
     - name: Install packages with Homebrew
       run: |-
         brew install texinfo
@@ -857,7 +853,7 @@ jobs:
     - name: Download artifact 'gcc-dependencies-artifacts'
       uses: actions/download-artifact@v4
       with:
-        name: gcc-dependencies-artifacts
+        name: gcc-dependencies-artifacts_macos-15
         path: in_artifacts/
     - name: Build GNAT native
       run: python3 ./anod build gcc -v --loglevel DEBUG --enable-cleanup
@@ -873,7 +869,7 @@ jobs:
     - name: Upload artifact 'gnat-release-packages'
       uses: actions/upload-artifact@v4
       with:
-        name: gnat-release-packages
+        name: gnat-release-packages_macos-15
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gprbuild_macos-15:
@@ -882,8 +878,6 @@ jobs:
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set Xcode 15.3
-      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
     - name: Install packages with Homebrew
       run: |-
         brew install texinfo
@@ -909,7 +903,7 @@ jobs:
     - name: Upload artifact 'gprbuild-release-packages'
       uses: actions/upload-artifact@v4
       with:
-        name: gprbuild-release-packages
+        name: gprbuild-release-packages_macos-15
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gnat_cross_macos-15:
@@ -930,8 +924,6 @@ jobs:
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set Xcode 15.3
-      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
     - name: Install packages with Homebrew
       run: |-
         brew install texinfo
@@ -948,7 +940,7 @@ jobs:
     - name: Download artifact 'gcc-dependencies-artifacts'
       uses: actions/download-artifact@v4
       with:
-        name: gcc-dependencies-artifacts
+        name: gcc-dependencies-artifacts_macos-15
         path: in_artifacts/
     - name: Build GNAT ${{ matrix.target }}
       run: python3 ./anod build gcc --target=${{ matrix.target }} -v --loglevel DEBUG --enable-cleanup
@@ -964,7 +956,7 @@ jobs:
     - name: Upload artifact 'gnat-release-packages-${{matrix.target}}'
       uses: actions/upload-artifact@v4
       with:
-        name: gnat-release-packages-${{matrix.target}}
+        name: gnat-release-packages-${{matrix.target}}_macos-15
         path: sbx/*/release_package*/install/*
   spark_macos-15:
     needs:
@@ -974,8 +966,6 @@ jobs:
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set Xcode 15.3
-      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
     - name: Install packages with Homebrew
       run: |-
         brew install texinfo
@@ -992,7 +982,7 @@ jobs:
     - name: Download artifact 'gprbuild-release-packages'
       uses: actions/download-artifact@v4
       with:
-        name: gprbuild-release-packages
+        name: gprbuild-release-packages_macos-15
         path: in_artifacts/
     - name: Build SPARK
       run: python3 ./anod build spark2014 -v --loglevel DEBUG --enable-cleanup
@@ -1006,7 +996,7 @@ jobs:
     - name: Upload artifact 'gnatprove-release-packages'
       uses: actions/upload-artifact@v4
       with:
-        name: gnatprove-release-packages
+        name: gnatprove-release-packages_macos-15
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gnatformat_macos-15:
@@ -1017,8 +1007,6 @@ jobs:
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set Xcode 15.3
-      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
     - name: Install packages with Homebrew
       run: |-
         brew install texinfo
@@ -1035,7 +1023,7 @@ jobs:
     - name: Download artifact 'gprbuild-release-packages'
       uses: actions/download-artifact@v4
       with:
-        name: gprbuild-release-packages
+        name: gprbuild-release-packages_macos-15
         path: in_artifacts/
     - name: Build GNATformat
       run: python3 ./anod build gnatformat -v --loglevel DEBUG --enable-cleanup
@@ -1049,7 +1037,7 @@ jobs:
     - name: Upload artifact 'gnatformat-release-packages'
       uses: actions/upload-artifact@v4
       with:
-        name: gnatformat-release-packages
+        name: gnatformat-release-packages_macos-15
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gnatdoc_macos-15:
@@ -1060,8 +1048,6 @@ jobs:
     steps:
     - name: Checkout Project
       uses: actions/checkout@v4
-    - name: Set Xcode 15.3
-      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
     - name: Install packages with Homebrew
       run: |-
         brew install texinfo
@@ -1078,7 +1064,7 @@ jobs:
     - name: Download artifact 'gprbuild-release-packages'
       uses: actions/download-artifact@v4
       with:
-        name: gprbuild-release-packages
+        name: gprbuild-release-packages_macos-15
         path: in_artifacts/
     - name: Build GNATdoc
       run: python3 ./anod build gnatdoc -v --loglevel DEBUG --enable-cleanup
@@ -1092,7 +1078,7 @@ jobs:
     - name: Upload artifact 'gnatdoc-release-packages'
       uses: actions/upload-artifact@v4
       with:
-        name: gnatdoc-release-packages
+        name: gnatdoc-release-packages_macos-15
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gcc_dependencies_windows-2022:
@@ -1140,7 +1126,7 @@ jobs:
     - name: Upload artifact 'gcc-dependencies-artifacts'
       uses: actions/upload-artifact@v4
       with:
-        name: gcc-dependencies-artifacts
+        name: gcc-dependencies-artifacts_windows-2022
         path: C:/aaa/GNAT-FSF-builds/out_artifacts/*
         retention-days: 1
   gnat_windows-2022:
@@ -1182,7 +1168,7 @@ jobs:
     - name: Download artifact 'gcc-dependencies-artifacts'
       uses: actions/download-artifact@v4
       with:
-        name: gcc-dependencies-artifacts
+        name: gcc-dependencies-artifacts_windows-2022
         path: C:/aaa/GNAT-FSF-builds/in_artifacts/
     - name: Build GNAT native
       run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gcc -v --loglevel DEBUG --enable-cleanup
@@ -1198,7 +1184,7 @@ jobs:
     - name: Upload artifact 'gnat-release-packages'
       uses: actions/upload-artifact@v4
       with:
-        name: gnat-release-packages
+        name: gnat-release-packages_windows-2022
         path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
         retention-days: 5
   gprbuild_windows-2022:
@@ -1247,7 +1233,7 @@ jobs:
     - name: Upload artifact 'gprbuild-release-packages'
       uses: actions/upload-artifact@v4
       with:
-        name: gprbuild-release-packages
+        name: gprbuild-release-packages_windows-2022
         path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
         retention-days: 5
   gnat_cross_windows-2022:
@@ -1299,7 +1285,7 @@ jobs:
     - name: Download artifact 'gcc-dependencies-artifacts'
       uses: actions/download-artifact@v4
       with:
-        name: gcc-dependencies-artifacts
+        name: gcc-dependencies-artifacts_windows-2022
         path: C:/aaa/GNAT-FSF-builds/in_artifacts/
     - name: Build GNAT ${{ matrix.target }}
       run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gcc --target=${{ matrix.target }} -v --loglevel DEBUG --enable-cleanup
@@ -1315,7 +1301,7 @@ jobs:
     - name: Upload artifact 'gnat-release-packages-${{matrix.target}}'
       uses: actions/upload-artifact@v4
       with:
-        name: gnat-release-packages-${{matrix.target}}
+        name: gnat-release-packages-${{matrix.target}}_windows-2022
         path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
   spark_windows-2022:
     needs:
@@ -1356,7 +1342,7 @@ jobs:
     - name: Download artifact 'gprbuild-release-packages'
       uses: actions/download-artifact@v4
       with:
-        name: gprbuild-release-packages
+        name: gprbuild-release-packages_windows-2022
         path: C:/aaa/GNAT-FSF-builds/in_artifacts/
     - name: Build SPARK
       run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build spark2014 -v --loglevel DEBUG --enable-cleanup
@@ -1370,7 +1356,7 @@ jobs:
     - name: Upload artifact 'gnatprove-release-packages'
       uses: actions/upload-artifact@v4
       with:
-        name: gnatprove-release-packages
+        name: gnatprove-release-packages_windows-2022
         path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
         retention-days: 5
   gnatformat_windows-2022:
@@ -1412,7 +1398,7 @@ jobs:
     - name: Download artifact 'gprbuild-release-packages'
       uses: actions/download-artifact@v4
       with:
-        name: gprbuild-release-packages
+        name: gprbuild-release-packages_windows-2022
         path: C:/aaa/GNAT-FSF-builds/in_artifacts/
     - name: Build GNATformat
       run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gnatformat -v --loglevel DEBUG --enable-cleanup
@@ -1426,7 +1412,7 @@ jobs:
     - name: Upload artifact 'gnatformat-release-packages'
       uses: actions/upload-artifact@v4
       with:
-        name: gnatformat-release-packages
+        name: gnatformat-release-packages_windows-2022
         path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
         retention-days: 5
   gnatdoc_windows-2022:
@@ -1468,7 +1454,7 @@ jobs:
     - name: Download artifact 'gprbuild-release-packages'
       uses: actions/download-artifact@v4
       with:
-        name: gprbuild-release-packages
+        name: gprbuild-release-packages_windows-2022
         path: C:/aaa/GNAT-FSF-builds/in_artifacts/
     - name: Build GNATdoc
       run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gnatdoc -v --loglevel DEBUG --enable-cleanup
@@ -1482,6 +1468,6 @@ jobs:
     - name: Upload artifact 'gnatdoc-release-packages'
       uses: actions/upload-artifact@v4
       with:
-        name: gnatdoc-release-packages
+        name: gnatdoc-release-packages_windows-2022
         path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
         retention-days: 5

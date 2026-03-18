@@ -49,10 +49,6 @@ class macOS_Arm(macOS):
     @classmethod
     def setup_python(cls) -> list[RawStep]:
         return [
-            Step(
-                "Set Xcode 15.3",
-                ["sudo xcode-select --switch /Applications/Xcode_15.3.app"],
-            ),
             *super().setup_python(),
         ]
 

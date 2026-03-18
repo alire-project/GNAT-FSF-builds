@@ -50,7 +50,10 @@ class GNATdoc(spec("common")):
             Anod.Dependency("gnatcoll-bindings", track=True),
             Anod.Dependency("xmlada", track=True),
             Anod.Dependency("prettier_ada", track=True),
+            Anod.Dependency("gmp", track=True),
         ]
+        if self.env.target.os.name == "windows":
+            deps.append(Anod.Dependency("libiconv", track=True))
         return deps
 
     @Anod.primitive()

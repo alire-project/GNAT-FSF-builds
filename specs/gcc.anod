@@ -23,7 +23,7 @@ class GCC(spec("gh-artifact")):
     @property
     def url(self):
         if self.host_is_macos_arm:
-            return "https://github.com/iains/gcc-15-branch/archive/refs/heads/gcc-15-1-darwin-rc1.tar.gz"
+            return "https://github.com/iains/gcc-15-branch/archive/refs/heads/gcc-15-2-darwin-pre-0.tar.gz"
         else:
             return "https://gcc.gnu.org/pub/gcc/releases/gcc-%s/%s" % (
                 self.version,
@@ -125,13 +125,13 @@ class GCC(spec("gh-artifact")):
             args.append("--disable-libcilkrts")
 
             # HACK: use a fixed version of the macOS SDK because of fixed-include breakages
-            xcode = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.sdk"
-            clu = "/Library/Developer/CommandLineTools/SDKs/MacOSX14.sdk"
+            clt_15 = "/Library/Developer/CommandLineTools/SDKs/MacOSX15.sdk"
+            clt_latest = "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
+            args.append("--with-build-sysroot=%s" % clt_15)
 
-            args.append("--with-build-sysroot=%s" % xcode)
             args.append(
-                "--with-specs=%%{!sysroot=*:--sysroot=%%:if-exists-else(%s %s)}"
-                % (xcode, clu)
+                "--with-specs=%%{!-sysroot=*:--sysroot=%%:if-exists-else(%s %s)}"
+                % (clt_15, clt_latest)
             )
 
         if self.env.host.os.name != "darwin":

@@ -1,5 +1,5 @@
-from e3.os.fs import touch, unixpath
-from e3.fs import cp
+from e3.os.fs import touch, unixpath, cd
+from e3.fs import cp, sync_tree
 from e3.anod.helper import Configure, Make
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
@@ -47,12 +47,15 @@ class ZLib(spec("common")):
         for m in self.deps:
             self.deps[m].setenv()
 
-        configure = Configure(self, exec_dir=self["SRC_DIR"], auto_target=False)
+        sync_tree(self["SRC_DIR"], self["BUILD_DIR"])
+        cd(self["BUILD_DIR"])
+
+        configure = Configure(self, exec_dir=self["BUILD_DIR"], auto_target=False)
         configure.add("--prefix=%s" % unixpath(self["INSTALL_DIR"]))
         configure.add("--static")
         configure()
 
-        make = Make(self, exec_dir=self["SRC_DIR"])
+        make = Make(self, exec_dir=self["BUILD_DIR"])
         make(jobs=self.jobs)
         make("install", jobs=1)
 
