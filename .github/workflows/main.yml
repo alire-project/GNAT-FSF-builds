@@ -1,4 +1,4 @@
-name: GNAT
+name: GNAT FSF builds
 'on':
   pull_request:
     paths-ignore:

@@ -212,7 +212,7 @@ def main():
     )
 
     workflow = Workflow(
-        "GNAT",
+        "GNAT FSF builds",
         {
             "pull_request": {
                 "paths-ignore": [
