@@ -6,7 +6,7 @@ import os
 class PrettierAda(spec("common")):
     @property
     def version(self):
-        return "25.0.0"
+        return "26.0.0"
 
     @property
     def tarball(self):
@@ -17,8 +17,8 @@ class PrettierAda(spec("common")):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/adacore/prettier-ada/archive/v%s/prettier-ada-%s.zip"
-                % (self.version, self.version)
+                url="https://github.com/AdaCore/prettier-ada/archive/refs/tags/v%s.zip"
+                % self.version
             )
         ]
 
@@ -32,7 +32,7 @@ class PrettierAda(spec("common")):
             Anod.Dependency("base_gcc", track=True),
             Anod.Dependency("gprbuild", track=True),
             Anod.Dependency("gnatcoll", track=True),
-            Anod.Dependency("vss", track=True),
+            Anod.Dependency("vss_text", track=True),
         ]
     
     @Anod.primitive()

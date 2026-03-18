@@ -8,7 +8,7 @@ import os
 class GNATcollBindings(spec("common")):
     @property
     def version(self):
-        return "25.0.0"
+        return "26.0.0"
 
     @property
     def tarball(self):
@@ -19,7 +19,7 @@ class GNATcollBindings(spec("common")):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/AdaCore/gnatcoll-bindings/archive/v%s.tar.gz"
+                url="https://github.com/AdaCore/gnatcoll-bindings/archive/refs/tags/v%s.tar.gz"
                 % self.version,
             )
         ]

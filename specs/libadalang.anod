@@ -7,7 +7,7 @@ import os
 class Libadalang(spec("common")):
     @property
     def version(self):
-        return "25.0.0"
+        return "26.0.0"
 
     @property
     def tarball(self):
@@ -34,13 +34,14 @@ class Libadalang(spec("common")):
             Anod.Dependency("gprbuild", track=True),
             Anod.Dependency("libgpr", track=True),
             Anod.Dependency("adasat", track=True),
-            Anod.Dependency("libgpr2"),
+            Anod.Dependency("libgpr2", track=True),
             Anod.Dependency("gnatcoll", track=True),
             Anod.Dependency("gnatcoll-bindings", track=True),
             Anod.Dependency("langkit_support", track=True),
             Anod.Dependency("xmlada", track=True),
             Anod.Dependency("prettier_ada", track=True),
-            Anod.Dependency("vss", track=True),
+            Anod.Dependency("vss_text", track=True),
+            Anod.Dependency("vss_extra", track=True),
         ]
 
     @Anod.primitive()

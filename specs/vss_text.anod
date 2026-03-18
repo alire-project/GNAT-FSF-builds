@@ -3,23 +3,22 @@ from e3.anod.loader import spec
 
 import os
 
-
-class VSS(spec("common")):
+class VSS_Text(spec("common")):
     @property
     def version(self):
-        return "25.0.0"
+        return "26.0.0"
 
     @property
     def tarball(self):
-        return "vss-%s.zip" % self.version
+        return "vss-text-%s.zip" % self.version
 
     @property
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/adacore/VSS/archive/v%s/VSS-%s.zip"
-                % (self.version, self.version),
+                url="https://github.com/AdaCore/vss-text/archive/refs/tags/v%s.zip"
+                % self.version,
             )
         ]
 
@@ -46,10 +45,6 @@ class VSS(spec("common")):
             for gpr in (
                 "gnat/vss_gnat.gpr",
                 "gnat/vss_text.gpr",
-                "gnat/vss_json.gpr",
-                "gnat/vss_regexp.gpr",
-                "gnat/vss_xml.gpr",
-                "gnat/vss_xml_templates.gpr",
             )
         ]
 
