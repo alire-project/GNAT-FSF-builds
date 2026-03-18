@@ -6,7 +6,7 @@ from e3.hash import sha256
 
 import os
 
-valid_packages = ["gprbuild", "gnat", "gnatcov", "gnatprove"]
+valid_packages = ["gprbuild", "gnat", "gnatcov", "gnatprove", "gnatformat", "gnatdoc"]
 
 
 class ReleasePackage(spec("common")):
@@ -29,7 +29,7 @@ class ReleasePackage(spec("common")):
     def version(self):
         package = self.package
 
-        if package in ["gprbuild", "gnatcov"]:
+        if package in ["gprbuild", "gnatcov", "gnatformat", "gnatdoc"]:
             return self.deps[package].version
         elif package == "gnat":
             return self.deps["gcc"].version
@@ -48,6 +48,8 @@ class ReleasePackage(spec("common")):
             "gnatcov": "1",
             "gnatprove": "1",
             "gnat": "1",
+            "gnatformat": "1",
+            "gnatdoc": "1",
         }
 
         if isinstance(r := release[package], dict):
@@ -93,8 +95,8 @@ class ReleasePackage(spec("common")):
                 Anod.Dependency("gpr2", qualifier="tools_only"),
             ]
 
-        if pck == "gnatcov":
-            return [Anod.Dependency("gnatcov", track=True)]
+        if pck in ["gnatcov", "gnatformat", "gnatdoc"]:
+            return [Anod.Dependency(pck, track=True)]
 
         if pck == "gnatprove":
             return [Anod.Dependency("spark2014", track=True)]

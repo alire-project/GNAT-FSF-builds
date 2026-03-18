@@ -1,0 +1,128 @@
+from e3.os.fs import unixpath, touch
+from e3.fs import cp, sync_tree, rm
+from e3.anod.helper import Make, text_replace
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+from e3.diff import patch
+
+import os
+import time
+
+class GNATdoc(spec("common")):
+    @property
+    def version(self) -> str:
+        return "26.0.0"
+
+    @property
+    def tarball(self):
+        return "gnatdoc-%s.zip" % self.version
+
+    @property
+    def source_pkg_build(self):
+        return [
+            self.HTTPSSourceBuilder(
+                name=self.tarball,
+                url="https://github.com/AdaCore/gnatdoc/archive/refs/tags/v%s.zip"
+                % self.version,
+            ),
+        ]
+
+    @property
+    def build_source_list(self):
+        return [
+            Anod.Source(name=self.tarball, publish=True, dest=""),
+        ]
+
+    @property
+    def build_deps(self):
+        deps = [
+            Anod.Dependency("base_gcc", track=True),
+            Anod.Dependency("gprbuild", track=True),
+            Anod.Dependency("langkit_support", track=True),
+            Anod.Dependency("libadalang", track=True),
+            Anod.Dependency("markdown", track=True),
+            Anod.Dependency("vss_text", track=True),
+            Anod.Dependency("vss_extra", track=True),
+            Anod.Dependency("libgpr", track=True),
+            Anod.Dependency("libgpr2", track=True),
+            Anod.Dependency("adasat", track=True),
+            Anod.Dependency("gnatcoll", track=True),
+            Anod.Dependency("gnatcoll-bindings", track=True),
+            Anod.Dependency("xmlada", track=True),
+            Anod.Dependency("prettier_ada", track=True),
+        ]
+        return deps
+
+    @Anod.primitive()
+    def build(self):
+        for m in self.deps:
+            self.deps[m].setenv()
+
+        sync_tree(self["SRC_DIR"], self["BUILD_DIR"])
+
+        text_replace(
+            os.path.join(self["BUILD_DIR"], "config", "gnatdoc_config.ads"),
+            [
+                (
+                    '%VERSION%',
+                    self.version,
+                ),
+                (
+                    '%DATE%',
+                    time.strftime("%Y%m%d"),
+                ),
+            ],
+        )
+
+        text_replace(
+            os.path.join(self["BUILD_DIR"], "gnat", "gnatdoc.gpr"),
+            [
+                (
+                    r'for Switches \("Ada"\) use \("-g", "-gnat2022", "-gnatygO", "-gnata", "-gnatwa"\);',
+                    'for Switches ("Ada") use ("-g", "-O2", "-gnat2022", "-gnatygO", "-gnata", "-gnatwa");'
+                )
+            ]
+        )
+
+        build_profile = "release"
+        build_mode = "prod"
+        gpr_files = [
+            os.path.join(self["BUILD_DIR"], gpr)
+            for gpr in (
+                "gnat/gnatdoc.gpr",
+            )
+        ]
+
+        for library_type in ["static"]:
+            for gpr in gpr_files:
+                self.shell(
+                    "gprbuild",
+                    "-p",
+                    "-P",
+                    gpr,
+                    "-j" + str(self.jobs),
+                    "--relocate-build-tree=" + library_type,
+                    "-XLIBRARY_TYPE=" + library_type,
+                    "-XBUILD_PROFILE=" + build_profile,
+                )
+
+            for gpr in gpr_files:
+                self.shell(
+                    "gprinstall",
+                    "-f",
+                    "-p",
+                    "-P",
+                    gpr,
+                    "--relocate-build-tree=" + library_type,
+                    "--prefix=" + self["INSTALL_DIR"],
+                    "-XBUILD_MODE=" + build_mode,
+                    "-XBUILD_PROFILE=" + build_profile,
+                    "-XLIBRARY_TYPE=" + library_type,
+                    "--build-var=LIBRARY_TYPE",
+                    "--build-name=" + library_type,
+                )
+
+        rm(os.path.join(self["INSTALL_DIR"], "share"), recursive=True)
+        rm(os.path.join(self["INSTALL_DIR"], "include"), recursive=True)
+
+        self.clean()
