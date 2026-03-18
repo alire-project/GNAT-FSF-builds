@@ -177,6 +177,39 @@ def main():
         ],
     )
 
+    jobs["gnatformat"] = Job(
+        "GNATformat",
+        [
+            AnodBuild("Build GNATformat", "gnatformat"),
+            ReleasePackage("Package GNATformat", "gnatformat"),
+            GhRelease("Release GNATformat", "gnatformat"),
+        ],
+        needs=[jobs["gprbuild"]],
+        outputs=[
+            Artifact(
+                "gnatformat-release-packages",
+                "sbx/*/release_package*/install/*",
+                retention_days=5,
+            )
+        ],
+    )
+
+    jobs["gnatdoc"] = Job(
+        "GNATdoc",
+        [
+            AnodBuild("Build GNATdoc", "gnatdoc"),
+            ReleasePackage("Package GNATdoc", "gnatdoc"),
+            GhRelease("Release GNATdoc", "gnatdoc"),
+        ],
+        needs=[jobs["gprbuild"]],
+        outputs=[
+            Artifact(
+                "gnatdoc-release-packages",
+                "sbx/*/release_package*/install/*",
+                retention_days=5,
+            )
+        ],
+    )
 
     workflow = Workflow(
         "GNAT",

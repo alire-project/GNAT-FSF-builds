@@ -193,6 +193,78 @@ jobs:
         name: gnatprove-release-packages
         path: sbx/*/release_package*/install/*
         retention-days: 5
+  gnatformat_ubuntu-22-04:
+    needs:
+    - gprbuild_ubuntu-22-04
+    name: GNATformat (ubuntu-22.04)
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v4
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install Python dependencies
+      run: |-
+        python3 -m pip install --upgrade pip
+        pip install --break-system-packages e3-core==22.10.0
+    - name: Download artifact 'gprbuild-release-packages'
+      uses: actions/download-artifact@v4
+      with:
+        name: gprbuild-release-packages
+        path: in_artifacts/
+    - name: Build GNATformat
+      run: python3 ./anod build gnatformat -v --loglevel DEBUG --enable-cleanup
+    - name: Package GNATformat
+      run: python3 ./anod build release_package --qualifier=package=gnatformat -v --loglevel DEBUG
+    - if: inputs.do_gh_release
+      name: Release GNATformat
+      run: python3 ./anod build release_github --qualifier=package=gnatformat -v --loglevel DEBUG --enable-cleanup
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact 'gnatformat-release-packages'
+      uses: actions/upload-artifact@v4
+      with:
+        name: gnatformat-release-packages
+        path: sbx/*/release_package*/install/*
+        retention-days: 5
+  gnatdoc_ubuntu-22-04:
+    needs:
+    - gprbuild_ubuntu-22-04
+    name: GNATdoc (ubuntu-22.04)
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v4
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install Python dependencies
+      run: |-
+        python3 -m pip install --upgrade pip
+        pip install --break-system-packages e3-core==22.10.0
+    - name: Download artifact 'gprbuild-release-packages'
+      uses: actions/download-artifact@v4
+      with:
+        name: gprbuild-release-packages
+        path: in_artifacts/
+    - name: Build GNATdoc
+      run: python3 ./anod build gnatdoc -v --loglevel DEBUG --enable-cleanup
+    - name: Package GNATdoc
+      run: python3 ./anod build release_package --qualifier=package=gnatdoc -v --loglevel DEBUG
+    - if: inputs.do_gh_release
+      name: Release GNATdoc
+      run: python3 ./anod build release_github --qualifier=package=gnatdoc -v --loglevel DEBUG --enable-cleanup
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact 'gnatdoc-release-packages'
+      uses: actions/upload-artifact@v4
+      with:
+        name: gnatdoc-release-packages
+        path: sbx/*/release_package*/install/*
+        retention-days: 5
   gcc_dependencies_ubuntu-22-04-arm:
     name: GCC Dependencies (ubuntu-22.04-arm)
     runs-on: ubuntu-22.04-arm
@@ -369,6 +441,78 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: gnatprove-release-packages
+        path: sbx/*/release_package*/install/*
+        retention-days: 5
+  gnatformat_ubuntu-22-04-arm:
+    needs:
+    - gprbuild_ubuntu-22-04-arm
+    name: GNATformat (ubuntu-22.04-arm)
+    runs-on: ubuntu-22.04-arm
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v4
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install Python dependencies
+      run: |-
+        python3 -m pip install --upgrade pip
+        pip install --break-system-packages e3-core==22.10.0
+    - name: Download artifact 'gprbuild-release-packages'
+      uses: actions/download-artifact@v4
+      with:
+        name: gprbuild-release-packages
+        path: in_artifacts/
+    - name: Build GNATformat
+      run: python3 ./anod build gnatformat -v --loglevel DEBUG --enable-cleanup
+    - name: Package GNATformat
+      run: python3 ./anod build release_package --qualifier=package=gnatformat -v --loglevel DEBUG
+    - if: inputs.do_gh_release
+      name: Release GNATformat
+      run: python3 ./anod build release_github --qualifier=package=gnatformat -v --loglevel DEBUG --enable-cleanup
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact 'gnatformat-release-packages'
+      uses: actions/upload-artifact@v4
+      with:
+        name: gnatformat-release-packages
+        path: sbx/*/release_package*/install/*
+        retention-days: 5
+  gnatdoc_ubuntu-22-04-arm:
+    needs:
+    - gprbuild_ubuntu-22-04-arm
+    name: GNATdoc (ubuntu-22.04-arm)
+    runs-on: ubuntu-22.04-arm
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v4
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install Python dependencies
+      run: |-
+        python3 -m pip install --upgrade pip
+        pip install --break-system-packages e3-core==22.10.0
+    - name: Download artifact 'gprbuild-release-packages'
+      uses: actions/download-artifact@v4
+      with:
+        name: gprbuild-release-packages
+        path: in_artifacts/
+    - name: Build GNATdoc
+      run: python3 ./anod build gnatdoc -v --loglevel DEBUG --enable-cleanup
+    - name: Package GNATdoc
+      run: python3 ./anod build release_package --qualifier=package=gnatdoc -v --loglevel DEBUG
+    - if: inputs.do_gh_release
+      name: Release GNATdoc
+      run: python3 ./anod build release_github --qualifier=package=gnatdoc -v --loglevel DEBUG --enable-cleanup
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact 'gnatdoc-release-packages'
+      uses: actions/upload-artifact@v4
+      with:
+        name: gnatdoc-release-packages
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gcc_dependencies_macos-15-intel:
@@ -570,6 +714,88 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: gnatprove-release-packages
+        path: sbx/*/release_package*/install/*
+        retention-days: 5
+  gnatformat_macos-15-intel:
+    needs:
+    - gprbuild_macos-15-intel
+    name: GNATformat (macos-15-intel)
+    runs-on: macos-15-intel
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v4
+    - name: Install packages with Homebrew
+      run: |-
+        brew install texinfo
+        brew install autoconf
+        brew install automake
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install Python dependencies
+      run: |-
+        python3 -m pip install --upgrade pip
+        pip install --break-system-packages e3-core==22.10.0
+    - name: Download artifact 'gprbuild-release-packages'
+      uses: actions/download-artifact@v4
+      with:
+        name: gprbuild-release-packages
+        path: in_artifacts/
+    - name: Build GNATformat
+      run: python3 ./anod build gnatformat -v --loglevel DEBUG --enable-cleanup
+    - name: Package GNATformat
+      run: python3 ./anod build release_package --qualifier=package=gnatformat -v --loglevel DEBUG
+    - if: inputs.do_gh_release
+      name: Release GNATformat
+      run: python3 ./anod build release_github --qualifier=package=gnatformat -v --loglevel DEBUG --enable-cleanup
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact 'gnatformat-release-packages'
+      uses: actions/upload-artifact@v4
+      with:
+        name: gnatformat-release-packages
+        path: sbx/*/release_package*/install/*
+        retention-days: 5
+  gnatdoc_macos-15-intel:
+    needs:
+    - gprbuild_macos-15-intel
+    name: GNATdoc (macos-15-intel)
+    runs-on: macos-15-intel
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v4
+    - name: Install packages with Homebrew
+      run: |-
+        brew install texinfo
+        brew install autoconf
+        brew install automake
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install Python dependencies
+      run: |-
+        python3 -m pip install --upgrade pip
+        pip install --break-system-packages e3-core==22.10.0
+    - name: Download artifact 'gprbuild-release-packages'
+      uses: actions/download-artifact@v4
+      with:
+        name: gprbuild-release-packages
+        path: in_artifacts/
+    - name: Build GNATdoc
+      run: python3 ./anod build gnatdoc -v --loglevel DEBUG --enable-cleanup
+    - name: Package GNATdoc
+      run: python3 ./anod build release_package --qualifier=package=gnatdoc -v --loglevel DEBUG
+    - if: inputs.do_gh_release
+      name: Release GNATdoc
+      run: python3 ./anod build release_github --qualifier=package=gnatdoc -v --loglevel DEBUG --enable-cleanup
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact 'gnatdoc-release-packages'
+      uses: actions/upload-artifact@v4
+      with:
+        name: gnatdoc-release-packages
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gcc_dependencies_macos-15:
@@ -781,6 +1007,92 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: gnatprove-release-packages
+        path: sbx/*/release_package*/install/*
+        retention-days: 5
+  gnatformat_macos-15:
+    needs:
+    - gprbuild_macos-15
+    name: GNATformat (macos-15)
+    runs-on: macos-15
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v4
+    - name: Set Xcode 15.3
+      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
+    - name: Install packages with Homebrew
+      run: |-
+        brew install texinfo
+        brew install autoconf
+        brew install automake
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install Python dependencies
+      run: |-
+        python3 -m pip install --upgrade pip
+        pip install --break-system-packages e3-core==22.10.0
+    - name: Download artifact 'gprbuild-release-packages'
+      uses: actions/download-artifact@v4
+      with:
+        name: gprbuild-release-packages
+        path: in_artifacts/
+    - name: Build GNATformat
+      run: python3 ./anod build gnatformat -v --loglevel DEBUG --enable-cleanup
+    - name: Package GNATformat
+      run: python3 ./anod build release_package --qualifier=package=gnatformat -v --loglevel DEBUG
+    - if: inputs.do_gh_release
+      name: Release GNATformat
+      run: python3 ./anod build release_github --qualifier=package=gnatformat -v --loglevel DEBUG --enable-cleanup
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact 'gnatformat-release-packages'
+      uses: actions/upload-artifact@v4
+      with:
+        name: gnatformat-release-packages
+        path: sbx/*/release_package*/install/*
+        retention-days: 5
+  gnatdoc_macos-15:
+    needs:
+    - gprbuild_macos-15
+    name: GNATdoc (macos-15)
+    runs-on: macos-15
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v4
+    - name: Set Xcode 15.3
+      run: sudo xcode-select --switch /Applications/Xcode_15.3.app
+    - name: Install packages with Homebrew
+      run: |-
+        brew install texinfo
+        brew install autoconf
+        brew install automake
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install Python dependencies
+      run: |-
+        python3 -m pip install --upgrade pip
+        pip install --break-system-packages e3-core==22.10.0
+    - name: Download artifact 'gprbuild-release-packages'
+      uses: actions/download-artifact@v4
+      with:
+        name: gprbuild-release-packages
+        path: in_artifacts/
+    - name: Build GNATdoc
+      run: python3 ./anod build gnatdoc -v --loglevel DEBUG --enable-cleanup
+    - name: Package GNATdoc
+      run: python3 ./anod build release_package --qualifier=package=gnatdoc -v --loglevel DEBUG
+    - if: inputs.do_gh_release
+      name: Release GNATdoc
+      run: python3 ./anod build release_github --qualifier=package=gnatdoc -v --loglevel DEBUG --enable-cleanup
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact 'gnatdoc-release-packages'
+      uses: actions/upload-artifact@v4
+      with:
+        name: gnatdoc-release-packages
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gcc_dependencies_windows-2022:
@@ -1059,5 +1371,117 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: gnatprove-release-packages
+        path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
+        retention-days: 5
+  gnatformat_windows-2022:
+    needs:
+    - gprbuild_windows-2022
+    name: GNATformat (windows-2022)
+    runs-on: windows-2022
+    env:
+      CONFIG_SHELL: /bin/bash
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v4
+    - name: Install msys2
+      uses: msys2/setup-msys2@v2
+      with:
+        install: |-
+          base-devel
+          git
+          rsync
+          mingw-w64-x86_64-github-cli
+          mingw-w64-x86_64-toolchain
+          mingw-w64-x86_64-python
+          mingw-w64-x86_64-python-pip
+          mingw-w64-x86_64-python-psutil
+    - name: Install Python dependencies
+      run: |-
+        python3 -m pip install --upgrade pip
+        pip install --break-system-packages e3-core==22.10.0
+    - name: Prepare msys2 build setup
+      run: |-
+        df -h
+        mkdir C:/aaa
+        mount C:/aaa /aaa
+        cd ..
+        cp -r GNAT-FSF-builds /aaa
+    - name: Download artifact 'gprbuild-release-packages'
+      uses: actions/download-artifact@v4
+      with:
+        name: gprbuild-release-packages
+        path: C:/aaa/GNAT-FSF-builds/in_artifacts/
+    - name: Build GNATformat
+      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gnatformat -v --loglevel DEBUG --enable-cleanup
+    - name: Package GNATformat
+      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_package --qualifier=package=gnatformat -v --loglevel DEBUG
+    - if: inputs.do_gh_release
+      name: Release GNATformat
+      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_github --qualifier=package=gnatformat -v --loglevel DEBUG --enable-cleanup
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact 'gnatformat-release-packages'
+      uses: actions/upload-artifact@v4
+      with:
+        name: gnatformat-release-packages
+        path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
+        retention-days: 5
+  gnatdoc_windows-2022:
+    needs:
+    - gprbuild_windows-2022
+    name: GNATdoc (windows-2022)
+    runs-on: windows-2022
+    env:
+      CONFIG_SHELL: /bin/bash
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v4
+    - name: Install msys2
+      uses: msys2/setup-msys2@v2
+      with:
+        install: |-
+          base-devel
+          git
+          rsync
+          mingw-w64-x86_64-github-cli
+          mingw-w64-x86_64-toolchain
+          mingw-w64-x86_64-python
+          mingw-w64-x86_64-python-pip
+          mingw-w64-x86_64-python-psutil
+    - name: Install Python dependencies
+      run: |-
+        python3 -m pip install --upgrade pip
+        pip install --break-system-packages e3-core==22.10.0
+    - name: Prepare msys2 build setup
+      run: |-
+        df -h
+        mkdir C:/aaa
+        mount C:/aaa /aaa
+        cd ..
+        cp -r GNAT-FSF-builds /aaa
+    - name: Download artifact 'gprbuild-release-packages'
+      uses: actions/download-artifact@v4
+      with:
+        name: gprbuild-release-packages
+        path: C:/aaa/GNAT-FSF-builds/in_artifacts/
+    - name: Build GNATdoc
+      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gnatdoc -v --loglevel DEBUG --enable-cleanup
+    - name: Package GNATdoc
+      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_package --qualifier=package=gnatdoc -v --loglevel DEBUG
+    - if: inputs.do_gh_release
+      name: Release GNATdoc
+      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_github --qualifier=package=gnatdoc -v --loglevel DEBUG --enable-cleanup
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact 'gnatdoc-release-packages'
+      uses: actions/upload-artifact@v4
+      with:
+        name: gnatdoc-release-packages
         path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
         retention-days: 5
