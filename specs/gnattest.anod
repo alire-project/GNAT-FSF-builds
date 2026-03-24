@@ -1,0 +1,94 @@
+from e3.os.fs import unixpath, touch
+from e3.fs import cp, sync_tree, rm
+from e3.anod.helper import Make, text_replace
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+from e3.diff import patch
+
+import os
+import time
+
+class GNATtest(spec("common")):
+    @property
+    def version(self) -> str:
+        return "26.2"
+
+    @property
+    def tarball(self):
+        return "gnattest-%s.zip" % self.version
+
+    @property
+    def source_pkg_build(self):
+        return [
+            self.HTTPSSourceBuilder(
+                name=self.tarball,
+                url="https://github.com/AdaCore/gnattest/archive/refs/heads/%s.zip"
+                % self.version,
+            ),
+        ]
+
+    @property
+    def build_source_list(self):
+        return [
+            Anod.Source(name=self.tarball, publish=True, dest=""),
+        ]
+
+    @property
+    def build_deps(self):
+        deps = [
+            Anod.Dependency("base_gcc", track=True),
+            Anod.Dependency("gprbuild", track=True),
+            Anod.Dependency("libadalang", track=True),
+            Anod.Dependency("prettier_ada", track=True),
+            Anod.Dependency("vss_text", track=True),
+            Anod.Dependency("vss_extra", track=True),
+            Anod.Dependency("gnatcoll", track=True),
+            Anod.Dependency("gnatcoll-bindings", track=True),
+            Anod.Dependency("xmlada", track=True),
+            Anod.Dependency("libgpr", track=True),
+            Anod.Dependency("libgpr2", track=True),
+            Anod.Dependency("adasat", track=True),
+            Anod.Dependency("langkit_support", track=True),
+            Anod.Dependency("gmp", track=True),
+            Anod.Dependency("templates_parser", track=True),
+        ]
+        if self.env.target.os.name == "windows":
+            deps.append(Anod.Dependency("libiconv", track=True))
+        return deps
+
+    @Anod.primitive()
+    def build(self):
+        for m in self.deps:
+            self.deps[m].setenv()
+
+        sync_tree(self["SRC_DIR"], self["BUILD_DIR"])
+
+        text_replace(
+            os.path.join(self["BUILD_DIR"], "src", "utils-versions.ads"),
+            [
+                (
+                    r'(Version\s*:\s*constant\s+String\s*:=\s*)".*"\s*;',
+                    r'\1"{}";'.format(self.version),
+                ),
+                (
+                    r'(Current_Year\s*:\s*constant\s+String\s*:=\s*)".*"\s*;',
+                    r'\1"{}";'.format(time.strftime("%Y"))
+                ),
+                (
+                    r'(Build_Type\s*:\s*constant\s+Gnat_Build_Type\s*:=\s*).*\s*;',
+                    r'\1GPL;',
+                ),
+            ],
+        )
+
+        make = Make(self, makefile=os.path.join(self["BUILD_DIR"], "Makefile"))
+        make.set_var("PROCESSORS", str(self.jobs))
+        make.set_var("BUILD_MODE", "prod")
+        make.set_var("DESTDIR", self["INSTALL_DIR"])
+
+        make("bin")
+
+        make("install-bin-strip")
+        make("install-tgen")
+
+        self.clean()

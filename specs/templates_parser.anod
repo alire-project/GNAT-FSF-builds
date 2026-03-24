@@ -1,0 +1,63 @@
+from e3.os.fs import unixpath, touch
+from e3.fs import cp, sync_tree, rm
+from e3.anod.helper import Make, text_replace
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+from e3.diff import patch
+
+import os
+import time
+
+class TemplatesParser(spec("common")):
+    @property
+    def version(self) -> str:
+        return "26.1"
+
+    @property
+    def tarball(self):
+        return "templates_parser-%s.zip" % self.version
+
+    @property
+    def source_pkg_build(self):
+        return [
+            self.HTTPSSourceBuilder(
+                name=self.tarball,
+                url="https://github.com/AdaCore/templates-parser/archive/refs/heads/%s.zip"
+                % self.version,
+            ),
+        ]
+
+    @property
+    def build_source_list(self):
+        return [
+            Anod.Source(name=self.tarball, publish=True, dest=""),
+        ]
+
+    @property
+    def build_deps(self):
+        deps = [
+            Anod.Dependency("base_gcc", track=True),
+            Anod.Dependency("gprbuild", track=True),
+            Anod.Dependency("xmlada", track=True),
+        ]
+        return deps
+
+    @Anod.primitive()
+    def build(self):
+        for m in self.deps:
+            self.deps[m].setenv()
+
+        sync_tree(self["SRC_DIR"], self["BUILD_DIR"])
+
+        make = Make(self, makefile=os.path.join(self["BUILD_DIR"], "Makefile"))
+        make.set_var("PROCESSORS", str(self.jobs))
+        make.set_var("BUILD_MODE", "prod")
+        make.set_var("ENABLE_SHARED", "false")
+        make.set_var("ENABLE_STATIC", "true")
+        make.set_var("prefix", self["INSTALL_DIR"])
+
+        make("setup")
+        make()
+        make("install")
+
+        self.clean()

@@ -211,6 +211,24 @@ def main():
         ],
     )
 
+    jobs["gnattest"] = Job(
+        "GNATtest",
+        [
+            AnodBuild("Build GNATtest", "gnattest"),
+            ReleasePackage("Package GNATtest", "gnattest"),
+            GhRelease("Release GNATtest", "gnattest"),
+        ],
+        needs=[jobs["gprbuild"]],
+        outputs=[
+            Artifact(
+                "gnattest-release-packages",
+                "sbx/*/release_package*/install/*",
+                retention_days=5,
+            )
+        ],
+    )
+
+
     workflow = Workflow(
         "GNAT FSF builds",
         {
