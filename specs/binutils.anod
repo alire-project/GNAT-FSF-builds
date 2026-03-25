@@ -68,6 +68,8 @@ class Binutils(spec("common")):
         # For embedded only?
         configure.add("--enable-multilib")
 
+        configure.add("--enable-install-libiberty")
+
         for m in ("mpfr", "gmp", "mpc", "isl"):
             configure.add("--with-%s=%s" % (m, unixpath(self.deps[m]["INSTALL_DIR"])))
 

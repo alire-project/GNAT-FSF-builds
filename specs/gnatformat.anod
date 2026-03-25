@@ -82,9 +82,6 @@ class GNATformat(spec("common")):
         make.set_var("PREFIX", self["INSTALL_DIR"])
 
         make("bin")
-        make("install-bin")
-
-        rm(os.path.join(self["INSTALL_DIR"], "share"), recursive=True)
-        rm(os.path.join(self["INSTALL_DIR"], "include"), recursive=True)
+        make("install-bin-stripped")
 
         self.clean()

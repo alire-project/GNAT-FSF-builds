@@ -1,0 +1,81 @@
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+
+import os
+
+class Ada_TOML(spec("common")):
+    @property
+    def version(self):
+        return "0.5"
+
+    @property
+    def tarball(self):
+        return "ada-toml-%s.tar.gz" % self.version
+
+    @property
+    def source_pkg_build(self):
+        return [
+            self.HTTPSSourceBuilder(
+                name=self.tarball,
+                url="https://github.com/pmderodat/ada-toml/archive/refs/tags/v%s.tar.gz"
+                % self.version,
+            )
+        ]
+
+    @property
+    def build_source_list(self):
+        return [Anod.Source(name=self.tarball, publish=True, dest="")]
+
+    @property
+    def build_deps(self):
+        return [
+            Anod.Dependency("base_gcc", track=True),
+            Anod.Dependency("gprbuild", track=True),
+        ]
+
+    @Anod.primitive()
+    def build(self):
+        for m in self.deps:
+            self.deps[m].setenv()
+
+        build_profile = "release"
+        build_mode = "prod"
+        gpr_files = [
+            os.path.join(self["SRC_DIR"], gpr)
+            for gpr in (
+                "ada_toml.gpr",
+            )
+        ]
+
+        for library_type in ["static"]:
+            for gpr in gpr_files:
+                self.shell(
+                    "gprbuild",
+                    "-p",
+                    "-P",
+                    gpr,
+                    "-j" + str(self.jobs),
+                    "--relocate-build-tree=" + library_type,
+                    "-XLIBRARY_TYPE=" + library_type,
+                    "-XBUILD_PROFILE=" + build_profile,
+                    "-XADA_TOML_BUILD_MODE=" + build_mode,
+                )
+
+            for gpr in gpr_files:
+                self.shell(
+                    "gprinstall",
+                    "-f",
+                    "-p",
+                    "-P",
+                    gpr,
+                    "--relocate-build-tree=" + library_type,
+                    "--prefix=" + self["INSTALL_DIR"],
+                    "-XBUILD_MODE=" + build_mode,
+                    "-XADA_TOML_BUILD_MODE=" + build_mode,
+                    "-XBUILD_PROFILE=" + build_profile,
+                    "-XLIBRARY_TYPE=" + library_type,
+                    "--build-var=LIBRARY_TYPE",
+                    "--build-name=" + library_type,
+                )
+
+        self.clean()

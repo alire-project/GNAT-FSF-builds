@@ -51,6 +51,7 @@ class Common(Anod):
             for directory in lib_dirs:
                 if os.path.exists(directory):
                     self.env.add_dll_path(directory)
+                    self.env.add_search_path("LIBRARY_PATH", directory)
                     env_modified = True
 
         if os.path.isdir(os.path.join(prefix, "share", "gpr")):

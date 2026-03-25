@@ -11,11 +11,11 @@ class binary_install(spec("common")):
     @property
     def tarball(self):
         raise NotImplementedError
-    
+
     @property
     def url(self):
         raise NotImplementedError
-    
+
     @property
     def remove_root_dir(self):
         return True
