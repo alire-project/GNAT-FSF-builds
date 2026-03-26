@@ -68,7 +68,7 @@ class Workflow(Yamlable[Os]):
             res["jobs"].update(
                 {
                     job.key(dispatch(os, job.kind)): job.to_yaml(dispatch(os, job.kind))
-                    for job in self.jobs
+                    for job in self.jobs if dispatch(os, job.kind) not in job.exclude
                 }
             )
         return res
@@ -242,7 +242,8 @@ def main():
                 "sbx/*/release_package*/install/*",
                 retention_days=5,
             )
-        ]
+        ],
+        exclude=[host.macOS]
     )
 
 

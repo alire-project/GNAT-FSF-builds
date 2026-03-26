@@ -7,7 +7,7 @@ import yaml
 class CustomDumper(yaml.SafeDumper):
     def represent_str(self, data: str) -> yaml.ScalarNode:
         if "\n" in data:
-            return self.represent_scalar("tag:yaml.org,2002:str", data, style="|")  # type: ignore #
+            return self.represent_scalar("tag:yaml.org,2002:str", data, style="|")
         return super().represent_str(data)
 
 

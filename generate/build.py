@@ -236,6 +236,8 @@ class Job(Yamlable[Host]):
     inputs: list[Artifact] = field(default_factory=list)
     outputs: list[Artifact] = field(default_factory=list)
 
+    exclude: list[Host] = field(default_factory=list)
+
     def key(self, ctx: Host):
         return f"{self.name}_{ctx.runner}".replace(" ", "_").replace(".", "-").lower()
 

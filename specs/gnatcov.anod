@@ -72,16 +72,24 @@ class GNATcov(spec("common")):
         self.env.add_search_path("LIBRARY_PATH", os.path.join(self.deps["binutils"]["INSTALL_DIR"], "lib64"))
 
         sync_tree(self["SRC_DIR"], self["BUILD_DIR"])
+        exec_dir = os.path.join(self["BUILD_DIR"], "tools", "gnatcov")
 
-        text_replace(os.path.join(self["BUILD_DIR"], "tools", "gnatcov", "version.ads"), [
+        text_replace(os.path.join(exec_dir, "version.ads"), [
             (
                 r'(Xcov_Version\s*:\s*constant\s+String\s*:=\s*)".*";',
                 r'\1"FSF %s";' % self.version
             )
         ])
 
+        if self.env.target.os.name == "windows":
+            text_replace(os.path.join(exec_dir, "Makefile"), [
+                (
+                    r'GPR_PROJECT_PATH := \$\(CURRENT_DIR\)/gpr_stubs:\$\(GPR_PROJECT_PATH\)',
+                    r'GPR_PROJECT_PATH := $(CURRENT_DIR)/gpr_stubs;$(GPR_PROJECT_PATH)',
+                )
+            ])
+
         build_mode = "prod"
-        exec_dir = os.path.join(self["BUILD_DIR"], "tools", "gnatcov")
 
         make_all = Make(self, exec_dir=exec_dir, jobs=1)
         make_all.set_default_target("all")

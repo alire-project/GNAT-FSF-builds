@@ -13,7 +13,7 @@ class LLVM(spec("binary_install")):
         if self.env.host.os.name == "windows":
             return "x86_64-pc-windows-msvc"
         if self.env.host.os.name == "darwin":
-            if self.env.host.cpu.name == "arm":
+            if self.host_is_macos_arm:
                 return "macos-arm64"
             else:
                 # Unsupported
