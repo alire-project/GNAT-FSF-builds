@@ -301,6 +301,42 @@ jobs:
         name: gnattest-release-packages_ubuntu-22-04
         path: sbx/*/release_package*/install/*
         retention-days: 5
+  gnatcoverage_ubuntu-22-04:
+    needs:
+    - gprbuild_ubuntu-22-04
+    name: GNATcoverage (ubuntu-22.04)
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v4
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install Python dependencies
+      run: |-
+        python3 -m pip install --upgrade pip
+        pip install --break-system-packages e3-core==22.10.0
+    - name: Download artifact 'gprbuild-release-packages'
+      uses: actions/download-artifact@v4
+      with:
+        name: gprbuild-release-packages_ubuntu-22-04
+        path: in_artifacts/
+    - name: Build GNATcoverage
+      run: python3 ./anod build gnatcov -v --loglevel DEBUG --enable-cleanup
+    - name: Package GNATcoverage
+      run: python3 ./anod build release_package --qualifier=package=gnatcov -v --loglevel DEBUG
+    - if: inputs.do_gh_release
+      name: Release GNATcoverage
+      run: python3 ./anod build release_github --qualifier=package=gnatcov -v --loglevel DEBUG --enable-cleanup
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact 'gnatcov-release-packages'
+      uses: actions/upload-artifact@v4
+      with:
+        name: gnatcov-release-packages_ubuntu-22-04
+        path: sbx/*/release_package*/install/*
+        retention-days: 5
   gcc_dependencies_ubuntu-22-04-arm:
     name: GCC Dependencies (ubuntu-22.04-arm)
     runs-on: ubuntu-22.04-arm
@@ -585,6 +621,42 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: gnattest-release-packages_ubuntu-22-04-arm
+        path: sbx/*/release_package*/install/*
+        retention-days: 5
+  gnatcoverage_ubuntu-22-04-arm:
+    needs:
+    - gprbuild_ubuntu-22-04-arm
+    name: GNATcoverage (ubuntu-22.04-arm)
+    runs-on: ubuntu-22.04-arm
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v4
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install Python dependencies
+      run: |-
+        python3 -m pip install --upgrade pip
+        pip install --break-system-packages e3-core==22.10.0
+    - name: Download artifact 'gprbuild-release-packages'
+      uses: actions/download-artifact@v4
+      with:
+        name: gprbuild-release-packages_ubuntu-22-04-arm
+        path: in_artifacts/
+    - name: Build GNATcoverage
+      run: python3 ./anod build gnatcov -v --loglevel DEBUG --enable-cleanup
+    - name: Package GNATcoverage
+      run: python3 ./anod build release_package --qualifier=package=gnatcov -v --loglevel DEBUG
+    - if: inputs.do_gh_release
+      name: Release GNATcoverage
+      run: python3 ./anod build release_github --qualifier=package=gnatcov -v --loglevel DEBUG --enable-cleanup
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact 'gnatcov-release-packages'
+      uses: actions/upload-artifact@v4
+      with:
+        name: gnatcov-release-packages_ubuntu-22-04-arm
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gcc_dependencies_macos-15-intel:
@@ -911,6 +983,47 @@ jobs:
         name: gnattest-release-packages_macos-15-intel
         path: sbx/*/release_package*/install/*
         retention-days: 5
+  gnatcoverage_macos-15-intel:
+    needs:
+    - gprbuild_macos-15-intel
+    name: GNATcoverage (macos-15-intel)
+    runs-on: macos-15-intel
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v4
+    - name: Install packages with Homebrew
+      run: |-
+        brew install texinfo
+        brew install autoconf
+        brew install automake
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install Python dependencies
+      run: |-
+        python3 -m pip install --upgrade pip
+        pip install --break-system-packages e3-core==22.10.0
+    - name: Download artifact 'gprbuild-release-packages'
+      uses: actions/download-artifact@v4
+      with:
+        name: gprbuild-release-packages_macos-15-intel
+        path: in_artifacts/
+    - name: Build GNATcoverage
+      run: python3 ./anod build gnatcov -v --loglevel DEBUG --enable-cleanup
+    - name: Package GNATcoverage
+      run: python3 ./anod build release_package --qualifier=package=gnatcov -v --loglevel DEBUG
+    - if: inputs.do_gh_release
+      name: Release GNATcoverage
+      run: python3 ./anod build release_github --qualifier=package=gnatcov -v --loglevel DEBUG --enable-cleanup
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact 'gnatcov-release-packages'
+      uses: actions/upload-artifact@v4
+      with:
+        name: gnatcov-release-packages_macos-15-intel
+        path: sbx/*/release_package*/install/*
+        retention-days: 5
   gcc_dependencies_macos-15:
     name: GCC Dependencies (macos-15)
     runs-on: macos-15
@@ -1233,6 +1346,47 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: gnattest-release-packages_macos-15
+        path: sbx/*/release_package*/install/*
+        retention-days: 5
+  gnatcoverage_macos-15:
+    needs:
+    - gprbuild_macos-15
+    name: GNATcoverage (macos-15)
+    runs-on: macos-15
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v4
+    - name: Install packages with Homebrew
+      run: |-
+        brew install texinfo
+        brew install autoconf
+        brew install automake
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install Python dependencies
+      run: |-
+        python3 -m pip install --upgrade pip
+        pip install --break-system-packages e3-core==22.10.0
+    - name: Download artifact 'gprbuild-release-packages'
+      uses: actions/download-artifact@v4
+      with:
+        name: gprbuild-release-packages_macos-15
+        path: in_artifacts/
+    - name: Build GNATcoverage
+      run: python3 ./anod build gnatcov -v --loglevel DEBUG --enable-cleanup
+    - name: Package GNATcoverage
+      run: python3 ./anod build release_package --qualifier=package=gnatcov -v --loglevel DEBUG
+    - if: inputs.do_gh_release
+      name: Release GNATcoverage
+      run: python3 ./anod build release_github --qualifier=package=gnatcov -v --loglevel DEBUG --enable-cleanup
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact 'gnatcov-release-packages'
+      uses: actions/upload-artifact@v4
+      with:
+        name: gnatcov-release-packages_macos-15
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gcc_dependencies_windows-2022:
@@ -1679,5 +1833,61 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: gnattest-release-packages_windows-2022
+        path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
+        retention-days: 5
+  gnatcoverage_windows-2022:
+    needs:
+    - gprbuild_windows-2022
+    name: GNATcoverage (windows-2022)
+    runs-on: windows-2022
+    env:
+      CONFIG_SHELL: /bin/bash
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v4
+    - name: Install msys2
+      uses: msys2/setup-msys2@v2
+      with:
+        install: |-
+          base-devel
+          git
+          rsync
+          mingw-w64-x86_64-github-cli
+          mingw-w64-x86_64-toolchain
+          mingw-w64-x86_64-python
+          mingw-w64-x86_64-python-pip
+          mingw-w64-x86_64-python-psutil
+    - name: Install Python dependencies
+      run: |-
+        python3 -m pip install --upgrade pip
+        pip install --break-system-packages e3-core==22.10.0
+    - name: Prepare msys2 build setup
+      run: |-
+        df -h
+        mkdir C:/aaa
+        mount C:/aaa /aaa
+        cd ..
+        cp -r GNAT-FSF-builds /aaa
+    - name: Download artifact 'gprbuild-release-packages'
+      uses: actions/download-artifact@v4
+      with:
+        name: gprbuild-release-packages_windows-2022
+        path: C:/aaa/GNAT-FSF-builds/in_artifacts/
+    - name: Build GNATcoverage
+      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gnatcov -v --loglevel DEBUG --enable-cleanup
+    - name: Package GNATcoverage
+      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_package --qualifier=package=gnatcov -v --loglevel DEBUG
+    - if: inputs.do_gh_release
+      name: Release GNATcoverage
+      run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_github --qualifier=package=gnatcov -v --loglevel DEBUG --enable-cleanup
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact 'gnatcov-release-packages'
+      uses: actions/upload-artifact@v4
+      with:
+        name: gnatcov-release-packages_windows-2022
         path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
         retention-days: 5
