@@ -12,7 +12,7 @@ patch_name = "gnatcov.patch"
 class GNATcov(spec("common")):
     @property
     def version(self):
-        return "26.0"
+        return "26.2"
 
     @property
     def tarball(self):
@@ -80,14 +80,6 @@ class GNATcov(spec("common")):
                 r'\1"FSF %s";' % self.version
             )
         ])
-
-        if self.env.target.os.name == "windows":
-            text_replace(os.path.join(exec_dir, "Makefile"), [
-                (
-                    r'GPR_PROJECT_PATH := \$\(CURRENT_DIR\)/gpr_stubs:\$\(GPR_PROJECT_PATH\)',
-                    r'GPR_PROJECT_PATH := $(CURRENT_DIR)/gpr_stubs;$(GPR_PROJECT_PATH)',
-                )
-            ])
 
         build_mode = "prod"
 
