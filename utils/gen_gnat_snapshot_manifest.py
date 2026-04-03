@@ -24,6 +24,21 @@ for package in ("gnat", "gnatprove"):
         )
         time.sleep(3)  # wait for deletion propagation
 
+    p = subprocess.run(
+        args=["gh", "release", "view", f"{release_name}-draft", "--json", "body,assets"],
+        capture_output=True,
+        check=True,
+    )
+    release=json.loads(p.stdout)
+    new_body = f"""{release['body']}
+
+### NOT A STABLE RELEASE.
+This is an unstable, automated snapshot build with no quality control."""
+
+    notes_file = 'release_notes.md'
+    with open(notes_file, "w+") as f:
+        f.write(new_body)
+
     subprocess.run(
         args=[
             "gh",
@@ -34,9 +49,12 @@ for package in ("gnat", "gnatprove"):
             "--target=snapshots",
             f"--title={release_name}",
             f"--tag={release_name}",
+            "--notes-file=release_notes.md",
             "--prerelease",
         ]
     )
+
+    os.remove(notes_file)
 
     p = subprocess.run(
         args=["gh", "release", "view", release_name, "--json", "body,assets"],
@@ -45,7 +63,7 @@ for package in ("gnat", "gnatprove"):
     )
     release = json.loads(p.stdout)
 
-    version = release["body"].removeprefix(f"{package}-")
+    version = release["body"].removeprefix(f"{package}-").split()
     assets = dict()
     for a in release["assets"]:
         assets[a["name"]] = a
