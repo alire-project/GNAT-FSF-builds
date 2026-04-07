@@ -1,5 +1,5 @@
 name = "gnatprove"
-version = "16.0.0-20260331"
+version = "['16.0.0-20260407', '###', 'NOT', 'A', 'STABLE', 'RELEASE.', 'This', 'is', 'an', 'unstable,', 'automated', 'snapshot', 'build', 'with', 'no', 'quality', 'control.']"
 authors = ["AdaCore"]
 description = "Automatic formal verification of SPARK code"
 maintainers = ["Fabien Chouteau <chouteau@adacore.com>", "César Sagaert <sagaert@adacore.com>"]
@@ -37,33 +37,3 @@ disabled = true
 [environment]
 PATH.prepend = "${CRATE_ROOT}/bin"
 GPR_PROJECT_PATH.prepend = "${CRATE_ROOT}/lib/gnat"
-
-
-[origin."case(os)".linux."case(host-arch)".x86-64]
-binary = true
-url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnatprove-16.0.0-snapshot/gnatprove-x86_64-linux-16.0.0-20260331.tar.gz"
-hashes = ["sha256:88eba8510ff8e5145b1a9dcb63db3dc2d45d4ddec47342e147b3d20f7258d619"]
-
-
-[origin."case(os)".linux."case(host-arch)".aarch64]
-binary = true
-url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnatprove-16.0.0-snapshot/gnatprove-aarch64-linux-16.0.0-20260331.tar.gz"
-hashes = ["sha256:6e05d7876088469183665bc37c1bbb939b24cc9384ed8f847aed698a1b02aa69"]
-
-
-[origin."case(os)".macos."case(host-arch)".x86-64]
-binary = true
-url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnatprove-16.0.0-snapshot/gnatprove-x86_64-darwin-16.0.0-20260331.tar.gz"
-hashes = ["sha256:0bb4d9061f918c0feccad66db37605808bba9f9858d95fb9b7893493116cc075"]
-
-
-[origin."case(os)".macos."case(host-arch)".aarch64]
-binary = true
-url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnatprove-16.0.0-snapshot/gnatprove-aarch64-darwin-16.0.0-20260331.tar.gz"
-hashes = ["sha256:55c91ec17fa40bab0acdde0789812fb571d18cc7a9a26a38e925066dc54facb4"]
-
-
-[origin."case(os)".windows."case(host-arch)".x86-64]
-binary = true
-url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnatprove-16.0.0-snapshot/gnatprove-x86_64-windows64-16.0.0-20260331.tar.gz"
-hashes = ["sha256:935c8f074ef78d4d1189bce7032580a3d01d7b906af46927c1e92e1a8ba11d92"]
