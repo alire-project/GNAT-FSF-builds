@@ -243,7 +243,6 @@ def main():
                 retention_days=5,
             )
         ],
-        exclude=[host.macOS]
     )
 
 
