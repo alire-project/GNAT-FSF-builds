@@ -1,5 +1,5 @@
 name = "gnatprove"
-version = "['16.0.0-20260407', '###', 'NOT', 'A', 'STABLE', 'RELEASE.', 'This', 'is', 'an', 'unstable,', 'automated', 'snapshot', 'build', 'with', 'no', 'quality', 'control.']"
+version = "16.0.0-20260407"
 authors = ["AdaCore"]
 description = "Automatic formal verification of SPARK code"
 maintainers = ["Fabien Chouteau <chouteau@adacore.com>", "César Sagaert <sagaert@adacore.com>"]

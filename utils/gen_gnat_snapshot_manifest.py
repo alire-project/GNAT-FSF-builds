@@ -63,7 +63,7 @@ This is an unstable, automated snapshot build with no quality control."""
     )
     release = json.loads(p.stdout)
 
-    version = release["body"].removeprefix(f"{package}-").split()
+    version = release["body"].removeprefix(f"{package}-").split()[0]
     assets = dict()
     for a in release["assets"]:
         assets[a["name"]] = a

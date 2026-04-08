@@ -1,6 +1,6 @@
 name = "gnat_native"
-version = "['16.0.0-20260405', '###', 'NOT', 'A', 'STABLE', 'RELEASE.', 'This', 'is', 'an', 'unstable,', 'automated', 'snapshot', 'build', 'with', 'no', 'quality', 'control.']"
-provides = ["gnat=['16.0.0-20260405', '###', 'NOT', 'A', 'STABLE', 'RELEASE.', 'This', 'is', 'an', 'unstable,', 'automated', 'snapshot', 'build', 'with', 'no', 'quality', 'control.']"]
+version = "16.0.0-20260405"
+provides = ["gnat=16.0.0-20260405"]
 description = "The GNAT Ada compiler - Native"
 maintainers = ["Fabien Chouteau <chouteau@adacore.com>", "César Sagaert <sagaert@adacore.com>"]
 maintainers-logins = ["Fabien-Chouteau", "AldanTanneo"]
