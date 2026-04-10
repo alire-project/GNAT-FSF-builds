@@ -68,7 +68,8 @@ class Workflow(Yamlable[Os]):
             res["jobs"].update(
                 {
                     job.key(dispatch(os, job.kind)): job.to_yaml(dispatch(os, job.kind))
-                    for job in self.jobs if dispatch(os, job.kind) not in job.exclude
+                    for job in self.jobs
+                    if dispatch(os, job.kind) not in job.exclude
                 }
             )
         return res
@@ -77,38 +78,38 @@ class Workflow(Yamlable[Os]):
 def main():
     jobs: dict[str, Job] = {}
 
-    jobs["gcc_dependencies"] = Job(
-        "GCC Dependencies",
-        [
-            AnodBuild("Build GMP", "gmp"),
-            AnodBuild("Build MPFR", "mpfr"),
-            AnodBuild("Build MPC", "mpc"),
-            Conditional(
-                AnodBuild("Build ISL", "isl"), lambda os: not issubclass(os, host.macOS)
-            ),
-        ],
-        outputs=[
-            Artifact("gcc-dependencies-artifacts", "out_artifacts/*", retention_days=1)
-        ],
-    )
+    # jobs["gcc_dependencies"] = Job(
+    #     "GCC Dependencies",
+    #     [
+    #         AnodBuild("Build GMP", "gmp"),
+    #         AnodBuild("Build MPFR", "mpfr"),
+    #         AnodBuild("Build MPC", "mpc"),
+    #         Conditional(
+    #             AnodBuild("Build ISL", "isl"), lambda os: not issubclass(os, host.macOS)
+    #         ),
+    #     ],
+    #     outputs=[
+    #         Artifact("gcc-dependencies-artifacts", "out_artifacts/*", retention_days=1)
+    #     ],
+    # )
 
-    jobs["gnat"] = Job(
-        "GNAT",
-        [
-            AnodBuild("Build GNAT native", "gcc"),
-            AnodBuild("Build GDB", "gdb"),
-            ReleasePackage("Package GNAT", "gnat"),
-            GhRelease("Release GNAT", "gnat"),
-        ],
-        needs=[jobs["gcc_dependencies"]],
-        outputs=[
-            Artifact(
-                "gnat-release-packages",
-                "sbx/*/release_package*/install/*",
-                retention_days=5,
-            ),
-        ],
-    )
+    # jobs["gnat"] = Job(
+    #     "GNAT",
+    #     [
+    #         AnodBuild("Build GNAT native", "gcc"),
+    #         AnodBuild("Build GDB", "gdb"),
+    #         ReleasePackage("Package GNAT", "gnat"),
+    #         GhRelease("Release GNAT", "gnat"),
+    #     ],
+    #     needs=[jobs["gcc_dependencies"]],
+    #     outputs=[
+    #         Artifact(
+    #             "gnat-release-packages",
+    #             "sbx/*/release_package*/install/*",
+    #             retention_days=5,
+    #         ),
+    #     ],
+    # )
 
     jobs["gprbuild"] = Job(
         "GPRbuild",
@@ -126,56 +127,56 @@ def main():
         ],
     )
 
-    jobs["gnat_cross"] = Job(
-        "GNAT Cross",
-        [
-            AnodBuild(
-                "Build GNAT ${{ matrix.target }}",
-                "gcc",
-                ["--target=${{ matrix.target }}"],
-            ),
-            AnodBuild(
-                "Build GDB ${{ matrix.target }}",
-                "gdb",
-                ["--target=${{ matrix.target}}"],
-            ),
-            ReleasePackage(
-                "Package GNAT ${{ matrix.target }}",
-                "gnat",
-                ["--target=${{ matrix.target }}"],
-            ),
-            GhRelease(
-                "Release GNAT ${{ matrix.target }}",
-                "gnat",
-                ["--target=${{ matrix.target }}"],
-            ),
-        ],
-        targets=Targets(),
-        needs=[jobs["gcc_dependencies"]],
-        outputs=[
-            Artifact(
-                "gnat-release-packages-${{matrix.target}}",
-                "sbx/*/release_package*/install/*",
-            )
-        ],
-    )
+    # jobs["gnat_cross"] = Job(
+    #     "GNAT Cross",
+    #     [
+    #         AnodBuild(
+    #             "Build GNAT ${{ matrix.target }}",
+    #             "gcc",
+    #             ["--target=${{ matrix.target }}"],
+    #         ),
+    #         AnodBuild(
+    #             "Build GDB ${{ matrix.target }}",
+    #             "gdb",
+    #             ["--target=${{ matrix.target}}"],
+    #         ),
+    #         ReleasePackage(
+    #             "Package GNAT ${{ matrix.target }}",
+    #             "gnat",
+    #             ["--target=${{ matrix.target }}"],
+    #         ),
+    #         GhRelease(
+    #             "Release GNAT ${{ matrix.target }}",
+    #             "gnat",
+    #             ["--target=${{ matrix.target }}"],
+    #         ),
+    #     ],
+    #     targets=Targets(),
+    #     needs=[jobs["gcc_dependencies"]],
+    #     outputs=[
+    #         Artifact(
+    #             "gnat-release-packages-${{matrix.target}}",
+    #             "sbx/*/release_package*/install/*",
+    #         )
+    #     ],
+    # )
 
-    jobs["spark"] = Job(
-        "SPARK",
-        [
-            AnodBuild("Build SPARK", "spark2014"),
-            ReleasePackage("Package GNATprove", "gnatprove"),
-            GhRelease("Release GNATprove", "gnatprove"),
-        ],
-        needs=[jobs["gprbuild"]],
-        outputs=[
-            Artifact(
-                "gnatprove-release-packages",
-                "sbx/*/release_package*/install/*",
-                retention_days=5,
-            )
-        ],
-    )
+    # jobs["spark"] = Job(
+    #     "SPARK",
+    #     [
+    #         AnodBuild("Build SPARK", "spark2014"),
+    #         ReleasePackage("Package GNATprove", "gnatprove"),
+    #         GhRelease("Release GNATprove", "gnatprove"),
+    #     ],
+    #     needs=[jobs["gprbuild"]],
+    #     outputs=[
+    #         Artifact(
+    #             "gnatprove-release-packages",
+    #             "sbx/*/release_package*/install/*",
+    #             retention_days=5,
+    #         )
+    #     ],
+    # )
 
     jobs["gnatformat"] = Job(
         "GNATformat",
@@ -192,6 +193,7 @@ def main():
                 retention_days=5,
             )
         ],
+        exclude=[host.Windows, host.WindowsMsys2],
     )
 
     jobs["gnatdoc"] = Job(
@@ -244,7 +246,6 @@ def main():
             )
         ],
     )
-
 
     workflow = Workflow(
         "GNAT FSF builds",
