@@ -29,3 +29,18 @@ PATH.prepend = "${CRATE_ROOT}/bin"
 LIBRARY_PATH.prepend = "${CRATE_ROOT}/lib"
 LD_LIBRARY_PATH.prepend = "${CRATE_ROOT}/lib"
 LD_RUN_PATH.prepend = "${CRATE_ROOT}/lib"
+
+[origin."case(os)".linux."case(host-arch)".x86-64]
+binary = true
+url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-16.0.0-snapshot/gnat-x86_64-linux-16.0.0-20260405.tar.gz"
+hashes = ["sha256:b17942b55561a6d6c3222d3d9495de3ab0d07ebb8c45fc3b9263542b6059d557"]
+
+[origin."case(os)".linux."case(host-arch)".aarch64]
+binary = true
+url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-16.0.0-snapshot/gnat-aarch64-linux-16.0.0-20260405.tar.gz"
+hashes = ["sha256:87fa5edb652ea67e2e5019d9d7e032d2000078a79db6a08f48f64d1471b1bf64"]
+
+[origin."case(os)".macos."case(host-arch)".aarch64]
+binary = true
+url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-16.0.0-snapshot/gnat-aarch64-darwin-16.0.0-20260405.tar.gz"
+hashes = ["sha256:d0a4516136fbfc2c0465ac42ab35eaa0874f07f0e4d1373ec7632a96beb44a50"]
