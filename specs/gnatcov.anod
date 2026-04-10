@@ -91,12 +91,6 @@ class GNATcov(spec("common")):
                     r'-l\1'
                 )
             ])
-            text_replace(os.path.join(exec_dir, "Makefile"), [
-                (
-                    r'distrib-windows-extra',
-                    r'distrib--extra',
-                )
-            ])
 
         build_mode = "prod"
 
