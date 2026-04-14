@@ -23,7 +23,7 @@ class GCC(spec("gh-artifact")):
 
     @cached_property
     def version(self):
-        return f"{self.branch}.0.0"
+        return f"{self.branch}.0.1"
 
     @cached_property
     def prerelease(self):
