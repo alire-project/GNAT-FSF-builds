@@ -83,6 +83,12 @@ class GNATcov(spec("common")):
                 r'\1"FSF %s";' % self.version
             )
         ])
+        text_replace(os.path.join(exec_dir, "rts", "gnatcov_rts_c-memory.h"), [
+            (
+                r'^(\s*extern void \*)([^ ]*)',
+                r'\1(\2)'
+            )
+        ])
 
         if self.env.target.os.name == "darwin":
             text_replace(os.path.join(exec_dir, "gnatcov.gpr"), [
