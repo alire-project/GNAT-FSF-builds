@@ -116,7 +116,7 @@ class UploadArtifact(Action):
     def __init__(self, art: Artifact):
         super().__init__(
             f"Upload artifact '{art.name}'",
-            "actions/upload-artifact@v4",
+            "actions/upload-artifact@v7",
             with_args=art,
         )
 
@@ -125,7 +125,7 @@ class DownloadArtifact(Action):
     def __init__(self, art: Artifact):
         super().__init__(
             f"Download artifact '{art.name}'",
-            "actions/download-artifact@v4",
+            "actions/download-artifact@v8",
             with_args=art,
         )
 
@@ -144,7 +144,7 @@ class Checkout(Action):
         self,
         repo: Repository | None = None,
     ):
-        super().__init__("Checkout Project", "actions/checkout@v4", with_args=repo)
+        super().__init__("Checkout Project", "actions/checkout@v6", with_args=repo)
 
 
 @dataclass
@@ -159,7 +159,7 @@ class SetupPython(Action):
     def __init__(self, python_version: str):
         super().__init__(
             f"Set up Python {python_version}",
-            "actions/setup-python@v5",
+            "actions/setup-python@v6",
             with_args=PythonVersion(python_version),
         )
 
