@@ -5,10 +5,14 @@ import os
 import subprocess
 import time
 
-basever = "16.0.0"
+basever_dict = {
+    "gnat": "16.0.1",
+    "gnatprove": "16.0.0"
+}
 error = []
 
 for package in ("gnat", "gnatprove"):
+    basever = basever_dict[package]
     release_name = f"{package}-{basever}-snapshot"
 
     old_rel = subprocess.run(args=["gh", "release", "view", release_name])
