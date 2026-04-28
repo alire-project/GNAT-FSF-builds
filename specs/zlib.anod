@@ -20,7 +20,9 @@ class ZLib(spec("common")):
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
-                name=self.tarball, url="https://zlib.net/%s" % self.tarball
+                name=self.tarball,
+                url="https://github.com/madler/zlib/releases/download/v%s/%s"
+                % (self.version, self.tarball)
             ),
         ]
 
