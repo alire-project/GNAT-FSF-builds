@@ -19,3 +19,7 @@ class base_gcc(spec("binary_install")):
 
         return "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-%s/%s" \
                 % (self.version, self.tarball)
+
+    def setenv(self):
+        if self.env.build.os.name != "windows":
+            super().setenv()

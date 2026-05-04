@@ -1,20 +1,18 @@
-from e3.os.fs import unixpath
+from e3.os.fs import unixpath, touch
 from e3.fs import cp, mkdir, sync_tree
-from e3.anod.helper import Configure, Make
+from e3.anod.helper import Configure, Make, text_replace
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
-from e3.env import Env
+from e3.diff import patch
 from e3.os.process import Run
 import os
 
-# A wrapper to call ld-classic on MacOS X
 patch_name = "ld"
-
 
 class GCC(spec("gh-artifact")):
     @property
     def version(self):
-        return "15.2.0"
+        return "16.1.0"
 
     @property
     def tarball(self):
@@ -23,7 +21,7 @@ class GCC(spec("gh-artifact")):
     @property
     def url(self):
         if self.host_is_macos_arm:
-            return "https://github.com/iains/gcc-15-branch/archive/refs/heads/gcc-15-2-darwin-pre-0.tar.gz"
+            return "https://github.com/iains/gcc-16-branch/archive/refs/heads/releases/gcc-16.tar.gz"
         else:
             return "https://gcc.gnu.org/pub/gcc/releases/gcc-%s/%s" % (
                 self.version,
@@ -92,6 +90,7 @@ class GCC(spec("gh-artifact")):
 
     def configure_args(self):
         args = [
+            "--with-pkgversion=GNAT-FSF-builds",
             "--disable-nls",  # Disable Native Language Support (NLS)
             "--without-libiconv-prefix",
             "--disable-libstdcxx-pch",
@@ -174,6 +173,20 @@ class GCC(spec("gh-artifact")):
         return args
 
     def artifact_build(self):
+        if self.env.build.os.name == "windows":
+            patched_file = os.path.join(unixpath(self["SRC_DIR"]), "gcc", "timevar.cc")
+            text_replace(patched_file, [
+                (
+                    "#ifdef HAVE_CLOCK_GETTIME",
+                    """#ifdef HAVE_CLOCK_GETTIME
+#undef HAVE_CLOCK_GETTIME
+#endif
+#define HAVE_GETTIMEOFDAY
+
+#ifdef HAVE_CLOCK_GETTIME"""
+                )
+            ])
+
         # This spec inherit from gh-artifact and therefore has a different
         # build method.
 
