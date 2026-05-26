@@ -21,6 +21,7 @@ class GCC(spec("gh-artifact")):
     @property
     def url(self):
         if self.host_is_macos_arm:
+            raise Exception("no darwin gcc release yet")
             return "https://github.com/iains/gcc-16-branch/archive/refs/heads/releases/gcc-16.tar.gz"
         else:
             return "https://gcc.gnu.org/pub/gcc/releases/gcc-%s/%s" % (
