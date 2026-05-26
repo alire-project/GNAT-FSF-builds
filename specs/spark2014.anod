@@ -22,7 +22,7 @@ class SPARK2014(spec("common")):
 
     @property
     def branch(self):
-        return "fsf"
+        return "fsf-16"
 
     @property
     def tarball(self):
@@ -45,7 +45,7 @@ class SPARK2014(spec("common")):
 
     @property
     def sparklib_branch(self):
-        return "fsf"
+        return "fsf-16"
 
     @property
     def sparklib_tarball(self):
