@@ -6,7 +6,7 @@ import subprocess
 import time
 
 basever_dict = {
-    "gnat": "16.0.1",
+    "gnat": "16.1.1",
     "gnatprove": "16.0.0"
 }
 error = []
