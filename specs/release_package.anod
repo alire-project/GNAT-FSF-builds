@@ -47,7 +47,7 @@ class ReleasePackage(spec("common")):
             "gprbuild": "1",
             "gnatcov": "1",
             "gnatprove": "1",
-            "gnat": "1",
+            "gnat": "rc2",
             "gnatformat": "1",
             "gnatdoc": "1",
             "gnattest": "1",
