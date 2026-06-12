@@ -20,9 +20,8 @@ class GCC(spec("gh-artifact")):
 
     @property
     def url(self):
-        if self.host_is_macos_arm:
-            raise Exception("no darwin gcc release yet")
-            return "https://github.com/iains/gcc-16-branch/archive/refs/heads/releases/gcc-16.tar.gz"
+        if self.env.host.os.name == "darwin":
+            return "https://github.com/iains/gcc-16-branch/archive/refs/tags/gcc-16.1-darwin-r0.tar.gz"
         else:
             return "https://gcc.gnu.org/pub/gcc/releases/gcc-%s/%s" % (
                 self.version,
@@ -124,9 +123,10 @@ class GCC(spec("gh-artifact")):
 
             args.append("--disable-libcilkrts")
             
+            clt_15 = "/Library/Developer/CommandLineTools/SDKs/MacOSX15.sdk"
             clt_latest = "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk"
             xcode_latest = "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
-            args.append("--with-build-sysroot=%s" % clt_latest) # match the current platform
+            args.append("--with-build-sysroot=%s" % clt_15)
 
             args.append(
                 "--with-specs=%%{!-sysroot=*:--sysroot=%%:if-exists-else(%s %s)}"
