@@ -1,6 +1,6 @@
 from e3.os.fs import unixpath, touch
 from e3.fs import cp
-from e3.anod.helper import Configure, Make
+from e3.anod.helper import Configure, Make, text_replace
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
 from e3.diff import patch
@@ -13,11 +13,11 @@ patch_name = "gdb-0002-Fix-using-gnu-print.patch"
 class GDB(spec("common")):
     @property
     def version(self):
-        return "16.3"
+        return "17.2"
 
     @property
     def tarball(self):
-        return "gdb-%s.tar.gz" % self.version
+        return "gdb-%s.tar.xz" % self.version
 
     @property
     def source_pkg_build(self):
@@ -64,6 +64,14 @@ class GDB(spec("common")):
             )
             touch(patched)
 
+        if self.env.host.os.name == "darwin":
+            text_replace(os.path.join(self["SRC_DIR"], "gdb", "darwin-nat.c"), [
+                (
+                    "#include \"inferior.h\"",
+                    "#include \"inferior.h\"\n#include \"gdbsupport/common-inferior.h\""
+                )
+            ])
+
         configure = Configure(self)
         configure.add("--prefix=%s" % unixpath(self["INSTALL_DIR"]))
         configure.add(
@@ -94,9 +102,9 @@ class GDB(spec("common")):
             "--with-python=no"
         )
 
+        configure.add("CFLAGS=-std=gnu17") # fix for new defaults in gcc 15.1.0
         if self.env.host.os.name == "windows":
-            configure.add("CFLAGS=-std=gnu17") # fix for new defaults in gcc 15.1.0
-            configure.add("CXXFLAGS=-D_WIN32_WINNT=0x0600") # set min windows version
+            configure.add("CXXFLAGS=-D_WIN32_WINNT=0x601") # set min windows version
             configure.add("--disable-tui")
             configure.add(
                 "--with-libiconv-prefix=%s"

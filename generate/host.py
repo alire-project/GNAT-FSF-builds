@@ -9,7 +9,7 @@ class Unix(HostOs):
     def setup_python(cls) -> list[RawStep]:
         return [
             SetupPython(cls.python_version),
-            InstallPythonDeps({"e3-core": cls.e3_core_version}),
+            InstallPythonDeps({"stevedore": "*", "e3-core": cls.e3_core_version}),
         ]
 
     @classmethod
@@ -106,6 +106,7 @@ class WindowsMsys2(Windows):
                         "base-devel",
                         "git",
                         "rsync",
+                        "mingw-w64-x86_64-gcc-ada",
                         "mingw-w64-x86_64-github-cli",
                         "mingw-w64-x86_64-toolchain",
                         "mingw-w64-x86_64-python",
@@ -114,7 +115,7 @@ class WindowsMsys2(Windows):
                     ],
                 ),
             ),
-            InstallPythonDeps({"e3-core": cls.e3_core_version}),
+            InstallPythonDeps({"stevedore": "*", "e3-core": cls.e3_core_version}),
             RawStep(
                 "Prepare msys2 build setup",
                 # we need a path that is compatible between Windows and Unix world

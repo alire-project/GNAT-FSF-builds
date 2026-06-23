@@ -10,7 +10,7 @@ from e3.anod.loader import spec
 class MINGW(spec("common")):
     @property
     def version(self):
-        return "12.0.0"
+        return "14.0.0"
 
     @property
     def tarball(self):
@@ -51,11 +51,12 @@ class MINGW(spec("common")):
             self, exec_dir=unixpath(hdr_build), src_dir=unixpath(hdr_src)
         )
         configure.add("--prefix=%s" % unixpath(self["INSTALL_DIR"]))
-        configure.add("--with-default-win32-winnt=0x0600")
         configure.add("--enable-sdk=all")
         configure.add("--enable-idl")
         configure.add("--without-widl")
+        configure.add("--with-default-win32-winnt=0x601")
         configure.add("--with-default-msvcrt=msvcrt")
+        os.chdir(unixpath(hdr_src))
         configure()
         make = Make(self, exec_dir=hdr_build)
         make("install")
@@ -91,8 +92,9 @@ class MINGW(spec("common")):
         # -Werror (see: U128-016).
         configure.add("CFLAGS=-Wno-expansion-to-defined")
 
-        configure.add("--disable-dependency-tracking") 
+        configure.add("--disable-dependency-tracking")
         configure.add("--with-default-msvcrt=msvcrt")
+        os.chdir(unixpath(crt_src))
         configure()
 
         make = Make(self, exec_dir=crt_build)

@@ -10,7 +10,7 @@ from e3.anod.loader import spec
 class Binutils(spec("common")):
     @property
     def version(self):
-        return "2.44"
+        return "2.46.1"
 
     @property
     def tarball(self):
@@ -63,6 +63,7 @@ class Binutils(spec("common")):
             "--disable-sim",
             "--disable-libquadmath",
             "--disable-readline",
+            "--enable-lto"
         )
 
         # For embedded only?
@@ -72,6 +73,8 @@ class Binutils(spec("common")):
 
         for m in ("mpfr", "gmp", "mpc", "isl"):
             configure.add("--with-%s=%s" % (m, unixpath(self.deps[m]["INSTALL_DIR"])))
+
+        configure.add_env("CC", os.path.join(unixpath(self.deps["base_gcc"]["INSTALL_DIR"]), "bin", "gcc"))
 
         configure()
 

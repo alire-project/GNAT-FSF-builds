@@ -3,10 +3,7 @@ from e3.anod.loader import spec
 class base_gcc(spec("binary_install")):
     @property
     def version(self):
-        if self.host_is_macos_arm:
-            return "15.2.0-2"
-        else:
-            return "15.2.0-1"
+        return "16.1.0-rc2"
 
     @property
     def tarball(self):
@@ -14,8 +11,5 @@ class base_gcc(spec("binary_install")):
 
     @property
     def url(self):
-        if self.host_is_macos_arm:
-            return "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-15.2.0-2-macos-pre0/gnat-aarch64-darwin-15.2.0-2-pre0.tar.gz"
-
         return "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-%s/%s" \
                 % (self.version, self.tarball)
