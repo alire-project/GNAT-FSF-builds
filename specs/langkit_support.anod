@@ -1,5 +1,6 @@
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
+from e3.anod.helper import text_replace
 
 import os
 
@@ -46,6 +47,25 @@ class LangkikSupport(spec("common")):
     def build(self):
         for m in self.deps:
             self.deps[m].setenv()
+
+        text_replace(
+            os.path.join(self["SRC_DIR"], "langkit", "support", "langkit_support-prettier_utils.ads"),
+            [
+                (
+                    "Symbol_Map  : in out Symbol_Parsing_Maps.Map",
+                    "Symbol_Map  : aliased in out Symbol_Parsing_Maps.Map",
+                ),
+            ]
+        )
+        text_replace(
+            os.path.join(self["SRC_DIR"], "langkit", "support", "langkit_support-prettier_utils.adb"),
+            [
+                (
+                    "Symbol_Map  : in out Symbol_Parsing_Maps.Map",
+                    "Symbol_Map  : aliased in out Symbol_Parsing_Maps.Map",
+                ),
+            ]
+        )
 
         gpr_file = os.path.join(self["SRC_DIR"], "langkit/support/langkit_support.gpr")
         build_mode = "prod"

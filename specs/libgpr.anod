@@ -1,5 +1,5 @@
 from e3.os.fs import touch
-from e3.anod.helper import Make
+from e3.anod.helper import Make, text_replace
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
 from e3.fs import cp
@@ -9,18 +9,18 @@ import os
 class LibGPR(spec("common")):
     @property
     def version(self):
-        return "26.0.0"
+        return "26.2"
 
     @property
     def tarball(self):
-        return "libgpr-%s.tar.gz" % self.version
+        return "libgpr-%s.zip" % self.version
 
     @property
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/AdaCore/gprbuild/archive/v%s.tar.gz"
+                url="https://github.com/AdaCore/gprbuild/archive/refs/heads/%s.zip"
                 % self.version,
             )
         ]
@@ -43,6 +43,16 @@ class LibGPR(spec("common")):
     def build(self):
         for m in self.deps:
             self.deps[m].setenv()
+
+        text_replace(
+            os.path.join(self["SRC_DIR"], "gpr", "src", "gpr-compilation-process.adb"),
+            [
+                (
+                    r'\(String, Env_Maps.Map, Env_Maps."<", Env_Maps."="\);',
+                    r'(String, Env_Maps.Map, "=" => Env_Maps."=");',
+                )
+            ],
+        )
 
         make = Make(self, exec_dir=self["SRC_DIR"])
         make("libgpr.build")

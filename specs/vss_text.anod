@@ -1,5 +1,6 @@
 from e3.anod.spec import Anod
 from e3.anod.loader import spec
+from e3.anod.helper import text_replace
 
 import os
 
@@ -37,6 +38,22 @@ class VSS_Text(spec("common")):
     def build(self):
         for m in self.deps:
             self.deps[m].setenv()
+
+        text_replace(
+            os.path.join(
+                self["SRC_DIR"],
+                "source",
+                "text",
+                "implementation",
+                "vss-strings-cursors-iterators-characters.adb",
+            ),
+            [
+                (
+                    "package body VSS.Strings.Cursors.Iterators.Characters is",
+                    "pragma Ada_2022;\npackage body VSS.Strings.Cursors.Iterators.Characters is",
+                )
+            ],
+        )
 
         build_profile = "release"
         build_mode = "prod"

@@ -10,18 +10,22 @@ class GNATcoll(spec("common")):
     @property
     def version(self):
         return "26.0.0"
+    
+    @property
+    def branch(self):
+        return "26-sustained"
 
     @property
     def tarball(self):
-        return "gnatcoll-core-%s.tar.gz" % self.version
+        return "gnatcoll-core-%s.zip" % self.version
 
     @property
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/AdaCore/gnatcoll-core/archive/v%s.tar.gz"
-                % self.version,
+                url="https://github.com/AdaCore/gnatcoll-core/archive/refs/heads/%s.zip"
+                % self.branch,
             )
         ]
 

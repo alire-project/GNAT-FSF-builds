@@ -1,4 +1,4 @@
-from e3.anod.helper import Make
+from e3.anod.helper import Make, text_replace
 from e3.anod.loader import spec
 from e3.anod.package import SourceBuilder
 from e3.anod.spec import Anod
@@ -10,11 +10,11 @@ import os
 class SPARK2014(spec("common")):
     @property
     def version(self):
-        return "15.1.0"
+        return "16.1.0"
     
     @property
     def spark_branch(self):
-        return "fsf-15"
+        return "fsf-16"
 
     @property
     def tarball(self):
@@ -33,11 +33,11 @@ class SPARK2014(spec("common")):
 
     @property
     def sparklib_tarball(self):
-        return "sparkib-%s.tar.gz" % self.version
+        return "sparklib-%s.tar.gz" % self.version
     
     @property
     def cvc5_version(self):
-        return "1.2.1"
+        return "1.3.2"
 
     @property
     def cvc5_zip(self):
@@ -57,7 +57,7 @@ class SPARK2014(spec("common")):
 
     @property
     def z3_version(self):
-        return "4.13.4"
+        return "4.15.4"
 
     @property
     def z3_zip(self):
@@ -65,12 +65,12 @@ class SPARK2014(spec("common")):
             fn = "z3-%s-x64-win.zip" % self.z3_version
         elif self.env.host.os.name == "darwin":
             if self.env.target.cpu.name == "x86_64":
-                fn = "z3-%s-x64-osx-13.7.1.zip" % self.z3_version
+                fn = "z3-%s-x64-osx-13.7.6.zip" % self.z3_version
             else:
-                fn = "z3-%s-arm64-osx-13.7.1.zip" % self.z3_version
+                fn = "z3-%s-arm64-osx-13.7.6.zip" % self.z3_version
         else: # self.env.host.os.name == "linux"
             if self.env.target.cpu.name == "x86_64":
-                fn = "z3-%s-x64-glibc-2.35.zip" % self.z3_version
+                fn = "z3-%s-x64-glibc-2.39.zip" % self.z3_version
             else:
                 fn = "z3-%s-arm64-glibc-2.34.zip" % self.z3_version
         return fn
@@ -136,6 +136,9 @@ class SPARK2014(spec("common")):
             Anod.Dependency("langkit_support"),
             Anod.Dependency("adasat", track=True),
             Anod.Dependency("libadalang"),
+            Anod.Dependency("vss_text"),
+            Anod.Dependency("vss_extra"),
+            Anod.Dependency("sarif_ada")
         ]
 
         if self.env.target.os.name == "windows":
@@ -148,6 +151,16 @@ class SPARK2014(spec("common")):
         ada_dir = os.path.join(self["SRC_DIR"], "gcc", "gcc", "ada")
         gnat_src_dir = os.path.join(self["SRC_DIR"], "gnat2why", "gnat_src")
         sync_tree(ada_dir, gnat_src_dir, delete=True)
+
+        text_replace(
+            os.path.join(self["SRC_DIR"], "spark2014vsn.ads"),
+            [
+                (
+                    r'(SPARK2014_Static_Version_String\s*:\s*constant\s+String\s*:=\s*)"0.0w";',
+                    r'\1"FSF %s";' % self.version
+                )
+            ]
+        )
 
         make = Make(
             self,
@@ -219,8 +232,7 @@ class SPARK2014(spec("common")):
         for exe in ["cvc5", "gnatwhy3", "alt-ergo"]:
             chmod("a+x",
                   os.path.join(libexec_spark_bin,
-                               (exe + (".exe" if self.env.host.os.name == "windows"
-                                        else ""))))
+                               (exe + self.exec_suffix)))
 
         for f in ls(os.path.join(libexec_spark, "bin", "why3*")):
             chmod("a+x", f)

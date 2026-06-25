@@ -6,31 +6,23 @@ import os
 class AltErgo(spec("binary_install")):
     @property
     def version(self):
-        return "15.1.1"
-
-    @property
-    def platform(self):
-        if self.env.host.os.name == "windows":
-            return "windows"
-        if self.env.host.os.name == "darwin":
-            if self.env.host.cpu.name == "x86_64":
-                return "macos-x86_64"
-            else:
-                return "macos-arm"
-        else:
-            if self.env.host.cpu.name == "x86_64":
-                return "linux-x86_64"
-            else:
-                return "linux-arm"
+        return "16.0.0"
 
     @property
     def tarball(self):
-        return f"altergo-{self.version}-{self.platform}.zip"
+        if self.env.host.os.name == "windows":
+            return "altergo-windows-2025.zip"
+        if self.env.host.os.name == "darwin":
+            if self.env.host.cpu.name == "x86_64":
+                return "altergo-macos-15-intel.tar.gz"
+            else:
+                return "altergo-macos-15.tar.gz"
+        else:
+            if self.env.host.cpu.name == "x86_64":
+                return "altergo-ubuntu-24.04.tar.gz"
+            else:
+                return "altergo-ubuntu-24.04-arm.tar.gz"
 
     @property
     def url(self):
-        return f"https://github.com/AdaCore/alt-ergo/releases/download/fsf-15-1.1/{self.tarball}"
-
-    @property
-    def remove_root_dir(self):
-        return False
+        return f"https://github.com/AdaCore/alt-ergo/releases/download/fsf-{self.version}/{self.tarball}"

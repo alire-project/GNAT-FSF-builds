@@ -15,7 +15,11 @@ class LibGPR2(spec("common")):
 
     @property
     def version(self):
-        return "26.0.0"
+        return "26.2.0"
+    
+    @property
+    def branch(self):
+        return "26-sustained-stabilized"
 
     @property
     def lk_version(self):
@@ -23,7 +27,7 @@ class LibGPR2(spec("common")):
 
     @property
     def tarball(self):
-        return "gpr-%s.tar.gz" % self.version
+        return "gpr-%s.zip" % self.version
 
     @property
     def lk_tarball(self):
@@ -41,8 +45,8 @@ class LibGPR2(spec("common")):
         return [
             self.HTTPSSourceBuilder(
                 name=self.tarball,
-                url="https://github.com/AdaCore/gpr/archive/v%s.tar.gz"
-                % (self.version),
+                url="https://github.com/AdaCore/gpr/archive/refs/heads/%s.zip"
+                % self.branch,
             ),
             self.HTTPSSourceBuilder(
                 name=self.lk_tarball,

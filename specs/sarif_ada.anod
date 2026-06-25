@@ -1,0 +1,77 @@
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+
+import os
+
+
+class SarifAda(spec("common")):
+    @property
+    def version(self):
+        return "26.2"
+
+    @property
+    def branch(self):
+        return "main"
+
+    @property
+    def tarball(self):
+        return "sarif-ada-%s.zip" % self.version
+
+    @property
+    def source_pkg_build(self):
+        return [
+            self.HTTPSSourceBuilder(
+                name=self.tarball,
+                url="https://github.com/AdaCore/sarif-ada/archive/refs/heads/%s.zip"
+                % self.branch,
+            )
+        ]
+
+    @property
+    def build_source_list(self):
+        return [Anod.Source(name=self.tarball, publish=True, dest="")]
+
+    @property
+    def build_deps(self):
+        return [
+            Anod.Dependency("base_gcc", track=True),
+            Anod.Dependency("gprbuild", track=True),
+            Anod.Dependency("vss_text"),
+            Anod.Dependency("vss_extra"),
+        ]
+
+    @Anod.primitive()
+    def build(self):
+        for m in self.deps:
+            self.deps[m].setenv()
+
+        gpr_file = os.path.join(self["SRC_DIR"], "sarif_ada.gpr")
+        build_mode = "release"
+
+        for library_type in ["static"]:
+            self.shell(
+                "gprbuild",
+                "-p",
+                "-P",
+                gpr_file,
+                "-j" + str(self.jobs),
+                "--relocate-build-tree=" + library_type,
+                "-XBUILD_PROFILE=" + build_mode,
+                "-XLIBRARY_TYPE=" + library_type,
+            )
+
+            self.shell(
+                "gprinstall",
+                "-f",
+                "-p",
+                "-P",
+                gpr_file,
+                "--relocate-build-tree=" + library_type,
+                "--prefix=" + self["INSTALL_DIR"],
+                "-XBUILD_PROFILE=" + build_mode,
+                "-XLIBRARY_TYPE=" + library_type,
+                "--build-var=LIBRARY_TYPE",
+                "--build-name=" + library_type,
+            )
+
+        self.clean()
