@@ -68,7 +68,8 @@ class Workflow(Yamlable[Os]):
             res["jobs"].update(
                 {
                     job.key(dispatch(os, job.kind)): job.to_yaml(dispatch(os, job.kind))
-                    for job in self.jobs if dispatch(os, job.kind) not in job.exclude
+                    for job in self.jobs
+                    if dispatch(os, job.kind) not in job.exclude
                 }
             )
         return res
@@ -110,21 +111,21 @@ def main():
         ],
     )
 
-    # jobs["gprbuild"] = Job(
-    #     "GPRbuild",
-    #     [
-    #         AnodBuild("Build GPRbuild", "gprbuild"),
-    #         ReleasePackage("Package GPRbuild", "gprbuild"),
-    #         GhRelease("Release GPRbuild", "gprbuild"),
-    #     ],
-    #     outputs=[
-    #         Artifact(
-    #             "gprbuild-release-packages",
-    #             "sbx/*/release_package*/install/*",
-    #             retention_days=5,
-    #         ),
-    #     ],
-    # )
+    jobs["gprbuild"] = Job(
+        "GPRbuild",
+        [
+            AnodBuild("Build GPRbuild", "gprbuild"),
+            ReleasePackage("Package GPRbuild", "gprbuild"),
+            GhRelease("Release GPRbuild", "gprbuild"),
+        ],
+        outputs=[
+            Artifact(
+                "gprbuild-release-packages",
+                "sbx/*/release_package*/install/*",
+                retention_days=5,
+            ),
+        ],
+    )
 
     # jobs["gnat_cross"] = Job(
     #     "GNAT Cross",
@@ -160,22 +161,22 @@ def main():
     #     ],
     # )
 
-    # jobs["spark"] = Job(
-    #     "SPARK",
-    #     [
-    #         AnodBuild("Build SPARK", "spark2014"),
-    #         ReleasePackage("Package GNATprove", "gnatprove"),
-    #         GhRelease("Release GNATprove", "gnatprove"),
-    #     ],
-    #     needs=[jobs["gprbuild"]],
-    #     outputs=[
-    #         Artifact(
-    #             "gnatprove-release-packages",
-    #             "sbx/*/release_package*/install/*",
-    #             retention_days=5,
-    #         )
-    #     ],
-    # )
+    jobs["spark"] = Job(
+        "SPARK",
+        [
+            AnodBuild("Build SPARK", "spark2014"),
+            ReleasePackage("Package GNATprove", "gnatprove"),
+            GhRelease("Release GNATprove", "gnatprove"),
+        ],
+        needs=[jobs["gprbuild"]],
+        outputs=[
+            Artifact(
+                "gnatprove-release-packages",
+                "sbx/*/release_package*/install/*",
+                retention_days=5,
+            )
+        ],
+    )
 
     # jobs["gnatformat"] = Job(
     #     "GNATformat",
@@ -244,7 +245,6 @@ def main():
     #         )
     #     ],
     # )
-
 
     workflow = Workflow(
         "GNAT FSF builds",
