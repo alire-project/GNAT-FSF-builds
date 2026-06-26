@@ -148,6 +148,27 @@ class SPARK2014(spec("common")):
 
     @Anod.primitive()
     def build(self):
+        text_replace(
+            os.path.join(self["SRC_DIR"], "gcc", "gcc", "ada", "comperr.adb"),
+            [
+                (
+                    "if Is_FSF_Version then",
+                    """if Is_FSF_Version and then GNATprove_Mode then
+                  Write_Str
+                    ("| Please submit a bug report at the SPARK issue" &
+                     " tracker:");
+                  End_Line;
+
+                  Write_Str
+                    ("| https://github.com/AdaCore/spark2014 .");
+                  End_Line;
+
+                  elsif Is_FSF_Version --  replaced
+                  then"""
+                )
+            ]
+        )
+
         ada_dir = os.path.join(self["SRC_DIR"], "gcc", "gcc", "ada")
         gnat_src_dir = os.path.join(self["SRC_DIR"], "gnat2why", "gnat_src")
         sync_tree(ada_dir, gnat_src_dir, delete=True)
