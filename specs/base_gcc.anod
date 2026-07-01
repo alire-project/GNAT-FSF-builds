@@ -3,7 +3,7 @@ from e3.anod.loader import spec
 class base_gcc(spec("binary_install")):
     @property
     def version(self):
-        return "16.1.0-1"
+        return "15.3.0-0"
 
     @property
     def tarball(self):
