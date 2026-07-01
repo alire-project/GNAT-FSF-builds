@@ -175,11 +175,14 @@ class GCC(spec("gh-artifact")):
         # This spec inherit from gh-artifact and therefore has a different
         # build method.
 
-        if self.env.is_cross and not self.deps["base_gcc"].version.startswith(
-            self.version.split(".")[0] + "."
+        def basever(version: str) -> int:
+            return int(version.split(".")[0])
+
+        if self.env.is_cross and basever(self.deps["base_gcc"].version) < basever(
+            self.version
         ):
             raise AssertionError(
-                "Cross compiler cannot be built with a different GCC version."
+                "Cross compiler cannot be built with a previous major GCC version."
             )
 
         for m in ("binutils", "mingw", "base_gcc"):
