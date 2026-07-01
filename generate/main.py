@@ -111,72 +111,72 @@ def main():
         ],
     )
 
-    jobs["gprbuild"] = Job(
-        "GPRbuild",
-        [
-            AnodBuild("Build GPRbuild", "gprbuild"),
-            ReleasePackage("Package GPRbuild", "gprbuild"),
-            GhRelease("Release GPRbuild", "gprbuild"),
-        ],
-        outputs=[
-            Artifact(
-                "gprbuild-release-packages",
-                "sbx/*/release_package*/install/*",
-                retention_days=5,
-            ),
-        ],
-    )
-
-    # jobs["gnat_cross"] = Job(
-    #     "GNAT Cross",
+    # jobs["gprbuild"] = Job(
+    #     "GPRbuild",
     #     [
-    #         AnodBuild(
-    #             "Build GNAT ${{ matrix.target }}",
-    #             "gcc",
-    #             ["--target=${{ matrix.target }}"],
-    #         ),
-    #         AnodBuild(
-    #             "Build GDB ${{ matrix.target }}",
-    #             "gdb",
-    #             ["--target=${{ matrix.target}}"],
-    #         ),
-    #         ReleasePackage(
-    #             "Package GNAT ${{ matrix.target }}",
-    #             "gnat",
-    #             ["--target=${{ matrix.target }}"],
-    #         ),
-    #         GhRelease(
-    #             "Release GNAT ${{ matrix.target }}",
-    #             "gnat",
-    #             ["--target=${{ matrix.target }}"],
-    #         ),
+    #         AnodBuild("Build GPRbuild", "gprbuild"),
+    #         ReleasePackage("Package GPRbuild", "gprbuild"),
+    #         GhRelease("Release GPRbuild", "gprbuild"),
     #     ],
-    #     targets=Targets(),
-    #     needs=[jobs["gcc_dependencies"]],
     #     outputs=[
     #         Artifact(
-    #             "gnat-release-packages-${{matrix.target}}",
+    #             "gprbuild-release-packages",
     #             "sbx/*/release_package*/install/*",
-    #         )
+    #             retention_days=5,
+    #         ),
     #     ],
     # )
 
-    jobs["spark"] = Job(
-        "SPARK",
+    jobs["gnat_cross"] = Job(
+        "GNAT Cross",
         [
-            AnodBuild("Build SPARK", "spark2014"),
-            ReleasePackage("Package GNATprove", "gnatprove"),
-            GhRelease("Release GNATprove", "gnatprove"),
+            AnodBuild(
+                "Build GNAT ${{ matrix.target }}",
+                "gcc",
+                ["--target=${{ matrix.target }}"],
+            ),
+            AnodBuild(
+                "Build GDB ${{ matrix.target }}",
+                "gdb",
+                ["--target=${{ matrix.target}}"],
+            ),
+            ReleasePackage(
+                "Package GNAT ${{ matrix.target }}",
+                "gnat",
+                ["--target=${{ matrix.target }}"],
+            ),
+            GhRelease(
+                "Release GNAT ${{ matrix.target }}",
+                "gnat",
+                ["--target=${{ matrix.target }}"],
+            ),
         ],
-        needs=[jobs["gprbuild"]],
+        targets=Targets(),
+        needs=[jobs["gcc_dependencies"]],
         outputs=[
             Artifact(
-                "gnatprove-release-packages",
+                "gnat-release-packages-${{matrix.target}}",
                 "sbx/*/release_package*/install/*",
-                retention_days=5,
             )
         ],
     )
+
+    # jobs["spark"] = Job(
+    #     "SPARK",
+    #     [
+    #         AnodBuild("Build SPARK", "spark2014"),
+    #         ReleasePackage("Package GNATprove", "gnatprove"),
+    #         GhRelease("Release GNATprove", "gnatprove"),
+    #     ],
+    #     needs=[jobs["gprbuild"]],
+    #     outputs=[
+    #         Artifact(
+    #             "gnatprove-release-packages",
+    #             "sbx/*/release_package*/install/*",
+    #             retention_days=5,
+    #         )
+    #     ],
+    # )
 
     # jobs["gnatformat"] = Job(
     #     "GNATformat",
