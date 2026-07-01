@@ -7,27 +7,30 @@ We aim to provide builds for various platforms on every major GCC release. There
 
 # How to build
 
-To start the builds you will need `python3` (up to version 3.12) and the `e3-core` package.
+To start the builds you will need `python3` and the `e3-core` package.
+Starting from python 3.13, `e3-core` also needs the `stevedore` package to be installed.
 This can be done in a virtual env, e.g.:
 
 ```console
 $ python3 -m venv my-virtual-env
 $ source my-virtual-env/bin/activate
-$ pip install e3-core==22.10.0
+$ pip install e3-core==22.10.0 stevedore
 ```
 
-A Python 3.12 specific environment can be created with [`uv`](https://docs.astral.sh/uv/) instead:
-
-```console
-$ uv venv --python=3.12
-```
+There is also a `pyproject.toml` file to easily setup a virtual environment with [`uv`](https://docs.astral.sh/uv/).
 
 To build a spec, for example `mpc`, run the `anod` script:
 ```console
-$ ./anod build mpc -v --loglevel DEBUG
+$ ./anod build mpc -v --loglevel=DEBUG
 ```
 
-`-v --loglevel DEBUG` will produce many information log about the build.
+Or with `uv`:
+
+```console
+$ uv run ./anod mpc -v --loglevel=DEBUG
+```
+
+`-v --loglevel DEBUG` will output more information logs about the build.
 
 For a cross compiler:
 
@@ -41,9 +44,10 @@ Building release packages can be done using the `release_package` spec:
 $ ./anod build release_package --qualifier=package=<package name>
 ```
 
-Currently supported package names are `gnat`, `gprbuild` and `gnatprove`.
+Currently supported package names are `gnat`, `gprbuild`, `gnatprove`, `gnatdoc`, `gnatcov`, `gnattest` and `gnatformat`.
 
 ## On Windows
+
 Only builds in the msys2 mingw64 environement are supported.
 You will need:
 
