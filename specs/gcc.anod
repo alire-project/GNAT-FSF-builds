@@ -79,7 +79,13 @@ class GCC(spec("gh-artifact")):
             deps.append(Anod.Dependency("binutils", target="target"))
 
         if self.env.target.os.is_bareboard and not self.bootstrap:
-            deps.append(Anod.Dependency("newlib"))
+            if self.env.target.triplet == "sh-elf":
+                # TODO: fix libfxcg anod definition
+                #
+                # deps.append(Anod.Dependency("libfxcg"))
+                ...
+            else:
+                deps.append(Anod.Dependency("newlib"))
 
         if self.env.target.os.name == "windows":
             deps.append(
@@ -149,16 +155,17 @@ class GCC(spec("gh-artifact")):
             "--disable-shared",
             "--disable-threads",
             "--disable-tls",
-            "--with-newlib",
         ]
 
         if self.env.target.triplet == "arm-eabi":
             args += cross_commons
+            args.append("--with-newlib")
             args.append("--enable-multilib")
             args.append("--with-multilib-list=rmprofile")
 
         if self.env.target.triplet == "riscv64-elf":
             args += cross_commons
+            args.append("--with-newlib")
             args.append("--enable-multilib")
             if self.env.host.os.name == "windows":
                 args.append("--with-specs='%{!mcmodel=*:-mcmodel=medany}'")
@@ -167,7 +174,12 @@ class GCC(spec("gh-artifact")):
 
         if self.env.target.triplet == "xtensa-esp32-elf":
             args += cross_commons
+            args.append("--with-newlib")
             args.append("--enable-multilib")
+
+        if self.env.target.triplet == "sh-elf":
+            args += cross_commons
+            args.append("--with-multilib-list=m4-nofpu")
 
         return args
 
@@ -201,6 +213,14 @@ class GCC(spec("gh-artifact")):
         gcc_libsubdir = os.path.join(
             "lib", "gcc", self.env.target.triplet, self.version
         )
+
+        # install the libfxcg libraries
+        # This is not the way you are supposed to do it but it works
+        if "libfxcg" in self.deps:
+            target_path = os.path.join(self["INSTALL_DIR"], gcc_libsubdir)
+            mkdir(os.path.join(target_path, "include"))
+            cp(os.path.join(self.deps["libfxcg"]["BUILD_DIR"], "include", "*"), os.path.join(target_path, "include"), recursive=True)
+            cp(os.path.join(self.deps["libfxcg"]["BUILD_DIR"], "lib", "*"), target_path)
 
         if self.env.target.os.name == "windows":
             # Deploy the mingw dependency in the ./mingw64 directory

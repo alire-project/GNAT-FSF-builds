@@ -9,6 +9,7 @@ class PlatDB(PlatformDBPlugin):
                 "riscv32": {"endian": "little", "bits": 32},
                 "riscv64": {"endian": "little", "bits": 64},
                 "x86_64": {"endian": "little", "bits": 64},
+                "sh": {"endian": "little", "bits": 32}, # actually bi-endian
             }
         )
 
@@ -20,6 +21,12 @@ class PlatDB(PlatformDBPlugin):
                     "exeext": "",
                     "dllext": "",
                 },
+                "casiowin": {
+                    "is_bareboard": False,
+                    "version": "unknown",
+                    "exeext": "",
+                    "dllext": "",
+                }
             }
         )
 
@@ -47,6 +54,8 @@ class PlatDB(PlatformDBPlugin):
                 "riscv64-unknown-elf": {"cpu": "riscv64", "os": "none", "is_hie": True},
                 "x86_64-elf": {"cpu": "x86_64", "os": "none", "is_hie": True},
                 "x86_64-unknown-elf": {"cpu": "x86_64", "os": "none", "is_hie": True},
+                "sh-elf": {"cpu": "sh", "os": "none", "is_hie": True},
+                # "sh-casiowin": {"cpu": "sh", "os": "casiowin", "is_hie": False},
             }
         )
 
@@ -62,6 +71,7 @@ class PlatDB(PlatformDBPlugin):
                 "riscv64-unknown-elf": {"name": "riscv64-unknown-elf"},
                 "x86_64-elf": {"name": "x86_64-elf"},
                 "x86_64-unknown-elf": {"name": "x86_64-unknown-elf"},
-
+                "sh-elf": {"name": "sh-elf"},
+                # "sh-casiowin": {"name": "sh-casiowin"},
             }
         )
