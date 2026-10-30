@@ -7,12 +7,10 @@ from e3.diff import patch
 from e3.os.process import Run
 import os
 
-patch_name = "ld"
-
 class GCC(spec("gh-artifact")):
     @property
     def version(self):
-        return "16.1.0"
+        return "16.2.0"
 
     @property
     def tarball(self):
@@ -21,7 +19,7 @@ class GCC(spec("gh-artifact")):
     @property
     def url(self):
         if self.env.host.os.name == "darwin":
-            return "https://github.com/iains/gcc-16-branch/archive/refs/tags/gcc-16.1-darwin-r0.tar.gz"
+            return "https://github.com/iains/gcc-16-branch/archive/refs/heads/gcc-16-2-darwin-pre-0.tar.gz"
         else:
             return "https://gcc.gnu.org/pub/gcc/releases/gcc-%s/%s" % (
                 self.version,
@@ -32,14 +30,12 @@ class GCC(spec("gh-artifact")):
     def source_pkg_build(self):
         return [
             self.HTTPSSourceBuilder(name=self.tarball, url=self.url),
-            self.LocalSourceBuilder(name=patch_name),
         ]
 
     @property
     def build_source_list(self):
         return [
             Anod.Source(name=self.tarball, publish=True, dest=""),
-            self.Source(name=patch_name, publish=True, unpack_cmd=cp, dest="patches"),
         ]
 
     @property
@@ -317,13 +313,4 @@ class GCC(spec("gh-artifact")):
                 delete=False,
             )
 
-        # Add ld-classic wrapper
-        if self.env.target.os.name == "darwin":
-            gcc = os.path.join(self["INSTALL_DIR"], "bin", "gcc")
-            p = Run([gcc, "--print-prog-name=cc1"])
-            libexec = os.path.dirname(p.out.strip())
-            cp(
-                os.path.join(self["SRC_DIR"], "patches", patch_name),
-                libexec,
-            )
         self.clean()
