@@ -1,0 +1,89 @@
+from e3.anod.helper import Make, text_replace
+from e3.anod.spec import Anod
+from e3.anod.loader import spec
+from e3.fs import cp, sync_tree
+import os
+
+class LibFXCG(spec("common")):
+    @property
+    def version(self):
+        return "0.6"
+
+    @property
+    def tarball(self):
+        return "libfxcg-%s.tar.gz" % self.version
+
+    @property
+    def source_pkg_build(self):
+        return [
+            self.HTTPSSourceBuilder(
+                name=self.tarball,
+                url="https://github.com/Jonimoose/libfxcg/archive/refs/tags/v0.6.tar.gz",
+            ),
+        ]
+
+    # What is this and what does it do?
+    @property
+    def build_source_list(self):
+        return [Anod.Source(name=self.tarball, publish=True, dest="")]
+
+    @property
+    def build_deps(self):
+        deps = [Anod.Dependency("binutils")]
+
+        if self.env.is_canadian:
+            deps.append(
+                Anod.Dependency(
+                    "gcc", qualifier="bootstrap", host="build", target="target"
+                )
+            )
+        else:
+            deps.append(Anod.Dependency("gcc", qualifier="bootstrap"))
+
+        return deps
+
+    @Anod.primitive()
+    def build(self):
+        self.deps["gcc"].setenv()
+
+        # repair compiler name
+        text_replace(os.path.join(self["SRC_DIR"], "libc/Makefile"), [("sh3eb-elf-", "sh-elf-")])
+        text_replace(os.path.join(self["SRC_DIR"], "libfxcg/Makefile"), [("sh3eb-elf-", "sh-elf-")])
+
+        # Due to the way the libfxcg library is structured I had to use _creative_ workarounds
+
+        # copy source to build
+        cp(os.path.join(self["SRC_DIR"], "*"), self["BUILD_DIR"], recursive=True)
+
+        make = Make(self, jobs=1)
+        make()
+
+        # copy the libraries to the compiler
+        libraries = os.path.join(
+            self["BUILD_DIR"], "lib"
+        )
+
+        target_dir = os.path.join(
+            self.deps["gcc"]["INSTALL_DIR"],
+            "lib", "gcc", "sh-elf", "15.2.0")
+
+        sync_tree(
+            libraries,
+            target_dir
+        )
+
+        # copy the headers
+        includes = os.path.join(
+            self["BUILD_DIR"], "include"
+        )
+
+        target_dir = os.path.join(
+            self.deps["gcc"]["INSTALL_DIR"],
+            "lib", "gcc", "sh-elf", "15.2.0", "include")
+
+        sync_tree(
+            includes,
+            target_dir
+        )
+
+        self.clean()
