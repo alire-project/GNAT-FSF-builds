@@ -65,14 +65,14 @@ class SPARK2014(spec("common")):
             fn = f"z3-{self.z3_version}-x64-win.zip"
         elif self.env.host.os.name == "darwin":
             if self.env.target.cpu.name == "x86_64":
-                fn = f"z3-{self.z3_version}-x64-osx-13.7.6.zip"
+                fn = f"z3-{self.z3_version}-x64-osx-13.3.zip"
             else:
-                fn = f"z3-{self.z3_version}-arm64-osx-13.7.6.zip"
+                fn = f"z3-{self.z3_version}-arm64-osx-13.3.zip"
         else: # self.env.host.os.name == "linux"
             if self.env.target.cpu.name == "x86_64":
                 fn = f"z3-{self.z3_version}-x64-glibc-2.39.zip"
             else:
-                fn = f"z3-{self.z3_version}-arm64-glibc-2.34.zip"
+                fn = f"z3-{self.z3_version}-arm64-glibc-2.38.zip"
         return fn
 
     @property
