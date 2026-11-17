@@ -14,6 +14,11 @@ name: GNAT FSF builds
         type: boolean
         required: false
         default: false
+      do_cross_compilers:
+        description: Set to true to build cross compilers
+        type: boolean
+        required: false
+        default: false
 jobs:
   gcc_dependencies_ubuntu-22-04:
     name: GCC Dependencies (ubuntu-22.04)
@@ -111,6 +116,7 @@ jobs:
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gnat_cross_ubuntu-22-04:
+    if: inputs.do_cross_compilers
     strategy:
       fail-fast: false
       matrix:
@@ -356,6 +362,7 @@ jobs:
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gnat_cross_ubuntu-22-04-arm:
+    if: inputs.do_cross_compilers
     strategy:
       fail-fast: false
       matrix:
@@ -614,6 +621,7 @@ jobs:
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gnat_cross_macos-15-intel:
+    if: inputs.do_cross_compilers
     strategy:
       fail-fast: false
       matrix:
@@ -882,6 +890,7 @@ jobs:
         path: sbx/*/release_package*/install/*
         retention-days: 5
   gnat_cross_macos-15:
+    if: inputs.do_cross_compilers
     strategy:
       fail-fast: false
       matrix:
@@ -1055,16 +1064,18 @@ jobs:
     - name: Install msys2
       uses: msys2/setup-msys2@v2
       with:
+        msystem: UCRT64
         install: |-
           base-devel
           git
           rsync
-          mingw-w64-x86_64-gcc-ada
-          mingw-w64-x86_64-github-cli
-          mingw-w64-x86_64-toolchain
-          mingw-w64-x86_64-python
-          mingw-w64-x86_64-python-pip
-          mingw-w64-x86_64-python-psutil
+          texinfo
+          mingw-w64-ucrt-x86_64-gcc-ada
+          mingw-w64-ucrt-x86_64-github-cli
+          mingw-w64-ucrt-x86_64-toolchain
+          mingw-w64-ucrt-x86_64-python
+          mingw-w64-ucrt-x86_64-python-pip
+          mingw-w64-ucrt-x86_64-python-psutil
     - name: Install Python dependencies
       run: |-
         python3 -m pip install --upgrade pip
@@ -1106,16 +1117,18 @@ jobs:
     - name: Install msys2
       uses: msys2/setup-msys2@v2
       with:
+        msystem: UCRT64
         install: |-
           base-devel
           git
           rsync
-          mingw-w64-x86_64-gcc-ada
-          mingw-w64-x86_64-github-cli
-          mingw-w64-x86_64-toolchain
-          mingw-w64-x86_64-python
-          mingw-w64-x86_64-python-pip
-          mingw-w64-x86_64-python-psutil
+          texinfo
+          mingw-w64-ucrt-x86_64-gcc-ada
+          mingw-w64-ucrt-x86_64-github-cli
+          mingw-w64-ucrt-x86_64-toolchain
+          mingw-w64-ucrt-x86_64-python
+          mingw-w64-ucrt-x86_64-python-pip
+          mingw-w64-ucrt-x86_64-python-psutil
     - name: Install Python dependencies
       run: |-
         python3 -m pip install --upgrade pip
@@ -1163,16 +1176,18 @@ jobs:
     - name: Install msys2
       uses: msys2/setup-msys2@v2
       with:
+        msystem: UCRT64
         install: |-
           base-devel
           git
           rsync
-          mingw-w64-x86_64-gcc-ada
-          mingw-w64-x86_64-github-cli
-          mingw-w64-x86_64-toolchain
-          mingw-w64-x86_64-python
-          mingw-w64-x86_64-python-pip
-          mingw-w64-x86_64-python-psutil
+          texinfo
+          mingw-w64-ucrt-x86_64-gcc-ada
+          mingw-w64-ucrt-x86_64-github-cli
+          mingw-w64-ucrt-x86_64-toolchain
+          mingw-w64-ucrt-x86_64-python
+          mingw-w64-ucrt-x86_64-python-pip
+          mingw-w64-ucrt-x86_64-python-psutil
     - name: Install Python dependencies
       run: |-
         python3 -m pip install --upgrade pip
@@ -1200,6 +1215,7 @@ jobs:
         path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
         retention-days: 5
   gnat_cross_windows-2022:
+    if: inputs.do_cross_compilers
     strategy:
       fail-fast: false
       matrix:
@@ -1225,16 +1241,18 @@ jobs:
     - name: Install msys2
       uses: msys2/setup-msys2@v2
       with:
+        msystem: UCRT64
         install: |-
           base-devel
           git
           rsync
-          mingw-w64-x86_64-gcc-ada
-          mingw-w64-x86_64-github-cli
-          mingw-w64-x86_64-toolchain
-          mingw-w64-x86_64-python
-          mingw-w64-x86_64-python-pip
-          mingw-w64-x86_64-python-psutil
+          texinfo
+          mingw-w64-ucrt-x86_64-gcc-ada
+          mingw-w64-ucrt-x86_64-github-cli
+          mingw-w64-ucrt-x86_64-toolchain
+          mingw-w64-ucrt-x86_64-python
+          mingw-w64-ucrt-x86_64-python-pip
+          mingw-w64-ucrt-x86_64-python-psutil
     - name: Install Python dependencies
       run: |-
         python3 -m pip install --upgrade pip
@@ -1340,16 +1358,18 @@ jobs:
     - name: Install msys2
       uses: msys2/setup-msys2@v2
       with:
+        msystem: UCRT64
         install: |-
           base-devel
           git
           rsync
-          mingw-w64-x86_64-gcc-ada
-          mingw-w64-x86_64-github-cli
-          mingw-w64-x86_64-toolchain
-          mingw-w64-x86_64-python
-          mingw-w64-x86_64-python-pip
-          mingw-w64-x86_64-python-psutil
+          texinfo
+          mingw-w64-ucrt-x86_64-gcc-ada
+          mingw-w64-ucrt-x86_64-github-cli
+          mingw-w64-ucrt-x86_64-toolchain
+          mingw-w64-ucrt-x86_64-python
+          mingw-w64-ucrt-x86_64-python-pip
+          mingw-w64-ucrt-x86_64-python-psutil
     - name: Install Python dependencies
       run: |-
         python3 -m pip install --upgrade pip

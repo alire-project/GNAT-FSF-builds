@@ -55,7 +55,7 @@ class MINGW(spec("common")):
         configure.add("--enable-idl")
         configure.add("--without-widl")
         configure.add("--with-default-win32-winnt=0x601")
-        configure.add("--with-default-msvcrt=msvcrt")
+        configure.add("--with-default-msvcrt=ucrt")
         os.chdir(unixpath(hdr_src))
         configure()
         make = Make(self, exec_dir=hdr_build)
@@ -93,7 +93,7 @@ class MINGW(spec("common")):
         configure.add("CFLAGS=-Wno-expansion-to-defined")
 
         configure.add("--disable-dependency-tracking")
-        configure.add("--with-default-msvcrt=msvcrt")
+        configure.add("--with-default-msvcrt=ucrt")
         os.chdir(unixpath(crt_src))
         configure()
 

@@ -240,12 +240,16 @@ class Job(Yamlable[Host]):
     outputs: list[Artifact] = field(default_factory=list)
 
     exclude: list[Host] = field(default_factory=list)
+    ifcond: str | None = None
 
     def key(self, ctx: Host):
         return f"{self.name}_{ctx.runner}".replace(" ", "_").replace(".", "-").lower()
 
     def to_yaml(self, ctx: Host) -> Yaml:
         res: Yaml = {}
+
+        if self.ifcond is not None:
+            res["if"] = self.ifcond
 
         if len(self.matrix) != 0 or self.targets is not None:
             res["strategy"] = {"fail-fast": False}

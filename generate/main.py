@@ -162,6 +162,7 @@ def main():
                 "sbx/*/release_package*/install/*",
             )
         ],
+        ifcond="inputs.do_cross_compilers",
     )
 
     jobs["alt-ergo"] = Job(
@@ -301,6 +302,12 @@ def main():
                         "required": False,
                         "default": False,
                     },
+                    "do_cross_compilers": {
+                        "description": "Set to true to build cross compilers",
+                        "type": "boolean",
+                        "required": False,
+                        "default": False,
+                    }
                 },
             },
         },
