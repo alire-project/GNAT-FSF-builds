@@ -10,7 +10,7 @@ import os
 class SPARK2014(spec("common")):
     @property
     def version(self):
-        return "16.1.0"
+        return "16.2.0"
     
     @property
     def spark_branch(self):
@@ -37,7 +37,7 @@ class SPARK2014(spec("common")):
     
     @property
     def cvc5_version(self):
-        return "1.3.2"
+        return "1.4.2"
 
     @property
     def cvc5_zip(self):
@@ -57,22 +57,22 @@ class SPARK2014(spec("common")):
 
     @property
     def z3_version(self):
-        return "4.15.4"
+        return "5.4.1"
 
     @property
     def z3_zip(self):
         if self.env.host.os.name == "windows":
-            fn = "z3-%s-x64-win.zip" % self.z3_version
+            fn = f"z3-{self.z3_version}-x64-win.zip"
         elif self.env.host.os.name == "darwin":
             if self.env.target.cpu.name == "x86_64":
-                fn = "z3-%s-x64-osx-13.7.6.zip" % self.z3_version
+                fn = f"z3-{self.z3_version}-x64-osx-13.7.6.zip"
             else:
-                fn = "z3-%s-arm64-osx-13.7.6.zip" % self.z3_version
+                fn = f"z3-{self.z3_version}-arm64-osx-13.7.6.zip"
         else: # self.env.host.os.name == "linux"
             if self.env.target.cpu.name == "x86_64":
-                fn = "z3-%s-x64-glibc-2.39.zip" % self.z3_version
+                fn = f"z3-{self.z3_version}-x64-glibc-2.39.zip"
             else:
-                fn = "z3-%s-arm64-glibc-2.34.zip" % self.z3_version
+                fn = f"z3-{self.z3_version}-arm64-glibc-2.34.zip"
         return fn
 
     @property

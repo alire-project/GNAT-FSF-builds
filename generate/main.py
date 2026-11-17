@@ -10,6 +10,9 @@ from build import (
     Job,
     JobKind,
     ReleasePackage,
+    Repository,
+    SetupPython,
+    Step,
     Targets,
 )
 from interfaces import Host, Yaml, Yamlable
@@ -161,6 +164,38 @@ def main():
         ],
     )
 
+    jobs["alt-ergo"] = Job(
+        "Alt-Ergo",
+        [
+            Step("Install OCaml dependencies", ["opam exec -- make deps"]),
+            Step(
+                "Build with opam",
+                [
+                    "opam exec -- make packages",
+                    "opam exec -- dune install -p alt-ergo --prefix=staging",
+                    "tar -cvaf alt-ergo.tar.gz staging",
+                ],
+            ),
+        ],
+        repo=Repository("OCamlPro/alt-ergo", "v2.6.5"),
+        kind="ocaml",
+        outputs=[Artifact("alt-ergo", "alt-ergo.tar.gz", retention_days=1)],
+    )
+
+    jobs["why3"] = Job(
+        "Why3",
+        [
+            SetupPython("3.12"),
+            Step("Call build script", [
+                "opam exec -- bash ./fsf_build.sh staging",
+                "tar -cvaf why3.tar.gz staging",
+            ]),
+        ],
+        repo=Repository("AdaCore/why3", "fsf-16"),
+        kind="ocaml",
+        outputs=[Artifact("why3", "why3.tar.gz", retention_days=1)],
+    )
+
     jobs["spark"] = Job(
         "SPARK",
         [
@@ -168,7 +203,7 @@ def main():
             ReleasePackage("Package GNATprove", "gnatprove"),
             GhRelease("Release GNATprove", "gnatprove"),
         ],
-        needs=[jobs["gprbuild"]],
+        needs=[jobs["gprbuild"], jobs["alt-ergo"], jobs["why3"]],
         outputs=[
             Artifact(
                 "gnatprove-release-packages",

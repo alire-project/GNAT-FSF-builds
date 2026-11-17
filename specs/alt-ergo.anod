@@ -3,26 +3,11 @@ from e3.fs import sync_tree
 from e3.anod.spec import Anod
 import os
 
-class AltErgo(spec("binary_install")):
+class AltErgo(spec("gh-artifact")):
     @property
     def version(self):
-        return "16.0.0"
+        return "16.2.0"
 
     @property
-    def tarball(self):
-        if self.env.host.os.name == "windows":
-            return "altergo-windows-2025.zip"
-        if self.env.host.os.name == "darwin":
-            if self.env.host.cpu.name == "x86_64":
-                return "altergo-macos-15-intel.tar.gz"
-            else:
-                return "altergo-macos-15.tar.gz"
-        else:
-            if self.env.host.cpu.name == "x86_64":
-                return "altergo-ubuntu-24.04.tar.gz"
-            else:
-                return "altergo-ubuntu-24.04-arm.tar.gz"
-
-    @property
-    def url(self):
-        return f"https://github.com/AdaCore/alt-ergo/releases/download/fsf-{self.version}/{self.tarball}"
+    def artifact_archive(self):
+        return "alt-ergo.tar.gz"

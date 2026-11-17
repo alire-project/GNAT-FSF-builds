@@ -157,9 +157,66 @@ jobs:
       with:
         name: gnat-release-packages-${{matrix.target}}_ubuntu-22-04
         path: sbx/*/release_package*/install/*
+  alt-ergo_ubuntu-22-04:
+    name: Alt-Ergo (ubuntu-22.04)
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v6
+      with:
+        repository: OCamlPro/alt-ergo
+        ref: v2.6.5
+    - name: Setup OCaml 4.14.2
+      uses: ocaml/setup-ocaml@v3
+      with:
+        ocaml-compiler: 4.14.2
+        dune-cache: true
+    - name: Install OCaml dependencies
+      run: opam exec -- make deps
+    - name: Build with opam
+      run: |-
+        opam exec -- make packages
+        opam exec -- dune install -p alt-ergo --prefix=staging
+        tar -cvaf alt-ergo.tar.gz staging
+    - name: Upload artifact 'alt-ergo'
+      uses: actions/upload-artifact@v7
+      with:
+        name: alt-ergo_ubuntu-22-04
+        path: alt-ergo.tar.gz
+        retention-days: 1
+  why3_ubuntu-22-04:
+    name: Why3 (ubuntu-22.04)
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v6
+      with:
+        repository: AdaCore/why3
+        ref: fsf-16
+    - name: Setup OCaml 4.14.2
+      uses: ocaml/setup-ocaml@v3
+      with:
+        ocaml-compiler: 4.14.2
+        dune-cache: true
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
+    - name: Call build script
+      run: |-
+        opam exec -- bash ./fsf_build.sh staging
+        tar -cvaf why3.tar.gz staging
+    - name: Upload artifact 'why3'
+      uses: actions/upload-artifact@v7
+      with:
+        name: why3_ubuntu-22-04
+        path: why3.tar.gz
+        retention-days: 1
   spark_ubuntu-22-04:
     needs:
     - gprbuild_ubuntu-22-04
+    - alt-ergo_ubuntu-22-04
+    - why3_ubuntu-22-04
     name: SPARK (ubuntu-22.04)
     runs-on: ubuntu-22.04
     steps:
@@ -177,6 +234,16 @@ jobs:
       uses: actions/download-artifact@v8
       with:
         name: gprbuild-release-packages_ubuntu-22-04
+        path: in_artifacts/
+    - name: Download artifact 'alt-ergo'
+      uses: actions/download-artifact@v8
+      with:
+        name: alt-ergo_ubuntu-22-04
+        path: in_artifacts/
+    - name: Download artifact 'why3'
+      uses: actions/download-artifact@v8
+      with:
+        name: why3_ubuntu-22-04
         path: in_artifacts/
     - name: Build SPARK
       run: python3 ./anod build spark2014 -v --loglevel DEBUG --enable-cleanup
@@ -335,9 +402,66 @@ jobs:
       with:
         name: gnat-release-packages-${{matrix.target}}_ubuntu-22-04-arm
         path: sbx/*/release_package*/install/*
+  alt-ergo_ubuntu-22-04-arm:
+    name: Alt-Ergo (ubuntu-22.04-arm)
+    runs-on: ubuntu-22.04-arm
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v6
+      with:
+        repository: OCamlPro/alt-ergo
+        ref: v2.6.5
+    - name: Setup OCaml 4.14.2
+      uses: ocaml/setup-ocaml@v3
+      with:
+        ocaml-compiler: 4.14.2
+        dune-cache: true
+    - name: Install OCaml dependencies
+      run: opam exec -- make deps
+    - name: Build with opam
+      run: |-
+        opam exec -- make packages
+        opam exec -- dune install -p alt-ergo --prefix=staging
+        tar -cvaf alt-ergo.tar.gz staging
+    - name: Upload artifact 'alt-ergo'
+      uses: actions/upload-artifact@v7
+      with:
+        name: alt-ergo_ubuntu-22-04-arm
+        path: alt-ergo.tar.gz
+        retention-days: 1
+  why3_ubuntu-22-04-arm:
+    name: Why3 (ubuntu-22.04-arm)
+    runs-on: ubuntu-22.04-arm
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v6
+      with:
+        repository: AdaCore/why3
+        ref: fsf-16
+    - name: Setup OCaml 4.14.2
+      uses: ocaml/setup-ocaml@v3
+      with:
+        ocaml-compiler: 4.14.2
+        dune-cache: true
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
+    - name: Call build script
+      run: |-
+        opam exec -- bash ./fsf_build.sh staging
+        tar -cvaf why3.tar.gz staging
+    - name: Upload artifact 'why3'
+      uses: actions/upload-artifact@v7
+      with:
+        name: why3_ubuntu-22-04-arm
+        path: why3.tar.gz
+        retention-days: 1
   spark_ubuntu-22-04-arm:
     needs:
     - gprbuild_ubuntu-22-04-arm
+    - alt-ergo_ubuntu-22-04-arm
+    - why3_ubuntu-22-04-arm
     name: SPARK (ubuntu-22.04-arm)
     runs-on: ubuntu-22.04-arm
     steps:
@@ -355,6 +479,16 @@ jobs:
       uses: actions/download-artifact@v8
       with:
         name: gprbuild-release-packages_ubuntu-22-04-arm
+        path: in_artifacts/
+    - name: Download artifact 'alt-ergo'
+      uses: actions/download-artifact@v8
+      with:
+        name: alt-ergo_ubuntu-22-04-arm
+        path: in_artifacts/
+    - name: Download artifact 'why3'
+      uses: actions/download-artifact@v8
+      with:
+        name: why3_ubuntu-22-04-arm
         path: in_artifacts/
     - name: Build SPARK
       run: python3 ./anod build spark2014 -v --loglevel DEBUG --enable-cleanup
@@ -531,9 +665,66 @@ jobs:
       with:
         name: gnat-release-packages-${{matrix.target}}_macos-15-intel
         path: sbx/*/release_package*/install/*
+  alt-ergo_macos-15-intel:
+    name: Alt-Ergo (macos-15-intel)
+    runs-on: macos-15-intel
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v6
+      with:
+        repository: OCamlPro/alt-ergo
+        ref: v2.6.5
+    - name: Setup OCaml 4.14.2
+      uses: ocaml/setup-ocaml@v3
+      with:
+        ocaml-compiler: 4.14.2
+        dune-cache: true
+    - name: Install OCaml dependencies
+      run: opam exec -- make deps
+    - name: Build with opam
+      run: |-
+        opam exec -- make packages
+        opam exec -- dune install -p alt-ergo --prefix=staging
+        tar -cvaf alt-ergo.tar.gz staging
+    - name: Upload artifact 'alt-ergo'
+      uses: actions/upload-artifact@v7
+      with:
+        name: alt-ergo_macos-15-intel
+        path: alt-ergo.tar.gz
+        retention-days: 1
+  why3_macos-15-intel:
+    name: Why3 (macos-15-intel)
+    runs-on: macos-15-intel
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v6
+      with:
+        repository: AdaCore/why3
+        ref: fsf-16
+    - name: Setup OCaml 4.14.2
+      uses: ocaml/setup-ocaml@v3
+      with:
+        ocaml-compiler: 4.14.2
+        dune-cache: true
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
+    - name: Call build script
+      run: |-
+        opam exec -- bash ./fsf_build.sh staging
+        tar -cvaf why3.tar.gz staging
+    - name: Upload artifact 'why3'
+      uses: actions/upload-artifact@v7
+      with:
+        name: why3_macos-15-intel
+        path: why3.tar.gz
+        retention-days: 1
   spark_macos-15-intel:
     needs:
     - gprbuild_macos-15-intel
+    - alt-ergo_macos-15-intel
+    - why3_macos-15-intel
     name: SPARK (macos-15-intel)
     runs-on: macos-15-intel
     steps:
@@ -556,6 +747,16 @@ jobs:
       uses: actions/download-artifact@v8
       with:
         name: gprbuild-release-packages_macos-15-intel
+        path: in_artifacts/
+    - name: Download artifact 'alt-ergo'
+      uses: actions/download-artifact@v8
+      with:
+        name: alt-ergo_macos-15-intel
+        path: in_artifacts/
+    - name: Download artifact 'why3'
+      uses: actions/download-artifact@v8
+      with:
+        name: why3_macos-15-intel
         path: in_artifacts/
     - name: Build SPARK
       run: python3 ./anod build spark2014 -v --loglevel DEBUG --enable-cleanup
@@ -732,9 +933,66 @@ jobs:
       with:
         name: gnat-release-packages-${{matrix.target}}_macos-15
         path: sbx/*/release_package*/install/*
+  alt-ergo_macos-15:
+    name: Alt-Ergo (macos-15)
+    runs-on: macos-15
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v6
+      with:
+        repository: OCamlPro/alt-ergo
+        ref: v2.6.5
+    - name: Setup OCaml 4.14.2
+      uses: ocaml/setup-ocaml@v3
+      with:
+        ocaml-compiler: 4.14.2
+        dune-cache: true
+    - name: Install OCaml dependencies
+      run: opam exec -- make deps
+    - name: Build with opam
+      run: |-
+        opam exec -- make packages
+        opam exec -- dune install -p alt-ergo --prefix=staging
+        tar -cvaf alt-ergo.tar.gz staging
+    - name: Upload artifact 'alt-ergo'
+      uses: actions/upload-artifact@v7
+      with:
+        name: alt-ergo_macos-15
+        path: alt-ergo.tar.gz
+        retention-days: 1
+  why3_macos-15:
+    name: Why3 (macos-15)
+    runs-on: macos-15
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v6
+      with:
+        repository: AdaCore/why3
+        ref: fsf-16
+    - name: Setup OCaml 4.14.2
+      uses: ocaml/setup-ocaml@v3
+      with:
+        ocaml-compiler: 4.14.2
+        dune-cache: true
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
+    - name: Call build script
+      run: |-
+        opam exec -- bash ./fsf_build.sh staging
+        tar -cvaf why3.tar.gz staging
+    - name: Upload artifact 'why3'
+      uses: actions/upload-artifact@v7
+      with:
+        name: why3_macos-15
+        path: why3.tar.gz
+        retention-days: 1
   spark_macos-15:
     needs:
     - gprbuild_macos-15
+    - alt-ergo_macos-15
+    - why3_macos-15
     name: SPARK (macos-15)
     runs-on: macos-15
     steps:
@@ -757,6 +1015,16 @@ jobs:
       uses: actions/download-artifact@v8
       with:
         name: gprbuild-release-packages_macos-15
+        path: in_artifacts/
+    - name: Download artifact 'alt-ergo'
+      uses: actions/download-artifact@v8
+      with:
+        name: alt-ergo_macos-15
+        path: in_artifacts/
+    - name: Download artifact 'why3'
+      uses: actions/download-artifact@v8
+      with:
+        name: why3_macos-15
         path: in_artifacts/
     - name: Build SPARK
       run: python3 ./anod build spark2014 -v --loglevel DEBUG --enable-cleanup
@@ -999,9 +1267,66 @@ jobs:
       with:
         name: gnat-release-packages-${{matrix.target}}_windows-2022
         path: C:/aaa/GNAT-FSF-builds/sbx/*/release_package*/install/*
+  alt-ergo_windows-2022:
+    name: Alt-Ergo (windows-2022)
+    runs-on: windows-2022
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v6
+      with:
+        repository: OCamlPro/alt-ergo
+        ref: v2.6.5
+    - name: Setup OCaml 4.14.2
+      uses: ocaml/setup-ocaml@v3
+      with:
+        ocaml-compiler: 4.14.2
+        dune-cache: true
+    - name: Install OCaml dependencies
+      run: opam exec -- make deps
+    - name: Build with opam
+      run: |-
+        opam exec -- make packages
+        opam exec -- dune install -p alt-ergo --prefix=staging
+        tar -cvaf alt-ergo.tar.gz staging
+    - name: Upload artifact 'alt-ergo'
+      uses: actions/upload-artifact@v7
+      with:
+        name: alt-ergo_windows-2022
+        path: alt-ergo.tar.gz
+        retention-days: 1
+  why3_windows-2022:
+    name: Why3 (windows-2022)
+    runs-on: windows-2022
+    steps:
+    - name: Checkout Project
+      uses: actions/checkout@v6
+      with:
+        repository: AdaCore/why3
+        ref: fsf-16
+    - name: Setup OCaml 4.14.2
+      uses: ocaml/setup-ocaml@v3
+      with:
+        ocaml-compiler: 4.14.2
+        dune-cache: true
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v6
+      with:
+        python-version: '3.12'
+    - name: Call build script
+      run: |-
+        opam exec -- bash ./fsf_build.sh staging
+        tar -cvaf why3.tar.gz staging
+    - name: Upload artifact 'why3'
+      uses: actions/upload-artifact@v7
+      with:
+        name: why3_windows-2022
+        path: why3.tar.gz
+        retention-days: 1
   spark_windows-2022:
     needs:
     - gprbuild_windows-2022
+    - alt-ergo_windows-2022
+    - why3_windows-2022
     name: SPARK (windows-2022)
     runs-on: windows-2022
     env:
@@ -1040,6 +1365,16 @@ jobs:
       uses: actions/download-artifact@v8
       with:
         name: gprbuild-release-packages_windows-2022
+        path: C:/aaa/GNAT-FSF-builds/in_artifacts/
+    - name: Download artifact 'alt-ergo'
+      uses: actions/download-artifact@v8
+      with:
+        name: alt-ergo_windows-2022
+        path: C:/aaa/GNAT-FSF-builds/in_artifacts/
+    - name: Download artifact 'why3'
+      uses: actions/download-artifact@v8
+      with:
+        name: why3_windows-2022
         path: C:/aaa/GNAT-FSF-builds/in_artifacts/
     - name: Build SPARK
       run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build spark2014 -v --loglevel DEBUG --enable-cleanup

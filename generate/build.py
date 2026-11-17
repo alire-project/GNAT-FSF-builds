@@ -102,9 +102,12 @@ class Artifact(Yamlable[Host]):
     path: str
     retention_days: int = 0
 
+    def get_name(self, ctx: Host) -> str:
+        return f"{self.name}_{ctx.runner.replace('.', '-')}"
+
     def to_yaml(self, ctx: Host) -> Yaml:
         res: Yaml = {
-            "name": f"{self.name}_{ctx.runner.replace('.', '-')}",
+            "name": self.get_name(ctx),
             "path": ctx.native_path(self.path),
         }
         if self.retention_days > 0:
@@ -169,7 +172,7 @@ class OcamlVersion(Yamlable[Host]):
     version: str
 
     def to_yaml(self, ctx: Host) -> Yaml:
-        return {"ocaml-compiler": self.version}
+        return {"ocaml-compiler": self.version, "dune-cache": True}
 
 
 class SetupOcaml(Action):
