@@ -172,7 +172,7 @@ class OcamlVersion(Yamlable[Host]):
     version: str
 
     def to_yaml(self, ctx: Host) -> Yaml:
-        return {"ocaml-compiler": self.version, "dune-cache": True}
+        return {"ocaml-compiler": self.version, "cache": True}
 
 
 class SetupOcaml(Action):

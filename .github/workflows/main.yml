@@ -188,7 +188,7 @@ jobs:
       uses: ocaml/setup-ocaml@v3
       with:
         ocaml-compiler: 4.14.2
-        dune-cache: true
+        cache: true
     - name: Install OCaml dependencies
       run: opam exec -- make deps
     - name: Build with opam
@@ -215,7 +215,7 @@ jobs:
       uses: ocaml/setup-ocaml@v3
       with:
         ocaml-compiler: 4.14.2
-        dune-cache: true
+        cache: true
     - name: Set up Python 3.12
       uses: actions/setup-python@v6
       with:
@@ -446,7 +446,7 @@ jobs:
       uses: ocaml/setup-ocaml@v3
       with:
         ocaml-compiler: 4.14.2
-        dune-cache: true
+        cache: true
     - name: Install OCaml dependencies
       run: opam exec -- make deps
     - name: Build with opam
@@ -473,7 +473,7 @@ jobs:
       uses: ocaml/setup-ocaml@v3
       with:
         ocaml-compiler: 4.14.2
-        dune-cache: true
+        cache: true
     - name: Set up Python 3.12
       uses: actions/setup-python@v6
       with:
@@ -722,7 +722,7 @@ jobs:
       uses: ocaml/setup-ocaml@v3
       with:
         ocaml-compiler: 4.14.2
-        dune-cache: true
+        cache: true
     - name: Install OCaml dependencies
       run: opam exec -- make deps
     - name: Build with opam
@@ -749,7 +749,7 @@ jobs:
       uses: ocaml/setup-ocaml@v3
       with:
         ocaml-compiler: 4.14.2
-        dune-cache: true
+        cache: true
     - name: Set up Python 3.12
       uses: actions/setup-python@v6
       with:
@@ -1003,7 +1003,7 @@ jobs:
       uses: ocaml/setup-ocaml@v3
       with:
         ocaml-compiler: 4.14.2
-        dune-cache: true
+        cache: true
     - name: Install OCaml dependencies
       run: opam exec -- make deps
     - name: Build with opam
@@ -1030,7 +1030,7 @@ jobs:
       uses: ocaml/setup-ocaml@v3
       with:
         ocaml-compiler: 4.14.2
-        dune-cache: true
+        cache: true
     - name: Set up Python 3.12
       uses: actions/setup-python@v6
       with:
@@ -1358,7 +1358,7 @@ jobs:
       uses: ocaml/setup-ocaml@v3
       with:
         ocaml-compiler: 4.14.2
-        dune-cache: true
+        cache: true
     - name: Install OCaml dependencies
       run: opam exec -- make deps
     - name: Build with opam
@@ -1385,7 +1385,7 @@ jobs:
       uses: ocaml/setup-ocaml@v3
       with:
         ocaml-compiler: 4.14.2
-        dune-cache: true
+        cache: true
     - name: Set up Python 3.12
       uses: actions/setup-python@v6
       with:
