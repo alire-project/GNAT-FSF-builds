@@ -109,6 +109,12 @@ jobs:
       run: python3 ./anod build release_github --qualifier=package=gprbuild -v --loglevel DEBUG --enable-cleanup
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact 'gprbuild-artifacts'
+      uses: actions/upload-artifact@v7
+      with:
+        name: gprbuild-artifacts_ubuntu-22-04
+        path: out_artifacts/*
+        retention-days: 1
     - name: Upload artifact 'gprbuild-release-packages'
       uses: actions/upload-artifact@v7
       with:
@@ -129,6 +135,7 @@ jobs:
         - xtensa-esp32-elf
     needs:
     - gcc_dependencies_ubuntu-22-04
+    - gprbuild_ubuntu-22-04
     name: GNAT Cross (ubuntu-22.04)
     runs-on: ubuntu-22.04
     steps:
@@ -146,6 +153,11 @@ jobs:
       uses: actions/download-artifact@v8
       with:
         name: gcc-dependencies-artifacts_ubuntu-22-04
+        path: in_artifacts/
+    - name: Download artifact 'gprbuild-artifacts'
+      uses: actions/download-artifact@v8
+      with:
+        name: gprbuild-artifacts_ubuntu-22-04
         path: in_artifacts/
     - name: Build GNAT ${{ matrix.target }}
       run: python3 ./anod build gcc --target=${{ matrix.target }} -v --loglevel DEBUG --enable-cleanup
@@ -236,10 +248,10 @@ jobs:
       run: |-
         python3 -m pip install --upgrade pip
         pip install --break-system-packages stevedore e3-core==22.10.0
-    - name: Download artifact 'gprbuild-release-packages'
+    - name: Download artifact 'gprbuild-artifacts'
       uses: actions/download-artifact@v8
       with:
-        name: gprbuild-release-packages_ubuntu-22-04
+        name: gprbuild-artifacts_ubuntu-22-04
         path: in_artifacts/
     - name: Download artifact 'alt-ergo'
       uses: actions/download-artifact@v8
@@ -355,6 +367,12 @@ jobs:
       run: python3 ./anod build release_github --qualifier=package=gprbuild -v --loglevel DEBUG --enable-cleanup
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact 'gprbuild-artifacts'
+      uses: actions/upload-artifact@v7
+      with:
+        name: gprbuild-artifacts_ubuntu-22-04-arm
+        path: out_artifacts/*
+        retention-days: 1
     - name: Upload artifact 'gprbuild-release-packages'
       uses: actions/upload-artifact@v7
       with:
@@ -375,6 +393,7 @@ jobs:
         - xtensa-esp32-elf
     needs:
     - gcc_dependencies_ubuntu-22-04-arm
+    - gprbuild_ubuntu-22-04-arm
     name: GNAT Cross (ubuntu-22.04-arm)
     runs-on: ubuntu-22.04-arm
     steps:
@@ -392,6 +411,11 @@ jobs:
       uses: actions/download-artifact@v8
       with:
         name: gcc-dependencies-artifacts_ubuntu-22-04-arm
+        path: in_artifacts/
+    - name: Download artifact 'gprbuild-artifacts'
+      uses: actions/download-artifact@v8
+      with:
+        name: gprbuild-artifacts_ubuntu-22-04-arm
         path: in_artifacts/
     - name: Build GNAT ${{ matrix.target }}
       run: python3 ./anod build gcc --target=${{ matrix.target }} -v --loglevel DEBUG --enable-cleanup
@@ -482,10 +506,10 @@ jobs:
       run: |-
         python3 -m pip install --upgrade pip
         pip install --break-system-packages stevedore e3-core==22.10.0
-    - name: Download artifact 'gprbuild-release-packages'
+    - name: Download artifact 'gprbuild-artifacts'
       uses: actions/download-artifact@v8
       with:
-        name: gprbuild-release-packages_ubuntu-22-04-arm
+        name: gprbuild-artifacts_ubuntu-22-04-arm
         path: in_artifacts/
     - name: Download artifact 'alt-ergo'
       uses: actions/download-artifact@v8
@@ -614,6 +638,12 @@ jobs:
       run: python3 ./anod build release_github --qualifier=package=gprbuild -v --loglevel DEBUG --enable-cleanup
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact 'gprbuild-artifacts'
+      uses: actions/upload-artifact@v7
+      with:
+        name: gprbuild-artifacts_macos-15-intel
+        path: out_artifacts/*
+        retention-days: 1
     - name: Upload artifact 'gprbuild-release-packages'
       uses: actions/upload-artifact@v7
       with:
@@ -634,6 +664,7 @@ jobs:
         - xtensa-esp32-elf
     needs:
     - gcc_dependencies_macos-15-intel
+    - gprbuild_macos-15-intel
     name: GNAT Cross (macos-15-intel)
     runs-on: macos-15-intel
     steps:
@@ -656,6 +687,11 @@ jobs:
       uses: actions/download-artifact@v8
       with:
         name: gcc-dependencies-artifacts_macos-15-intel
+        path: in_artifacts/
+    - name: Download artifact 'gprbuild-artifacts'
+      uses: actions/download-artifact@v8
+      with:
+        name: gprbuild-artifacts_macos-15-intel
         path: in_artifacts/
     - name: Build GNAT ${{ matrix.target }}
       run: python3 ./anod build gcc --target=${{ matrix.target }} -v --loglevel DEBUG --enable-cleanup
@@ -751,10 +787,10 @@ jobs:
       run: |-
         python3 -m pip install --upgrade pip
         pip install --break-system-packages stevedore e3-core==22.10.0
-    - name: Download artifact 'gprbuild-release-packages'
+    - name: Download artifact 'gprbuild-artifacts'
       uses: actions/download-artifact@v8
       with:
-        name: gprbuild-release-packages_macos-15-intel
+        name: gprbuild-artifacts_macos-15-intel
         path: in_artifacts/
     - name: Download artifact 'alt-ergo'
       uses: actions/download-artifact@v8
@@ -883,6 +919,12 @@ jobs:
       run: python3 ./anod build release_github --qualifier=package=gprbuild -v --loglevel DEBUG --enable-cleanup
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact 'gprbuild-artifacts'
+      uses: actions/upload-artifact@v7
+      with:
+        name: gprbuild-artifacts_macos-15
+        path: out_artifacts/*
+        retention-days: 1
     - name: Upload artifact 'gprbuild-release-packages'
       uses: actions/upload-artifact@v7
       with:
@@ -903,6 +945,7 @@ jobs:
         - xtensa-esp32-elf
     needs:
     - gcc_dependencies_macos-15
+    - gprbuild_macos-15
     name: GNAT Cross (macos-15)
     runs-on: macos-15
     steps:
@@ -925,6 +968,11 @@ jobs:
       uses: actions/download-artifact@v8
       with:
         name: gcc-dependencies-artifacts_macos-15
+        path: in_artifacts/
+    - name: Download artifact 'gprbuild-artifacts'
+      uses: actions/download-artifact@v8
+      with:
+        name: gprbuild-artifacts_macos-15
         path: in_artifacts/
     - name: Build GNAT ${{ matrix.target }}
       run: python3 ./anod build gcc --target=${{ matrix.target }} -v --loglevel DEBUG --enable-cleanup
@@ -1020,10 +1068,10 @@ jobs:
       run: |-
         python3 -m pip install --upgrade pip
         pip install --break-system-packages stevedore e3-core==22.10.0
-    - name: Download artifact 'gprbuild-release-packages'
+    - name: Download artifact 'gprbuild-artifacts'
       uses: actions/download-artifact@v8
       with:
-        name: gprbuild-release-packages_macos-15
+        name: gprbuild-artifacts_macos-15
         path: in_artifacts/
     - name: Download artifact 'alt-ergo'
       uses: actions/download-artifact@v8
@@ -1208,6 +1256,12 @@ jobs:
       run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build release_github --qualifier=package=gprbuild -v --loglevel DEBUG --enable-cleanup
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload artifact 'gprbuild-artifacts'
+      uses: actions/upload-artifact@v7
+      with:
+        name: gprbuild-artifacts_windows-2022
+        path: C:/aaa/GNAT-FSF-builds/out_artifacts/*
+        retention-days: 1
     - name: Upload artifact 'gprbuild-release-packages'
       uses: actions/upload-artifact@v7
       with:
@@ -1228,6 +1282,7 @@ jobs:
         - xtensa-esp32-elf
     needs:
     - gcc_dependencies_windows-2022
+    - gprbuild_windows-2022
     name: GNAT Cross (windows-2022)
     runs-on: windows-2022
     env:
@@ -1268,6 +1323,11 @@ jobs:
       uses: actions/download-artifact@v8
       with:
         name: gcc-dependencies-artifacts_windows-2022
+        path: C:/aaa/GNAT-FSF-builds/in_artifacts/
+    - name: Download artifact 'gprbuild-artifacts'
+      uses: actions/download-artifact@v8
+      with:
+        name: gprbuild-artifacts_windows-2022
         path: C:/aaa/GNAT-FSF-builds/in_artifacts/
     - name: Build GNAT ${{ matrix.target }}
       run: mount C:/aaa /aaa && cd /aaa/GNAT-FSF-builds && python3 ./anod build gcc --target=${{ matrix.target }} -v --loglevel DEBUG --enable-cleanup
@@ -1381,10 +1441,10 @@ jobs:
         mount C:/aaa /aaa
         cd ..
         cp -r GNAT-FSF-builds /aaa
-    - name: Download artifact 'gprbuild-release-packages'
+    - name: Download artifact 'gprbuild-artifacts'
       uses: actions/download-artifact@v8
       with:
-        name: gprbuild-release-packages_windows-2022
+        name: gprbuild-artifacts_windows-2022
         path: C:/aaa/GNAT-FSF-builds/in_artifacts/
     - name: Download artifact 'alt-ergo'
       uses: actions/download-artifact@v8

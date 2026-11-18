@@ -92,7 +92,11 @@ def main():
             ),
         ],
         outputs=[
-            Artifact("gcc-dependencies-artifacts", "out_artifacts/*", retention_days=1)
+            Artifact(
+                "gcc-dependencies-artifacts",
+                "out_artifacts/*",
+                retention_days=1,
+            )
         ],
     )
 
@@ -122,6 +126,11 @@ def main():
             GhRelease("Release GPRbuild", "gprbuild"),
         ],
         outputs=[
+            Artifact(
+                "gprbuild-artifacts",
+                "out_artifacts/*",
+                retention_days=1,
+            ),
             Artifact(
                 "gprbuild-release-packages",
                 "sbx/*/release_package*/install/*",
@@ -155,7 +164,7 @@ def main():
             ),
         ],
         targets=Targets(),
-        needs=[jobs["gcc_dependencies"]],
+        needs=[jobs["gcc_dependencies"], jobs["gprbuild"]],
         outputs=[
             Artifact(
                 "gnat-release-packages-${{matrix.target}}",

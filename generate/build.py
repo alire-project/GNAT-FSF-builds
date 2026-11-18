@@ -281,6 +281,8 @@ class Job(Yamlable[Host]):
 
         for need in self.needs:
             for output in need.outputs:
+                if output.name.endswith("release-packages"):
+                    continue
                 res["steps"].append(
                     DownloadArtifact(
                         Artifact(output.name, path="in_artifacts/")
