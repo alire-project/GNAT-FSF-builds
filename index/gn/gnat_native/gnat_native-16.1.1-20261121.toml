@@ -1,6 +1,6 @@
 name = "gnat_native"
-version = "16.1.1-20261114"
-provides = ["gnat=16.1.1-20261114"]
+version = "16.1.1-20261121"
+provides = ["gnat=16.1.1-20261121"]
 description = "The GNAT Ada compiler - Native"
 maintainers = ["Fabien Chouteau <chouteau@adacore.com>", "César Sagaert <sagaert@adacore.com>"]
 maintainers-logins = ["Fabien-Chouteau", "AldanTanneo"]
@@ -33,11 +33,17 @@ LD_RUN_PATH.prepend = "${CRATE_ROOT}/lib"
 
 [origin."case(os)".linux."case(host-arch)".x86-64]
 binary = true
-url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-16.1.1-snapshot/gnat-x86_64-linux-16.1.1-20261114.tar.gz"
-hashes = ["sha256:d65a476ad86e96dea695b1678d33dfdaacc85be3ef3233177859ed5ce4967ffb"]
+url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-16.1.1-snapshot/gnat-x86_64-linux-16.1.1-20261121.tar.gz"
+hashes = ["sha256:fd2c0b5ea6a6402748f5ef4b7dd75463e11031b86d9cf9a5d6faaee930726713"]
 
 
 [origin."case(os)".linux."case(host-arch)".aarch64]
 binary = true
-url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-16.1.1-snapshot/gnat-aarch64-linux-16.1.1-20261114.tar.gz"
-hashes = ["sha256:d7642a32b4ef544da21a0d328b34e8930efc0d2f0094e9c8089a2f1768ca94bf"]
+url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-16.1.1-snapshot/gnat-aarch64-linux-16.1.1-20261121.tar.gz"
+hashes = ["sha256:a4de6d06de4f3d9465560cc64562f6a6eafe3307dd569a25d9d63ffd51b5b076"]
+
+
+[origin."case(os)".macos."case(host-arch)".x86-64]
+binary = true
+url = "https://github.com/alire-project/GNAT-FSF-builds/releases/download/gnat-16.1.1-snapshot/gnat-x86_64-darwin-16.1.1-20261121.tar.gz"
+hashes = ["sha256:049eeeabb62a53d28720f052b9875206fdf45e2adb6178a7db43815d8d2bf423"]
