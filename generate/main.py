@@ -174,6 +174,8 @@ def main():
         ifcond="inputs.do_cross_compilers",
     )
 
+    alt_ergo_version = "v2.6.5"
+
     jobs["alt-ergo"] = Job(
         "Alt-Ergo",
         [
@@ -181,13 +183,15 @@ def main():
             Step(
                 "Build with opam",
                 [
+                    f"git -c user.name=github-actions -c user.email=noreply@github.com tag -fa {alt_ergo_version} -m {alt_ergo_version}",
+                    "opam exec -- dune subst",
                     "opam exec -- make packages",
                     "opam exec -- dune install -p alt-ergo --prefix=staging",
                     "tar -cvaf alt-ergo.tar.gz staging",
                 ],
             ),
         ],
-        repo=Repository("OCamlPro/alt-ergo", "v2.6.5"),
+        repo=Repository("OCamlPro/alt-ergo", alt_ergo_version),
         kind="ocaml",
         outputs=[Artifact("alt-ergo", "alt-ergo.tar.gz", retention_days=1)],
     )

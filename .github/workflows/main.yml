@@ -193,6 +193,8 @@ jobs:
       run: opam exec -- make deps
     - name: Build with opam
       run: |-
+        git -c user.name=github-actions -c user.email=noreply@github.com tag -fa v2.6.5 -m v2.6.5
+        opam exec -- dune subst
         opam exec -- make packages
         opam exec -- dune install -p alt-ergo --prefix=staging
         tar -cvaf alt-ergo.tar.gz staging
@@ -451,6 +453,8 @@ jobs:
       run: opam exec -- make deps
     - name: Build with opam
       run: |-
+        git -c user.name=github-actions -c user.email=noreply@github.com tag -fa v2.6.5 -m v2.6.5
+        opam exec -- dune subst
         opam exec -- make packages
         opam exec -- dune install -p alt-ergo --prefix=staging
         tar -cvaf alt-ergo.tar.gz staging
@@ -727,6 +731,8 @@ jobs:
       run: opam exec -- make deps
     - name: Build with opam
       run: |-
+        git -c user.name=github-actions -c user.email=noreply@github.com tag -fa v2.6.5 -m v2.6.5
+        opam exec -- dune subst
         opam exec -- make packages
         opam exec -- dune install -p alt-ergo --prefix=staging
         tar -cvaf alt-ergo.tar.gz staging
@@ -1008,6 +1014,8 @@ jobs:
       run: opam exec -- make deps
     - name: Build with opam
       run: |-
+        git -c user.name=github-actions -c user.email=noreply@github.com tag -fa v2.6.5 -m v2.6.5
+        opam exec -- dune subst
         opam exec -- make packages
         opam exec -- dune install -p alt-ergo --prefix=staging
         tar -cvaf alt-ergo.tar.gz staging
@@ -1367,6 +1375,8 @@ jobs:
       run: opam exec -- make deps
     - name: Build with opam
       run: |-
+        git -c user.name=github-actions -c user.email=noreply@github.com tag -fa v2.6.5 -m v2.6.5
+        opam exec -- dune subst
         opam exec -- make packages
         opam exec -- dune install -p alt-ergo --prefix=staging
         tar -cvaf alt-ergo.tar.gz staging
