@@ -108,6 +108,7 @@ class WindowsMsys2(Windows):
                         "git",
                         "rsync",
                         "texinfo",
+                        "m4",
                         "mingw-w64-ucrt-x86_64-gcc-ada",
                         "mingw-w64-ucrt-x86_64-github-cli",
                         "mingw-w64-ucrt-x86_64-toolchain",

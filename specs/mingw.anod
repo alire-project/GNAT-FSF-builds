@@ -54,7 +54,7 @@ class MINGW(spec("common")):
         configure.add("--enable-sdk=all")
         configure.add("--enable-idl")
         configure.add("--without-widl")
-        configure.add("--with-default-win32-winnt=0x601")
+        configure.add("--with-default-win32-winnt=0xA00") # windows 10
         configure.add("--with-default-msvcrt=ucrt")
         os.chdir(unixpath(hdr_src))
         configure()

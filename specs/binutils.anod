@@ -74,7 +74,9 @@ class Binutils(spec("common")):
         for m in ("mpfr", "gmp", "mpc", "isl"):
             configure.add("--with-%s=%s" % (m, unixpath(self.deps[m]["INSTALL_DIR"])))
 
-        configure.add_env("CC", os.path.join(unixpath(self.deps["base_gcc"]["INSTALL_DIR"]), "bin", "gcc"))
+        if self.env.host.os.name != "windows":
+            # We build on windows using the msys2 gcc compiler for now.
+            configure.add_env("CC", unixpath(os.path.join(unixpath(self.deps["base_gcc"]["INSTALL_DIR"]), "bin", "gcc")))
 
         configure()
 

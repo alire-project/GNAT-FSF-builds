@@ -52,11 +52,11 @@ class GCC(spec("gh-artifact")):
     @property
     def enable_languages(self):
         if self.bootstrap:
-            return ["c"]
+            return ["c", "lto"]
         elif not self.env.target.os.is_bareboard:
-            return ["c", "ada", "c++"]
+            return ["c", "ada", "c++", "lto"]
         else:
-            return ["c", "ada"]
+            return ["c", "ada", "lto"]
 
     @property
     def build_deps(self):
